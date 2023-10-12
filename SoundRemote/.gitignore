@@ -1,0 +1,8 @@
+# Build results
+x64/
+
+# User specific files
+*.user
+
+# Visual C++ cache
+*.aps
