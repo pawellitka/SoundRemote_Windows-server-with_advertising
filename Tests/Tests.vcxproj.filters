@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="EncoderOpusTest.cpp" />
+    <ClCompile Include="KeystrokeTest.cpp" />
+    <ClCompile Include="pch.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\lib\native\src\gmock\gmock-all.cc">
+      <Filter>gtest Package Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\lib\native\src\gtest\gtest-all.cc">
+      <Filter>gtest Package Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\packages\gmock.1.11.0\lib\native\src\gtest\src\gtest_main.cc">
+      <Filter>gtest Package Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="pch.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="gtest Package Files">
+      <UniqueIdentifier>{f58def6f-26f7-414c-a9f0-ffc861515233}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config">
+      <Filter>gtest Package Files</Filter>
+    </None>
+  </ItemGroup>
+</Project>
