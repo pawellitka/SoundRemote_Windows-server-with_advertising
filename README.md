@@ -7,7 +7,11 @@ Desktop app that pairs up with Android device via [SoundRemote client](https://g
 
 ## Build
 Prerequisites:
-1. [Opus audio codec](https://github.com/xiph/opus) library.
+ - Microsoft Visual Studio 2022.
+ - [Opus audio codec](https://github.com/xiph/opus) library.
 Build `opus.lib` and put it in `$(SolutionDir)\lib\opus\x64` or `$(SolutionDir)\lib\opus\Win32`.
-1. [Boost](https://www.boost.org/) has to be accessible by `BOOST_ROOT` environment variable.
+ - [Boost](https://www.boost.org/) has to be accessible by `BOOST_ROOT` environment variable.
 It must point to the Boost root directory, for example `C:\Program Files\boost\boost_1_82_0`.
+
+## Testing
+Tests are implemented with GoogleTest. To run tests install the [gmock](https://www.nuget.org/packages/gmock/) NuGet package from Google.
