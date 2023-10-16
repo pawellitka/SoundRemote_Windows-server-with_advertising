@@ -29,4 +29,7 @@ private:
 	std::size_t frameSize_;
 	// Bytes per input packet for 16 bit sample size
 	std::size_t inputPacketSize_;
+
+	EncoderOpus(const EncoderOpus&) = delete;
+	EncoderOpus& operator= (const EncoderOpus&) = delete;
 };
