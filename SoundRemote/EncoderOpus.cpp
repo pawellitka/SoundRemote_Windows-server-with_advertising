@@ -4,37 +4,17 @@
 #include <opus/opus.h>
 
 #include "Util.h"
-#include "AudioUtil.h"
 #include "EncoderOpus.h"
 
-namespace {
-    bool isFormatSupported(const Audio::Format& format) {
-        std::set<int> sampleRates{ 8000, 12000, 16000, 24000, 48000 };
-        if (sampleRates.find(format.sampleRate) == sampleRates.end())
-            return false;
-        if (format.channelCount > 2 || format.channelCount < 1)
-            return false;
-        if (format.sampleType != Audio::SampleType::SignedInt)
-            return false;
-        if (format.sampleSize != 16)
-            return false;
-        if (format.byteOrder != Util::Endian::Little)
-            return false;
-        return true;
-    }
-}
+EncoderOpus::EncoderOpus(Audio::Opus::SampleRate fs, Audio::Opus::Channels channels) {
+    int sampleRate = static_cast<int>(fs);
+    int channelCount = static_cast<int>(channels);
 
-EncoderOpus::EncoderOpus(Audio::Format format) {
-    if (!isFormatSupported(format)) {
-        Audio::processError(0, Audio::Location::ENCODER_UNSUPPORTED_FORMAT);
-    }
-    // Number of samples per frame
-    frameSize_ = Audio::Opus::FRAME_LENGTH * format.sampleRate / 1000;
-    // Bytes per input packet
-    inputPacketSize_ = frameSize_ * format.channelCount * format.sampleSize / 8;
+    frameSize_ = Audio::Opus::FRAME_LENGTH * sampleRate / 1000;
+    inputPacketSize_ = frameSize_ * channelCount * sizeof(opus_int16);
 
     int error;
-    encoder_ = encoder_ptr(opus_encoder_create(format.sampleRate, format.channelCount, OPUS_APPLICATION_AUDIO, &error), EncoderDeleter());
+    encoder_ = encoder_ptr(opus_encoder_create(sampleRate, channelCount, OPUS_APPLICATION_AUDIO, &error), EncoderDeleter());
     if (OPUS_OK != error || nullptr == encoder_) {
         Audio::processError(error, Audio::Location::ENCODER_CREATE);
     }
