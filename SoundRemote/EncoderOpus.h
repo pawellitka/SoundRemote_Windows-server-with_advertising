@@ -1,5 +1,7 @@
 #pragma once
 
+#include "AudioUtil.h"
+
 struct OpusEncoder;
 
 struct EncoderDeleter {

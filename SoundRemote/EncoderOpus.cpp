@@ -4,7 +4,6 @@
 #include <opus/opus.h>
 
 #include "Util.h"
-#include "AudioUtil.h"
 #include "EncoderOpus.h"
 
 namespace {
