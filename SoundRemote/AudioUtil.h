@@ -27,6 +27,10 @@ namespace Audio {
 	constexpr auto DEFAULT_CAPTURE_DEVICE_ID = -2;
 
 	namespace Opus {
+		// Supported sample rates
+		enum class SampleRate { _8k = 8000, _12k = 12000, _16k = 16000, _24k = 24000, _48k = 48000 };
+		// Supported channels
+		enum class Channels { mono = 1, stereo = 2 };
 		// Bitrate for the Opus encoder.
 		constexpr int BITRATE = 192000;
 		// Opus frame length in ms. Opus can encode frames of 2.5, 5, 10, 20, 40, or 60 ms. This value determines Opus frame size.
