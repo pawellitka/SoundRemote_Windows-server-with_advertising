@@ -27,10 +27,8 @@ EncoderOpus::EncoderOpus(Audio::Opus::SampleRate fs, Audio::Opus::Channels chann
     int sampleRate = static_cast<int>(fs);
     int channelCount = static_cast<int>(channels);
 
-    // Number of samples per frame
     frameSize_ = Audio::Opus::FRAME_LENGTH * sampleRate / 1000;
-    // Bytes per input packet for 16 bit sample
-    inputPacketSize_ = frameSize_ * channelCount * 16 / 8;
+    inputPacketSize_ = frameSize_ * channelCount * sizeof(opus_int16);
 
     int error;
     encoder_ = encoder_ptr(opus_encoder_create(sampleRate, channelCount, OPUS_APPLICATION_AUDIO, &error), EncoderDeleter());
