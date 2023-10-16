@@ -6,23 +6,6 @@
 #include "Util.h"
 #include "EncoderOpus.h"
 
-namespace {
-    bool isFormatSupported(const Audio::Format& format) {
-        std::set<int> sampleRates{ 8000, 12000, 16000, 24000, 48000 };
-        if (sampleRates.find(format.sampleRate) == sampleRates.end())
-            return false;
-        if (format.channelCount > 2 || format.channelCount < 1)
-            return false;
-        if (format.sampleType != Audio::SampleType::SignedInt)
-            return false;
-        if (format.sampleSize != 16)
-            return false;
-        if (format.byteOrder != Util::Endian::Little)
-            return false;
-        return true;
-    }
-}
-
 EncoderOpus::EncoderOpus(Audio::Opus::SampleRate fs, Audio::Opus::Channels channels) {
     int sampleRate = static_cast<int>(fs);
     int channelCount = static_cast<int>(channels);
