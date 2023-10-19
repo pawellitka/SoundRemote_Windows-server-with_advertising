@@ -14,6 +14,7 @@ public:
 	~CapturePipe();
 	void start();
 	float getPeakValue() const;
+	void setMuted(bool muted);
 private:
 	// Capturing coroutine
 	task process();

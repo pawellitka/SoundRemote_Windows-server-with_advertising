@@ -58,6 +58,10 @@ float CapturePipe::getPeakValue() const {
     return audioCapture_->getPeakValue();
 }
 
+void CapturePipe::setMuted(bool muted) {
+    muted_ = muted;
+}
+
 task CapturePipe::process() {
     //throw std::runtime_error("CapturePipe::process start");
     auto audioCapture = audioCapture_->capture();
