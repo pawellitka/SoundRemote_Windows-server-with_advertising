@@ -332,11 +332,19 @@ void SoundRemoteApp::initInterface(HWND hWndParent) {
         addressButtonX, addressButtonY, addressButtonW, addressButtonH, hWndParent, NULL, hInst_, NULL);
     setTooltip(addressButton_, sServerAddresses_.data(), hWndParent);
 
+// Mute button
+    const int muteButtonX = addressButtonX;
+    const int muteButtonY = windowH - rightBlockW - padding;
+    const int muteButtonW = rightBlockW;
+    const int muteButtonH = rightBlockW;
+    muteButton_ = CreateWindowW(WC_BUTTON, L"M", WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_FLAT | BS_AUTOCHECKBOX | BS_PUSHLIKE,
+        muteButtonX, muteButtonY, muteButtonW, muteButtonH, hWndParent, NULL, hInst_, NULL);
+
 // Peak meter
     const int peakMeterX = addressButtonX;
     const int peakMeterY = addressButtonY + addressButtonH + padding;
     const int peakMeterW = rightBlockW;
-    const int peakMeterH = windowH - peakMeterY - padding;
+    const int peakMeterH = muteButtonY - peakMeterY - padding;
     peakMeterProgress_ = CreateWindowW(PROGRESS_CLASS, (LPCWSTR)NULL, WS_CHILD | WS_VISIBLE | PBS_VERTICAL | PBS_SMOOTH,
         peakMeterX, peakMeterY, peakMeterW, peakMeterH, hWndParent, NULL, hInst_, NULL);
 }

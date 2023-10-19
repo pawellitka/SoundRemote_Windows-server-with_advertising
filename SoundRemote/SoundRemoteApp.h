@@ -31,6 +31,7 @@ private:
 	HWND deviceComboBox_ = nullptr;
 	HWND clientsList_ = nullptr;
 	HWND addressButton_ = nullptr;
+	HWND muteButton_ = nullptr;
 	HWND peakMeterProgress_ = nullptr;
 	HWND keystrokes_ = nullptr;
 	// Data
