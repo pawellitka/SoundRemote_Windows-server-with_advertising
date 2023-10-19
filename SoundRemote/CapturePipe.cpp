@@ -33,8 +33,8 @@ struct task {
     //task(const task&) = delete;
 };
 
-CapturePipe::CapturePipe(const std::wstring& deviceId, std::shared_ptr<Server> server, boost::asio::io_context& ioContext):
-    device_(deviceId), server_(server), io_context_(ioContext) {
+CapturePipe::CapturePipe(const std::wstring& deviceId, std::shared_ptr<Server> server, boost::asio::io_context& ioContext, bool muted):
+    device_(deviceId), server_(server), io_context_(ioContext), muted_(muted) {
     //throw std::runtime_error("CapturePipe::ctr");
     Audio::Format requestedFormat;
     audioCapture_ = std::make_unique<AudioCapture>(deviceId, requestedFormat, ioContext);
