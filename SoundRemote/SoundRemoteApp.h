@@ -83,6 +83,7 @@ private:
 	void onDeviceSelect();
 	void onClientListUpdate(std::forward_list<std::string> clients);
 	void onAddressButtonClick() const;
+	void onMuteButtonClick() const;
 	void updatePeakMeter();
 	void onReceiveKeystroke(const Keystroke& keystroke);
 

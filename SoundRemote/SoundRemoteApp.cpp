@@ -224,6 +224,11 @@ void SoundRemoteApp::onAddressButtonClick() const {
     Util::showInfo(addressesStr, sServerAddresses_);
 }
 
+void SoundRemoteApp::onMuteButtonClick() const {
+    const bool muteState = Button_GetCheck(muteButton_) == BST_CHECKED;
+    capturePipe_->setMuted(muteState);
+}
+
 void SoundRemoteApp::updatePeakMeter() {
     if (capturePipe_) {
         auto peakValue = capturePipe_->getPeakValue();
@@ -484,6 +489,7 @@ LRESULT SoundRemoteApp::wndProc(UINT message, WPARAM wParam, LPARAM lParam) {
                 break;
             }
         } else {    // If Control
+            const HWND controlHandle = reinterpret_cast<HWND>(lParam);
             switch (wmType)
             {
             case CBN_SELCHANGE: {
@@ -492,8 +498,10 @@ LRESULT SoundRemoteApp::wndProc(UINT message, WPARAM wParam, LPARAM lParam) {
             }
             break;
             case BN_CLICKED: {
-                if (addressButton_ == reinterpret_cast<HWND>(lParam)) {
+                if (addressButton_ == controlHandle) {
                     onAddressButtonClick();
+                } if (muteButton_ == controlHandle) {
+                    onMuteButtonClick();
                 } else {
                     wasHandled = false;
                 }
