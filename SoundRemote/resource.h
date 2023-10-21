@@ -15,6 +15,7 @@
 #define IDS_CLIENTS                     107
 #define IDS_KEYSTROKES                  108
 #define IDC_SOUNDREMOTE                 109
+#define IDS_MUTE                        110
 #define IDR_MAINFRAME                   128
 #define IDI_SOUND_ON                    131
 #define IDI_SOUND_OFF                   132
