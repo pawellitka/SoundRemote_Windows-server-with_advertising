@@ -72,6 +72,9 @@
     <ClInclude Include="SettingsImpl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Controls.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SoundRemoteApp.cpp">
@@ -110,6 +113,9 @@
     <ClCompile Include="SettingsImpl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Controls.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SoundRemote.rc">
@@ -118,6 +124,12 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="SoundRemote.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\sound_on.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\sound_off.ico">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

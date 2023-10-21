@@ -26,6 +26,7 @@ private:
 	std::wstring sDefaultCaptureDevice_;			// default capture device description
 	std::wstring sClients_;							// clients label
 	std::wstring sKeystrokes_;						// keystrokes label
+	std::wstring muteButtonText;					// mute button text
 	// Controls
 	HWND mainWindow_ = nullptr;
 	HWND deviceComboBox_ = nullptr;
@@ -33,6 +34,7 @@ private:
 	HWND addressButton_ = nullptr;
 	HWND peakMeterProgress_ = nullptr;
 	HWND keystrokes_ = nullptr;
+	std::unique_ptr<MuteButton> muteButton_;
 	// Data
 	std::wstring currentDeviceId_;
 	std::unordered_map<int, std::wstring> deviceIds_;	// <Number stored as data in CombBox items, Device id string>

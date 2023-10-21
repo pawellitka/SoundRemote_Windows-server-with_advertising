@@ -174,6 +174,7 @@
     <ClInclude Include="AudioResampler.h" />
     <ClInclude Include="AudioUtil.h" />
     <ClInclude Include="CapturePipe.h" />
+    <ClInclude Include="Controls.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Keystroke.h" />
     <ClInclude Include="NetUtil.h" />
@@ -191,6 +192,7 @@
     <ClCompile Include="AudioResampler.cpp" />
     <ClCompile Include="AudioUtil.cpp" />
     <ClCompile Include="CapturePipe.cpp" />
+    <ClCompile Include="Controls.cpp" />
     <ClCompile Include="Keystroke.cpp" />
     <ClCompile Include="NetUtil.cpp" />
     <ClCompile Include="EncoderOpus.cpp" />
@@ -204,6 +206,8 @@
     <ResourceCompile Include="SoundRemote.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="resources\sound_off.ico" />
+    <Image Include="resources\sound_on.ico" />
     <Image Include="SoundRemote.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

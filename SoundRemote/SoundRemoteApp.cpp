@@ -19,6 +19,7 @@ processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #include "NetUtil.h"
 #include "Server.h"
 #include "SettingsImpl.h"
+#include "Controls.h"
 
 #include "SoundRemoteApp.h"
 
@@ -328,15 +329,20 @@ void SoundRemoteApp::initInterface(HWND hWndParent) {
     const int addressButtonY = deviceComboRect.bottom + padding;
     const int addressButtonW = rightBlockW;
     const int addressButtonH = rightBlockW;
-    addressButton_ = CreateWindowW(WC_BUTTON, L"IP", WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_FLAT,
+    addressButton_ = CreateWindowW(WC_BUTTON, L"IP", WS_CHILD | WS_VISIBLE | WS_TABSTOP,
         addressButtonX, addressButtonY, addressButtonW, addressButtonH, hWndParent, NULL, hInst_, NULL);
     setTooltip(addressButton_, sServerAddresses_.data(), hWndParent);
+
+// Mute button
+    Rect muteButtonRect = Rect(addressButtonX, windowH - rightBlockW - padding, rightBlockW, rightBlockW);
+    muteButton_ = std::make_unique<MuteButton>(hWndParent, muteButtonRect, muteButtonText);
+    muteButton_->setStateCallback([&](bool v) { capturePipe_->setMuted(v); });
 
 // Peak meter
     const int peakMeterX = addressButtonX;
     const int peakMeterY = addressButtonY + addressButtonH + padding;
     const int peakMeterW = rightBlockW;
-    const int peakMeterH = windowH - peakMeterY - padding;
+    const int peakMeterH = muteButtonRect.y - peakMeterY - padding;
     peakMeterProgress_ = CreateWindowW(PROGRESS_CLASS, (LPCWSTR)NULL, WS_CHILD | WS_VISIBLE | PBS_VERTICAL | PBS_SMOOTH,
         peakMeterX, peakMeterY, peakMeterW, peakMeterH, hWndParent, NULL, hInst_, NULL);
 }
@@ -375,6 +381,7 @@ void SoundRemoteApp::initStrings() {
     sDefaultCaptureDevice_ = loadStringResource(IDS_DEFAULT_CAPTURE);
     sClients_ = loadStringResource(IDS_CLIENTS);
     sKeystrokes_ = loadStringResource(IDS_KEYSTROKES);
+    muteButtonText = loadStringResource(IDS_MUTE);
 }
 
 //
@@ -476,6 +483,7 @@ LRESULT SoundRemoteApp::wndProc(UINT message, WPARAM wParam, LPARAM lParam) {
                 break;
             }
         } else {    // If Control
+            const HWND controlHandle = reinterpret_cast<HWND>(lParam);
             switch (wmType)
             {
             case CBN_SELCHANGE: {
@@ -484,8 +492,10 @@ LRESULT SoundRemoteApp::wndProc(UINT message, WPARAM wParam, LPARAM lParam) {
             }
             break;
             case BN_CLICKED: {
-                if (addressButton_ == reinterpret_cast<HWND>(lParam)) {
+                if (addressButton_ == controlHandle) {
                     onAddressButtonClick();
+                } if (muteButton_->handle() == controlHandle) {
+                    muteButton_->onClick();
                 } else {
                     wasHandled = false;
                 }

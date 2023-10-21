@@ -33,8 +33,8 @@ struct task {
     //task(const task&) = delete;
 };
 
-CapturePipe::CapturePipe(const std::wstring& deviceId, std::shared_ptr<Server> server, boost::asio::io_context& ioContext):
-    device_(deviceId), server_(server), io_context_(ioContext) {
+CapturePipe::CapturePipe(const std::wstring& deviceId, std::shared_ptr<Server> server, boost::asio::io_context& ioContext, bool muted):
+    device_(deviceId), server_(server), io_context_(ioContext), muted_(muted) {
     //throw std::runtime_error("CapturePipe::ctr");
     Audio::Format requestedFormat;
     audioCapture_ = std::make_unique<AudioCapture>(deviceId, requestedFormat, ioContext);
@@ -58,14 +58,20 @@ float CapturePipe::getPeakValue() const {
     return audioCapture_->getPeakValue();
 }
 
+void CapturePipe::setMuted(bool muted) {
+    muted_ = muted;
+}
+
 task CapturePipe::process() {
     //throw std::runtime_error("CapturePipe::process start");
     auto audioCapture = audioCapture_->capture();
     for (;;) {
         auto capturedAudio = co_await audioCapture;
-        auto server = server_.lock();
-        if (server && server->hasClients()) {
-            processAudio(capturedAudio, server);
+        if (!muted_) {
+            auto server = server_.lock();
+            if (server && server->hasClients()) {
+                processAudio(capturedAudio, server);
+            }
         }
         //throw std::runtime_error("CapturePipe::process loop");
         audioCapture.h_();

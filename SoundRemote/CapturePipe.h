@@ -10,10 +10,11 @@ struct task;
 
 class CapturePipe {
 public:
-	CapturePipe(const std::wstring& deviceId, std::shared_ptr<Server> server, boost::asio::io_context& io_context);
+	CapturePipe(const std::wstring& deviceId, std::shared_ptr<Server> server, boost::asio::io_context& io_context, bool muted = false);
 	~CapturePipe();
 	void start();
 	float getPeakValue() const;
+	void setMuted(bool muted);
 private:
 	// Capturing coroutine
 	task process();
@@ -29,4 +30,5 @@ private:
 	std::weak_ptr<Server> server_;
 	const std::wstring device_;
 	boost::asio::streambuf pcmAudioBuffer_;
+	std::atomic_bool muted_ = false;
 };
