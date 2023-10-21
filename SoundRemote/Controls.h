@@ -4,7 +4,7 @@ struct Rect;
 
 class MuteButton {
 public:
-	MuteButton(HWND hParent, const Rect& rect);
+	MuteButton(HWND hParent, const Rect& rect, const std::wstring& name);
     void onClick();
     HWND handle() const;
     void setStateCallback(std::function<void(bool)> callback);

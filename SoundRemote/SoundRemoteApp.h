@@ -26,6 +26,7 @@ private:
 	std::wstring sDefaultCaptureDevice_;			// default capture device description
 	std::wstring sClients_;							// clients label
 	std::wstring sKeystrokes_;						// keystrokes label
+	std::wstring muteButtonText;					// mute button text
 	// Controls
 	HWND mainWindow_ = nullptr;
 	HWND deviceComboBox_ = nullptr;

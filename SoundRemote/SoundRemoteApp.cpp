@@ -335,7 +335,7 @@ void SoundRemoteApp::initInterface(HWND hWndParent) {
 
 // Mute button
     Rect muteButtonRect = Rect(addressButtonX, windowH - rightBlockW - padding, rightBlockW, rightBlockW);
-    muteButton_ = std::make_unique<MuteButton>(hWndParent, muteButtonRect);
+    muteButton_ = std::make_unique<MuteButton>(hWndParent, muteButtonRect, muteButtonText);
     muteButton_->setStateCallback([&](bool v) { capturePipe_->setMuted(v); });
 
 // Peak meter
@@ -381,6 +381,7 @@ void SoundRemoteApp::initStrings() {
     sDefaultCaptureDevice_ = loadStringResource(IDS_DEFAULT_CAPTURE);
     sClients_ = loadStringResource(IDS_CLIENTS);
     sKeystrokes_ = loadStringResource(IDS_KEYSTROKES);
+    muteButtonText = loadStringResource(IDS_MUTE);
 }
 
 //
