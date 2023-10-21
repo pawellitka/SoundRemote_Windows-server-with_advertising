@@ -31,9 +31,9 @@ private:
 	HWND deviceComboBox_ = nullptr;
 	HWND clientsList_ = nullptr;
 	HWND addressButton_ = nullptr;
-	HWND muteButton_ = nullptr;
 	HWND peakMeterProgress_ = nullptr;
 	HWND keystrokes_ = nullptr;
+	std::unique_ptr<MuteButton> muteButton_;
 	// Data
 	std::wstring currentDeviceId_;
 	std::unordered_map<int, std::wstring> deviceIds_;	// <Number stored as data in CombBox items, Device id string>
@@ -83,7 +83,6 @@ private:
 	void onDeviceSelect();
 	void onClientListUpdate(std::forward_list<std::string> clients);
 	void onAddressButtonClick() const;
-	void onMuteButtonClick() const;
 	void updatePeakMeter();
 	void onReceiveKeystroke(const Keystroke& keystroke);
 

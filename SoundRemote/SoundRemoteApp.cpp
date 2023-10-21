@@ -19,6 +19,7 @@ processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #include "NetUtil.h"
 #include "Server.h"
 #include "SettingsImpl.h"
+#include "Controls.h"
 
 #include "SoundRemoteApp.h"
 
@@ -224,11 +225,6 @@ void SoundRemoteApp::onAddressButtonClick() const {
     Util::showInfo(addressesStr, sServerAddresses_);
 }
 
-void SoundRemoteApp::onMuteButtonClick() const {
-    const bool muteState = Button_GetCheck(muteButton_) == BST_CHECKED;
-    capturePipe_->setMuted(muteState);
-}
-
 void SoundRemoteApp::updatePeakMeter() {
     if (capturePipe_) {
         auto peakValue = capturePipe_->getPeakValue();
@@ -338,18 +334,15 @@ void SoundRemoteApp::initInterface(HWND hWndParent) {
     setTooltip(addressButton_, sServerAddresses_.data(), hWndParent);
 
 // Mute button
-    const int muteButtonX = addressButtonX;
-    const int muteButtonY = windowH - rightBlockW - padding;
-    const int muteButtonW = rightBlockW;
-    const int muteButtonH = rightBlockW;
-    muteButton_ = CreateWindowW(WC_BUTTON, L"M", WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_FLAT | BS_AUTOCHECKBOX | BS_PUSHLIKE,
-        muteButtonX, muteButtonY, muteButtonW, muteButtonH, hWndParent, NULL, hInst_, NULL);
+    Rect muteButtonRect = Rect(addressButtonX, windowH - rightBlockW - padding, rightBlockW, rightBlockW);
+    muteButton_ = std::make_unique<MuteButton>(hWndParent, muteButtonRect);
+    muteButton_->setStateCallback([&](bool v) { capturePipe_->setMuted(v); });
 
 // Peak meter
     const int peakMeterX = addressButtonX;
     const int peakMeterY = addressButtonY + addressButtonH + padding;
     const int peakMeterW = rightBlockW;
-    const int peakMeterH = muteButtonY - peakMeterY - padding;
+    const int peakMeterH = muteButtonRect.y - peakMeterY - padding;
     peakMeterProgress_ = CreateWindowW(PROGRESS_CLASS, (LPCWSTR)NULL, WS_CHILD | WS_VISIBLE | PBS_VERTICAL | PBS_SMOOTH,
         peakMeterX, peakMeterY, peakMeterW, peakMeterH, hWndParent, NULL, hInst_, NULL);
 }
@@ -500,8 +493,8 @@ LRESULT SoundRemoteApp::wndProc(UINT message, WPARAM wParam, LPARAM lParam) {
             case BN_CLICKED: {
                 if (addressButton_ == controlHandle) {
                     onAddressButtonClick();
-                } if (muteButton_ == controlHandle) {
-                    onMuteButtonClick();
+                } if (muteButton_->handle() == controlHandle) {
+                    muteButton_->onClick();
                 } else {
                     wasHandled = false;
                 }
