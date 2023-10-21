@@ -329,7 +329,7 @@ void SoundRemoteApp::initInterface(HWND hWndParent) {
     const int addressButtonY = deviceComboRect.bottom + padding;
     const int addressButtonW = rightBlockW;
     const int addressButtonH = rightBlockW;
-    addressButton_ = CreateWindowW(WC_BUTTON, L"IP", WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_FLAT,
+    addressButton_ = CreateWindowW(WC_BUTTON, L"IP", WS_CHILD | WS_VISIBLE | WS_TABSTOP,
         addressButtonX, addressButtonY, addressButtonW, addressButtonH, hWndParent, NULL, hInst_, NULL);
     setTooltip(addressButton_, sServerAddresses_.data(), hWndParent);
 
