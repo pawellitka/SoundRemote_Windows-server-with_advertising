@@ -170,7 +170,7 @@ HWND SoundRemoteApp::setTooltip(HWND toolWindow, PTSTR text, HWND parentWindow) 
 }
 
 std::wstring SoundRemoteApp::loadStringResource(UINT resourceId) {
-    const WCHAR* unterminatedString;
+    const WCHAR* unterminatedString = nullptr;
     const auto stringLength = LoadStringW(hInst_, resourceId, (LPWSTR)&unterminatedString, 0);
     return { unterminatedString, static_cast<size_t>(stringLength) };
 }
@@ -219,7 +219,7 @@ void SoundRemoteApp::onClientListUpdate(std::forward_list<std::string> clients) 
 void SoundRemoteApp::onAddressButtonClick() const {
     auto addresses = Net::getLocalAddresses();
     std::wstring addressesStr;
-    for (auto adr: addresses) {
+    for (auto& adr : addresses) {
         addressesStr += adr + L"\n";
     }
     Util::showInfo(addressesStr, sServerAddresses_);
@@ -390,7 +390,7 @@ void SoundRemoteApp::initStrings() {
 //  PURPOSE: Registers the window class.
 //
 ATOM SoundRemoteApp::registerClass() {
-    WNDCLASSEXW wcex;
+    WNDCLASSEXW wcex = { };
 
     wcex.cbSize = sizeof(WNDCLASSEX);
 
