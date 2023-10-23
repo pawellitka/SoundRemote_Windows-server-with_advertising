@@ -52,10 +52,6 @@ std::unique_ptr<SoundRemoteApp> SoundRemoteApp::create(_In_ HINSTANCE hInstance)
 }
 
 int SoundRemoteApp::exec(int nCmdShow) {
-    initStrings();
-    registerClass();
-
-    // Application initialization:
     if (!initInstance(nCmdShow)) {
         return 1;
     }
@@ -384,36 +380,29 @@ void SoundRemoteApp::initStrings() {
     muteButtonText = loadStringResource(IDS_MUTE);
 }
 
-//
-//  FUNCTION: registerClass()
-//
-//  PURPOSE: Registers the window class.
-//
-ATOM SoundRemoteApp::registerClass() {
-    WNDCLASSEXW wcex = { };
+bool SoundRemoteApp::initInstance(int nCmdShow) {
+    constexpr wchar_t CLASS_NAME[] = L"SOUNDREMOTE";
 
+    WNDCLASSEXW wcex = { 0 };
     wcex.cbSize = sizeof(WNDCLASSEX);
-
     wcex.style = CS_HREDRAW | CS_VREDRAW;
     wcex.lpfnWndProc = staticWndProc;
-    wcex.cbClsExtra = 0;
-    wcex.cbWndExtra = 0;
     wcex.hInstance = hInst_;
     wcex.hIcon = LoadIcon(hInst_, MAKEINTRESOURCE(IDI_SOUNDREMOTE));
     wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
     wcex.hbrBackground = (HBRUSH)(COLOR_BTNFACE + 1);
     wcex.lpszMenuName = MAKEINTRESOURCEW(IDC_SOUNDREMOTE);
-    wcex.lpszClassName = sWindowClass_.data();
+    wcex.lpszClassName = CLASS_NAME;
     wcex.hIconSm = nullptr;
+    if (RegisterClassExW(&wcex) == 0) {
+        return false;
+    }
 
-    return RegisterClassExW(&wcex);
-}
+    initStrings();
 
-bool SoundRemoteApp::initInstance(int nCmdShow) {
-    mainWindow_ = CreateWindowW(sWindowClass_.data(), sTitle_.data(), WS_OVERLAPPED | WS_SYSMENU | WS_MINIMIZEBOX,
+    mainWindow_ = CreateWindowW(CLASS_NAME, sTitle_.data(), WS_OVERLAPPED | WS_SYSMENU | WS_MINIMIZEBOX,
         CW_USEDEFAULT, 0, WINDOW_WIDTH, WINDOW_HEIGHT, nullptr, nullptr, hInst_, this);
-
-    if (!mainWindow_) {
+    if (mainWindow_ == NULL) {
         return false;
     }
 
@@ -421,8 +410,6 @@ bool SoundRemoteApp::initInstance(int nCmdShow) {
     initControls();
 
     ShowWindow(mainWindow_, nCmdShow);
-    UpdateWindow(mainWindow_);
-
     return true;
 }
 

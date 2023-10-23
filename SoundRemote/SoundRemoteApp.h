@@ -45,10 +45,9 @@ private:
 	std::unique_ptr<CapturePipe> capturePipe_;
 	std::shared_ptr<Settings> settings_;
 
-	void initStrings();
-	ATOM registerClass();
 	bool initInstance(int nCmdShow);
 	// UI related
+	void initStrings();
 	void initInterface(HWND hWndParent);
 	void initControls();
 	void startPeakMeter();
