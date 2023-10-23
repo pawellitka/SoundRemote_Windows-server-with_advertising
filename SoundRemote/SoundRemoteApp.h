@@ -19,13 +19,13 @@ private:
 
 	HINSTANCE hInst_ = nullptr;						// current instance
 	// Strings
-	std::wstring sTitle_;							// the title bar text
-	std::wstring sServerAddresses_;					// server addresses description
-	std::wstring sDefaultRenderDevice_;				// default render device description
-	std::wstring sDefaultCaptureDevice_;			// default capture device description
-	std::wstring sClients_;							// clients label
-	std::wstring sKeystrokes_;						// keystrokes label
-	std::wstring muteButtonText;					// mute button text
+	std::wstring mainWindowTitle_;
+	std::wstring serverAddressesLabel_;
+	std::wstring defaultRenderDeviceLabel_;
+	std::wstring defaultCaptureDeviceLabel_;
+	std::wstring clientListLabel_;
+	std::wstring keystrokeListLabel_;
+	std::wstring muteButtonText_;
 	// Controls
 	HWND mainWindow_ = nullptr;
 	HWND deviceComboBox_ = nullptr;

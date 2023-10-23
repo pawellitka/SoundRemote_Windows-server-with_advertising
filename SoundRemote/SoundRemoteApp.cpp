@@ -120,10 +120,10 @@ void SoundRemoteApp::addDefaultDevice(HWND comboBox, EDataFlow flow) {
 
     int newItemIndex, deviceId;
     if (flow == eRender) {
-        newItemIndex = ComboBox_AddString(comboBox, sDefaultRenderDevice_.data());
+        newItemIndex = ComboBox_AddString(comboBox, defaultRenderDeviceLabel_.data());
         deviceId = Audio::DEFAULT_RENDER_DEVICE_ID;
     } else {
-        newItemIndex = ComboBox_AddString(comboBox, sDefaultCaptureDevice_.data());
+        newItemIndex = ComboBox_AddString(comboBox, defaultCaptureDeviceLabel_.data());
         deviceId = Audio::DEFAULT_CAPTURE_DEVICE_ID;
     }
     ComboBox_SetItemData(comboBox, newItemIndex, (LPARAM)deviceId);
@@ -218,7 +218,7 @@ void SoundRemoteApp::onAddressButtonClick() const {
     for (auto& adr : addresses) {
         addressesStr += adr + L"\n";
     }
-    Util::showInfo(addressesStr, sServerAddresses_);
+    Util::showInfo(addressesStr, serverAddressesLabel_);
 }
 
 void SoundRemoteApp::updatePeakMeter() {
@@ -293,7 +293,7 @@ void SoundRemoteApp::initInterface(HWND hWndParent) {
     const int clientsLabelY = deviceComboRect.bottom + padding;
     const int clientsLabelW = leftBlockW;
     const int clientsLabelH = charH;
-    HWND clientsLabel = CreateWindow(WC_STATIC, sClients_.c_str(), WS_CHILD | WS_VISIBLE | SS_LEFT,
+    HWND clientsLabel = CreateWindow(WC_STATIC, clientListLabel_.c_str(), WS_CHILD | WS_VISIBLE | SS_LEFT,
         clientsLabelX, clientsLabelY, clientsLabelW, clientsLabelH, hWndParent, NULL, hInst_, NULL);
 
 // Clients
@@ -309,7 +309,7 @@ void SoundRemoteApp::initInterface(HWND hWndParent) {
     const int keystrokesLabelY = clientListY + clientListH + padding;
     const int keystrokesLabelW = leftBlockW;
     const int keystrokesLabelH = charH;
-    HWND keystrokesLabel = CreateWindow(WC_STATIC, sKeystrokes_.c_str(), WS_CHILD | WS_VISIBLE | SS_LEFT,
+    HWND keystrokesLabel = CreateWindow(WC_STATIC, keystrokeListLabel_.c_str(), WS_CHILD | WS_VISIBLE | SS_LEFT,
         keystrokesLabelX, keystrokesLabelY, keystrokesLabelW, keystrokesLabelH, hWndParent, NULL, hInst_, NULL);
 
 // Keystrokes
@@ -327,11 +327,11 @@ void SoundRemoteApp::initInterface(HWND hWndParent) {
     const int addressButtonH = rightBlockW;
     addressButton_ = CreateWindowW(WC_BUTTON, L"IP", WS_CHILD | WS_VISIBLE | WS_TABSTOP,
         addressButtonX, addressButtonY, addressButtonW, addressButtonH, hWndParent, NULL, hInst_, NULL);
-    setTooltip(addressButton_, sServerAddresses_.data(), hWndParent);
+    setTooltip(addressButton_, serverAddressesLabel_.data(), hWndParent);
 
 // Mute button
     Rect muteButtonRect = Rect(addressButtonX, windowH - rightBlockW - padding, rightBlockW, rightBlockW);
-    muteButton_ = std::make_unique<MuteButton>(hWndParent, muteButtonRect, muteButtonText);
+    muteButton_ = std::make_unique<MuteButton>(hWndParent, muteButtonRect, muteButtonText_);
     muteButton_->setStateCallback([&](bool v) { capturePipe_->setMuted(v); });
 
 // Peak meter
@@ -370,13 +370,13 @@ void SoundRemoteApp::initSettings() {
 }
 
 void SoundRemoteApp::initStrings() {
-    sTitle_ = loadStringResource(IDS_APP_TITLE);
-    sServerAddresses_ = loadStringResource(IDS_SERVER_ADDRESSES);
-    sDefaultRenderDevice_ = loadStringResource(IDS_DEFAULT_RENDER);
-    sDefaultCaptureDevice_ = loadStringResource(IDS_DEFAULT_CAPTURE);
-    sClients_ = loadStringResource(IDS_CLIENTS);
-    sKeystrokes_ = loadStringResource(IDS_KEYSTROKES);
-    muteButtonText = loadStringResource(IDS_MUTE);
+    mainWindowTitle_ = loadStringResource(IDS_APP_TITLE);
+    serverAddressesLabel_ = loadStringResource(IDS_SERVER_ADDRESSES);
+    defaultRenderDeviceLabel_ = loadStringResource(IDS_DEFAULT_RENDER);
+    defaultCaptureDeviceLabel_ = loadStringResource(IDS_DEFAULT_CAPTURE);
+    clientListLabel_ = loadStringResource(IDS_CLIENTS);
+    keystrokeListLabel_ = loadStringResource(IDS_KEYSTROKES);
+    muteButtonText_ = loadStringResource(IDS_MUTE);
 }
 
 bool SoundRemoteApp::initInstance(int nCmdShow) {
@@ -399,7 +399,7 @@ bool SoundRemoteApp::initInstance(int nCmdShow) {
 
     initStrings();
 
-    mainWindow_ = CreateWindowW(CLASS_NAME, sTitle_.data(), WS_OVERLAPPED | WS_SYSMENU | WS_MINIMIZEBOX,
+    mainWindow_ = CreateWindowW(CLASS_NAME, mainWindowTitle_.data(), WS_OVERLAPPED | WS_SYSMENU | WS_MINIMIZEBOX,
         CW_USEDEFAULT, 0, WINDOW_WIDTH, WINDOW_HEIGHT, nullptr, nullptr, hInst_, this);
     if (mainWindow_ == NULL) {
         return false;
