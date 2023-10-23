@@ -20,7 +20,6 @@ private:
 	HINSTANCE hInst_ = nullptr;						// current instance
 	// Strings
 	std::wstring sTitle_;							// the title bar text
-	std::wstring sWindowClass_;						// the main window class name
 	std::wstring sServerAddresses_;					// server addresses description
 	std::wstring sDefaultRenderDevice_;				// default render device description
 	std::wstring sDefaultCaptureDevice_;			// default capture device description

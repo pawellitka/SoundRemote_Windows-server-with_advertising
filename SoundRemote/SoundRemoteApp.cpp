@@ -371,7 +371,6 @@ void SoundRemoteApp::initSettings() {
 
 void SoundRemoteApp::initStrings() {
     sTitle_ = loadStringResource(IDS_APP_TITLE);
-    sWindowClass_ = loadStringResource(IDC_SOUNDREMOTE);
     sServerAddresses_ = loadStringResource(IDS_SERVER_ADDRESSES);
     sDefaultRenderDevice_ = loadStringResource(IDS_DEFAULT_RENDER);
     sDefaultCaptureDevice_ = loadStringResource(IDS_DEFAULT_CAPTURE);
