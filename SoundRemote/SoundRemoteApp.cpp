@@ -461,8 +461,6 @@ LRESULT SoundRemoteApp::staticWndProc(HWND hWnd, UINT message, WPARAM wParam, LP
 }
 
 LRESULT SoundRemoteApp::wndProc(UINT message, WPARAM wParam, LPARAM lParam) {
-    bool wasHandled = true;
-    LRESULT result = 0;
     switch (message)
     {
     case WM_COMMAND:
@@ -474,62 +472,67 @@ LRESULT SoundRemoteApp::wndProc(UINT message, WPARAM wParam, LPARAM lParam) {
             {
             case IDM_ABOUT:
                 DialogBox(GetModuleHandle(nullptr), MAKEINTRESOURCE(IDD_ABOUTBOX), mainWindow_, about);
-                break;
+                return 0;
+
             case IDM_EXIT:
                 DestroyWindow(mainWindow_);
-                break;
+                return 0;
+
             default:
-                wasHandled = false;
                 break;
             }
         } else {    // If Control
-            const HWND controlHandle = reinterpret_cast<HWND>(lParam);
+            const HWND controlHwnd = reinterpret_cast<HWND>(lParam);
             switch (wmType)
             {
-            case CBN_SELCHANGE: {
+            case CBN_SELCHANGE:
                 // The only combobox is device select.
                 onDeviceSelect();
-            }
-            break;
+                return 0;
+
             case BN_CLICKED: {
-                if (addressButton_ == controlHandle) {
+                if (controlHwnd == addressButton_) {
                     onAddressButtonClick();
-                } if (muteButton_->handle() == controlHandle) {
+                    return 0;
+                }
+                if (controlHwnd == muteButton_->handle()) {
                     muteButton_->onClick();
-                } else {
-                    wasHandled = false;
+                    return 0;
                 }
             }
             break;
+
             default:    // Other controls
-                wasHandled = false;
                 break;
             }
         }
     }
     break;
+
     case WM_SYSCOMMAND:
         if (wParam == SC_CLOSE) {
             DestroyWindow(mainWindow_);
-        } else {
-            wasHandled = false;
+            return 0;
         }
     break;
+
     // Ignore WM_CLOSE because multiline edit sends it on Esc.
     case WM_CLOSE:
-    break;
+        return 0;
+
     case WM_TIMER:
     {
         switch ((int)wParam) {
         case TIMER_ID_PEAK_METER:
             updatePeakMeter();
-            break;
+            return 0;
+
         default:
-            wasHandled = false;
             break;
         }
     }
     break;
+
     case WM_PAINT:
     {
         PAINTSTRUCT ps;
@@ -537,17 +540,14 @@ LRESULT SoundRemoteApp::wndProc(UINT message, WPARAM wParam, LPARAM lParam) {
         // TODO: Add any drawing code that uses hdc here...
         EndPaint(mainWindow_, &ps);
     }
-    break;
+    return 0;
+
     case WM_DESTROY:
         PostQuitMessage(0);
-        break;
-    default:
-        wasHandled = false;
-        break;
-    }
+        return 0;
 
-    if (!wasHandled) {
-        result = DefWindowProc(mainWindow_, message, wParam, lParam);
+    default:
+        break;
     }
-    return result;
+    return DefWindowProc(mainWindow_, message, wParam, lParam);
 }
