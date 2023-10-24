@@ -130,7 +130,7 @@ void SoundRemoteApp::addDefaultDevice(HWND comboBox, EDataFlow flow) {
 }
 
 std::wstring SoundRemoteApp::getDeviceId(const int deviceIndex) const {
-    if (deviceIds_.find(deviceIndex) == deviceIds_.end()) {
+    if (!deviceIds_.contains(deviceIndex)) {
         assert(deviceIndex == Audio::DEFAULT_CAPTURE_DEVICE_ID || deviceIndex == Audio::DEFAULT_RENDER_DEVICE_ID);
         EDataFlow flow = (deviceIndex == Audio::DEFAULT_CAPTURE_DEVICE_ID) ? eCapture : eRender;
         return Audio::getDefaultDevice(flow);
