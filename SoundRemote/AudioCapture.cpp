@@ -121,35 +121,26 @@ namespace {
 AudioCapture::AudioCapture(const std::wstring& deviceId, Audio::Format requestedFormat, boost::asio::io_context& ioContext) : ioContext_(ioContext) {
     //throw Audio::Error("AudioCapture::ctor");
 
-    const CLSID CLSID_MMDeviceEnumerator = __uuidof(MMDeviceEnumerator);
-    const IID IID_IMMDeviceEnumerator = __uuidof(IMMDeviceEnumerator);
-    const IID IID_IAudioClient = __uuidof(IAudioClient);
-    const IID IID_IAudioCaptureClient = __uuidof(IAudioCaptureClient);
-    const IID IID_IAudioMeterInformation = __uuidof(IAudioMeterInformation);
-
     constexpr int REFTIMES_PER_SEC = 10'000'000;
     constexpr int REFTIMES_PER_MILLISEC = 10'000;
 
     HRESULT hr;
-    hr = CoInitializeEx(NULL, COINIT_MULTITHREADED | COINIT_DISABLE_OLE1DDE);
+    hr = CoInitializeEx(nullptr, COINIT_MULTITHREADED | COINIT_DISABLE_OLE1DDE);
     throwOnError(hr, Audio::Location::CAPTURE_COINITIALIZE);
     coUninitializer_ = std::make_unique<CoUninitializer>();
 
     CComPtr<IMMDeviceEnumerator> enumerator;
-    hr = CoCreateInstance(
-        CLSID_MMDeviceEnumerator, nullptr,
-        CLSCTX_ALL, IID_IMMDeviceEnumerator,
-        reinterpret_cast<void**>(&enumerator));
+    hr = enumerator.CoCreateInstance(__uuidof(MMDeviceEnumerator));
     throwOnError(hr, Audio::Location::CAPTURE_COCREATEINSTANCE);
 
     CComPtr<IMMDevice> device;
     hr = enumerator->GetDevice(deviceId.c_str(), &device);
     throwOnError(hr, Audio::Location::CAPTURE_GETDEVICE);
 
-    hr = device->Activate(IID_IAudioMeterInformation, CLSCTX_ALL, nullptr, reinterpret_cast<void**>(&meterInfo_));
+    hr = device->Activate(__uuidof(IAudioMeterInformation), CLSCTX_ALL, nullptr, reinterpret_cast<void**>(&meterInfo_));
     throwOnError(hr, Audio::Location::CAPTURE_ACTIVATE_METERINFO);
 
-    hr = device->Activate(IID_IAudioClient, CLSCTX_ALL, nullptr, reinterpret_cast<void**>(&audioClient_));
+    hr = device->Activate(__uuidof(IAudioClient), CLSCTX_ALL, nullptr, reinterpret_cast<void**>(&audioClient_));
     throwOnError(hr, Audio::Location::CAPTURE_ACTIVATE_AUDIOCLIENT);
 
     CComPtr<IMMEndpoint> endpoint;
@@ -165,7 +156,7 @@ AudioCapture::AudioCapture(const std::wstring& deviceId, Audio::Format requested
     if (nullptr == requestedWaveFormat_) {
         throwOnError(E_OUTOFMEMORY, Audio::Location::CAPTURE_MEMALLOC);
     }
-    WAVEFORMATEXTENSIBLE* pSupportedFormat;
+    WAVEFORMATEXTENSIBLE* pSupportedFormat = nullptr;
     hr = audioClient_->IsFormatSupported(AUDCLNT_SHAREMODE_SHARED,
         reinterpret_cast<WAVEFORMATEX*>(requestedWaveFormat_.get()),
         reinterpret_cast<WAVEFORMATEX**>(&pSupportedFormat));
@@ -216,9 +207,7 @@ AudioCapture::AudioCapture(const std::wstring& deviceId, Audio::Format requested
     hr = audioClient_->GetBufferSize(&bufferFrameCount);
     throwOnError(hr, Audio::Location::CAPTURE_AC_GETBUFFERSIZE);
 
-    hr = audioClient_->GetService(
-        IID_IAudioCaptureClient,
-        reinterpret_cast<void**>(&captureClient_));
+    hr = audioClient_->GetService(IID_PPV_ARGS(&captureClient_));
     throwOnError(hr, Audio::Location::CAPTURE_AC_GETSERVICE);
 
 // Calculate the actual duration of the allocated buffer.
