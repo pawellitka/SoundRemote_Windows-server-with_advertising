@@ -131,7 +131,7 @@ AudioCapture::AudioCapture(const std::wstring& deviceId, Audio::Format requested
     constexpr int REFTIMES_PER_MILLISEC = 10'000;
 
     HRESULT hr;
-    hr = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+    hr = CoInitializeEx(NULL, COINIT_MULTITHREADED | COINIT_DISABLE_OLE1DDE);
     throwOnError(hr, Audio::Location::CAPTURE_COINITIALIZE);
     coUninitializer_ = std::make_unique<CoUninitializer>();
 

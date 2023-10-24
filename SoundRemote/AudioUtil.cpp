@@ -11,7 +11,7 @@
 std::unordered_map<std::wstring, std::wstring> Audio::getEndpointDevices(const EDataFlow dataFlow) {
     HRESULT hr;
 
-    hr = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+    hr = CoInitializeEx(NULL, COINIT_MULTITHREADED | COINIT_DISABLE_OLE1DDE);
     exitOnError(hr, Location::UTIL_GETDEVICES_COINITIALIZE);
     CoUninitializer coUninitializer;
 
@@ -59,7 +59,7 @@ std::unordered_map<std::wstring, std::wstring> Audio::getEndpointDevices(const E
 std::wstring Audio::getDefaultDevice(EDataFlow flow) {
     HRESULT hr;
 
-    hr = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+    hr = CoInitializeEx(NULL, COINIT_MULTITHREADED | COINIT_DISABLE_OLE1DDE);
     exitOnError(hr, Location::UTIL_GETDEFAULTDEVICE_COINITIALIZE);
     CoUninitializer coUninitializer;
 
