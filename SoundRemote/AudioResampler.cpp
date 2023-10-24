@@ -12,16 +12,9 @@
 
 AudioResampler::AudioResampler(_In_ const WAVEFORMATEXTENSIBLE* inputFormat, _In_ const WAVEFORMATEXTENSIBLE* outputFormat, _In_ boost::asio::streambuf& outBuffer):
         outBuffer_(outBuffer) {
-    const CLSID CLSID_CResamplerMediaObject = __uuidof(CResamplerMediaObject);
-    const IID IID_IMFTransform = __uuidof(IMFTransform);
-
     HRESULT hr;
     CComPtr<IUnknown> transformUnk;
-    hr = CoCreateInstance(CLSID_CResamplerMediaObject,
-        nullptr,
-        CLSCTX_INPROC_SERVER,
-        IID_IMFTransform,
-        reinterpret_cast<void**>(&transformUnk));
+    hr = transformUnk.CoCreateInstance(__uuidof(CResamplerMediaObject));
     throwOnError(hr, Audio::Location::RESAMPLER_COCREATEINSTANCE);
 // Get resampler MFT
     hr = transformUnk->QueryInterface(IID_PPV_ARGS(&transform_));
