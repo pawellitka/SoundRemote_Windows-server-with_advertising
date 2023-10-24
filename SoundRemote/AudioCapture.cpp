@@ -235,7 +235,7 @@ PcmAudioSource AudioCapture::capture() {
     auto uncompensatedSilenceDuration = BufferDuration::zero();
     unsigned int silenceCompensationFrames = 0;
     const std::chrono::duration<double> periodSeconds = timerPeriod;
-    const unsigned int silenceBufferSize = std::round(supportedWaveFormat_->Format.nSamplesPerSec * periodSeconds.count()) *
+    const unsigned int silenceBufferSize = std::lround(supportedWaveFormat_->Format.nSamplesPerSec * periodSeconds.count()) *
         supportedWaveFormat_->Format.nBlockAlign;
     std::vector<unsigned char> silenceBuffer( silenceBufferSize );
     AwaitableTimer timer(ioContext_, timerPeriod);
