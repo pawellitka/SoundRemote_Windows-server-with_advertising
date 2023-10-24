@@ -90,7 +90,7 @@ void AudioResampler::resample(_In_ const std::span<char>& pcmAudio) {
     // If the MFT does not set one of this flags, the client must allocate the samples for the output stream.
     const bool outSampleProvided = 0 != (outStreamInfo.dwFlags & (MFT_OUTPUT_STREAM_PROVIDES_SAMPLES | MFT_OUTPUT_STREAM_CAN_PROVIDE_SAMPLES));
     if (!outSampleProvided) {
-        const DWORD outSampleBufferSize = outBufferSizeMultiplier_ * pcmAudio.size_bytes();
+        const DWORD outSampleBufferSize = static_cast<DWORD>(outBufferSizeMultiplier_ * pcmAudio.size_bytes());
         hr = MFCreateMemoryBuffer(outSampleBufferSize, &outSampleBuffer);
         throwOnError(hr, Audio::Location::RESAMPLER_CREATE_OUTPUT_BUFFER);
         hr = MFCreateSample(&outSample);
