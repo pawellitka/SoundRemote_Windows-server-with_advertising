@@ -11,15 +11,12 @@
 std::unordered_map<std::wstring, std::wstring> Audio::getEndpointDevices(const EDataFlow dataFlow) {
     HRESULT hr;
 
-    hr = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+    hr = CoInitializeEx(nullptr, COINIT_MULTITHREADED | COINIT_DISABLE_OLE1DDE);
     exitOnError(hr, Location::UTIL_GETDEVICES_COINITIALIZE);
     CoUninitializer coUninitializer;
 
     CComPtr<IMMDeviceEnumerator> enumerator;
-    hr = CoCreateInstance(
-        __uuidof(MMDeviceEnumerator), nullptr,
-        CLSCTX_ALL, __uuidof(IMMDeviceEnumerator),
-        reinterpret_cast<void**>(&enumerator));
+    hr = enumerator.CoCreateInstance(__uuidof(MMDeviceEnumerator));
     exitOnError(hr, Location::UTIL_GETDEVICES_CREATE_ENUMERATOR);
 
     CComPtr<IMMDeviceCollection> devices;
@@ -59,15 +56,12 @@ std::unordered_map<std::wstring, std::wstring> Audio::getEndpointDevices(const E
 std::wstring Audio::getDefaultDevice(EDataFlow flow) {
     HRESULT hr;
 
-    hr = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+    hr = CoInitializeEx(nullptr, COINIT_MULTITHREADED | COINIT_DISABLE_OLE1DDE);
     exitOnError(hr, Location::UTIL_GETDEFAULTDEVICE_COINITIALIZE);
     CoUninitializer coUninitializer;
 
     CComPtr<IMMDeviceEnumerator> enumerator;
-    hr = CoCreateInstance(
-        __uuidof(MMDeviceEnumerator), nullptr,
-        CLSCTX_ALL, __uuidof(IMMDeviceEnumerator),
-        reinterpret_cast<void**>(&enumerator));
+    hr = enumerator.CoCreateInstance(__uuidof(MMDeviceEnumerator));
     exitOnError(hr, Location::UTIL_GETDEFAULTDEVICE_CREATE_ENUMERATOR);
 
     CComPtr<IMMDevice> device;

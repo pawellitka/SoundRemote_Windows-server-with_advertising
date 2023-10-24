@@ -12,16 +12,9 @@
 
 AudioResampler::AudioResampler(_In_ const WAVEFORMATEXTENSIBLE* inputFormat, _In_ const WAVEFORMATEXTENSIBLE* outputFormat, _In_ boost::asio::streambuf& outBuffer):
         outBuffer_(outBuffer) {
-    const CLSID CLSID_CResamplerMediaObject = __uuidof(CResamplerMediaObject);
-    const IID IID_IMFTransform = __uuidof(IMFTransform);
-
     HRESULT hr;
     CComPtr<IUnknown> transformUnk;
-    hr = CoCreateInstance(CLSID_CResamplerMediaObject,
-        nullptr,
-        CLSCTX_INPROC_SERVER,
-        IID_IMFTransform,
-        reinterpret_cast<void**>(&transformUnk));
+    hr = transformUnk.CoCreateInstance(__uuidof(CResamplerMediaObject));
     throwOnError(hr, Audio::Location::RESAMPLER_COCREATEINSTANCE);
 // Get resampler MFT
     hr = transformUnk->QueryInterface(IID_PPV_ARGS(&transform_));
@@ -97,7 +90,7 @@ void AudioResampler::resample(_In_ const std::span<char>& pcmAudio) {
     // If the MFT does not set one of this flags, the client must allocate the samples for the output stream.
     const bool outSampleProvided = 0 != (outStreamInfo.dwFlags & (MFT_OUTPUT_STREAM_PROVIDES_SAMPLES | MFT_OUTPUT_STREAM_CAN_PROVIDE_SAMPLES));
     if (!outSampleProvided) {
-        const DWORD outSampleBufferSize = outBufferSizeMultiplier_ * pcmAudio.size_bytes();
+        const DWORD outSampleBufferSize = static_cast<DWORD>(outBufferSizeMultiplier_ * pcmAudio.size_bytes());
         hr = MFCreateMemoryBuffer(outSampleBufferSize, &outSampleBuffer);
         throwOnError(hr, Audio::Location::RESAMPLER_CREATE_OUTPUT_BUFFER);
         hr = MFCreateSample(&outSample);

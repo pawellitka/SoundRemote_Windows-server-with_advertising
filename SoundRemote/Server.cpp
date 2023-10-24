@@ -184,9 +184,9 @@ bool Server::ClientList::empty() const {
 }
 
 void Server::ClientList::keepClient(address_t clientAddress) {
-    const bool updated = clients_.find(clientAddress) == clients_.end();
+    const bool newClient = !clients_.contains(clientAddress);
     clients_[clientAddress] = std::chrono::steady_clock::now();
-    if (updated) {
+    if (newClient) {
         onUpdate();
     }
 }
