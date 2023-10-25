@@ -11,9 +11,9 @@ EncoderOpus::EncoderOpus(Audio::Bitrate bitrate, Audio::Opus::SampleRate fs, Aud
     int channelCount = static_cast<int>(channels);
 
     frameSize_ = Audio::Opus::FRAME_LENGTH * sampleRate / 1000;
-    inputPacketSize_ = frameSize_ * channelCount * sizeof(opus_int16);
+    inputPacketSize_ = frameSize_ * channelCount * 2;   // 2 - sample size in bytes
 
-    int error;
+    int error{};
     encoder_ = encoder_ptr(opus_encoder_create(sampleRate, channelCount, OPUS_APPLICATION_AUDIO, &error), EncoderDeleter());
     if (OPUS_OK != error || nullptr == encoder_) {
         Audio::processError(error, Audio::Location::ENCODER_CREATE);
@@ -25,7 +25,7 @@ EncoderOpus::EncoderOpus(Audio::Bitrate bitrate, Audio::Opus::SampleRate fs, Aud
 }
 
 int EncoderOpus::encode(const char* pcmAudio, unsigned char* encodedPacket) {
-    const opus_int32 encodeResult = opus_encode(encoder_.get(), reinterpret_cast<const opus_int16*>(pcmAudio), static_cast<int>(frameSize_),
+    const opus_int32 encodeResult = opus_encode(encoder_.get(), reinterpret_cast<const opus_int16*>(pcmAudio), frameSize_,
         encodedPacket, Audio::Opus::MAX_PACKET_SIZE);
     // If DTX is on and the return value is 2 bytes or less, then the packet does not need to be transmitted.
     if (encodeResult >= 0 && encodeResult <= 2) {
@@ -37,7 +37,7 @@ int EncoderOpus::encode(const char* pcmAudio, unsigned char* encodedPacket) {
     return encodeResult;
 }
 
-std::size_t EncoderOpus::inputLength() const {
+int EncoderOpus::inputLength() const {
     return inputPacketSize_;
 }
 

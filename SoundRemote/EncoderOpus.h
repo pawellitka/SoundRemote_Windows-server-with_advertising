@@ -22,13 +22,13 @@ public:
 	/// <returns>Encoded packet length in bytes. If the return value is 0 encoded packet does not need to be transmitted (DTX).</returns>
 	int encode(const char* pcmAudio, unsigned char* encodedPacket);
 	//Required input data length in bytes for 16 bit sample size.
-	size_t inputLength() const;
+	int inputLength() const;
 private:
 	encoder_ptr encoder_;
 	// Number of samples per frame
-	std::size_t frameSize_;
+	int frameSize_;
 	// Bytes per input packet for 16 bit sample size
-	std::size_t inputPacketSize_;
+	int inputPacketSize_;
 
 	EncoderOpus(const EncoderOpus&) = delete;
 	EncoderOpus& operator= (const EncoderOpus&) = delete;
