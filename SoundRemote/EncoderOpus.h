@@ -11,7 +11,7 @@ struct EncoderDeleter {
 class EncoderOpus {
 	using encoder_ptr = std::unique_ptr<OpusEncoder, EncoderDeleter>;
 public:
-	EncoderOpus(Audio::Opus::SampleRate sampleRate, Audio::Opus::Channels channels);
+	EncoderOpus(Audio::Bitrate bitrate, Audio::Opus::SampleRate sampleRate, Audio::Opus::Channels channels);
 
 	/// <summary>
 	/// Encodes a frame of PCM audio.

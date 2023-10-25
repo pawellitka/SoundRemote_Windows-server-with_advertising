@@ -6,7 +6,7 @@
 #include "Util.h"
 #include "EncoderOpus.h"
 
-EncoderOpus::EncoderOpus(Audio::Opus::SampleRate fs, Audio::Opus::Channels channels) {
+EncoderOpus::EncoderOpus(Audio::Bitrate bitrate, Audio::Opus::SampleRate fs, Audio::Opus::Channels channels) {
     int sampleRate = static_cast<int>(fs);
     int channelCount = static_cast<int>(channels);
 
@@ -18,7 +18,7 @@ EncoderOpus::EncoderOpus(Audio::Opus::SampleRate fs, Audio::Opus::Channels chann
     if (OPUS_OK != error || nullptr == encoder_) {
         Audio::processError(error, Audio::Location::ENCODER_CREATE);
     }
-    auto ret = opus_encoder_ctl(encoder_.get(), OPUS_SET_BITRATE(Audio::Opus::BITRATE));
+    auto ret = opus_encoder_ctl(encoder_.get(), OPUS_SET_BITRATE(static_cast<int>(bitrate)));
     if (ret != OPUS_OK) {
         Audio::processError(ret, Audio::Location::ENCODER_SET_BITRATE);
     };
