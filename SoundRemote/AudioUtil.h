@@ -40,6 +40,8 @@ namespace Audio {
 		constexpr int MAX_PACKET_SIZE = 2 * (BITRATE * FRAME_LENGTH) / (1000 * 8);
 	}
 
+	enum class Bitrate { kbps_64 = 64'000, kbps_128 = 128'000, kbps_192 = 192'000, kbps_256 = 256'000, kbps_320 = 320'000, none = 0 };
+
 	enum class SampleType {
 		Unknown = 0,
 		SignedInt = 1,
