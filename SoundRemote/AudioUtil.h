@@ -28,7 +28,7 @@ namespace Audio {
 
 	namespace Opus {
 		// Supported sample rates
-		enum class SampleRate { _8k = 8000, _12k = 12000, _16k = 16000, _24k = 24000, _48k = 48000 };
+		enum class SampleRate { khz_8 = 8'000, khz_12 = 12'000, khz_16 = 16'000, khz_24 = 24'000, khz_48 = 48'000 };
 		// Supported channels
 		enum class Channels { mono = 1, stereo = 2 };
 		// Bitrate for the Opus encoder.
