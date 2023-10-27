@@ -3,6 +3,7 @@
 #include <forward_list>
 #include <string>
 #include <cassert>
+#include <boost/asio.hpp>
 
 #include <ws2tcpip.h>
 #include <iphlpapi.h>

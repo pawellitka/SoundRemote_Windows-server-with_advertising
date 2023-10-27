@@ -32,6 +32,7 @@ namespace Net {
 			const int DATA_SIZE = sizeof key_t + sizeof mods_t;
 		}
 	}
+	using Address = boost::asio::ip::address;
 	// Default ports
 	const uint16_t DEFAULT_PORT_IN = 15711u;
 	const uint16_t DEFAULT_PORT_OUT = 15712u;
