@@ -1,12 +1,14 @@
 #pragma once
 
 #include <span>
+#include "AudioUtil.h"
 
 class AudioCapture;
 class AudioResampler;
 class EncoderOpus;
 class Server;
 struct task;
+struct ClientInfo;
 
 class CapturePipe {
 public:
@@ -15,6 +17,7 @@ public:
 	void start();
 	float getPeakValue() const;
 	void setMuted(bool muted);
+	void onClientsUpdate(std::forward_list<ClientInfo> clients);
 private:
 	// Capturing coroutine
 	task process();
@@ -31,4 +34,5 @@ private:
 	const std::wstring device_;
 	boost::asio::streambuf pcmAudioBuffer_;
 	std::atomic_bool muted_ = false;
+	std::unordered_map<Audio::Bitrate, std::unique_ptr<EncoderOpus>> encoders_;
 };

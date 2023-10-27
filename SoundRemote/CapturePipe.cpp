@@ -1,5 +1,6 @@
 #include <boost/asio.hpp>
 #include <coroutine>
+#include <unordered_set>
 
 #include "Util.h"
 #include "AudioUtil.h"
@@ -7,6 +8,7 @@
 #include "AudioResampler.h"
 #include "EncoderOpus.h"
 #include "Server.h"
+#include "Clients.h"
 #include "CapturePipe.h"
 
 struct task {
@@ -60,6 +62,31 @@ float CapturePipe::getPeakValue() const {
 
 void CapturePipe::setMuted(bool muted) {
     muted_ = muted;
+}
+
+void CapturePipe::onClientsUpdate(std::forward_list<ClientInfo> clients) {
+    std::unordered_set<Audio::Bitrate> newBitrates;
+    std::unordered_set<Audio::Bitrate> repeatingBitrates;
+    for (auto&& client : clients) {
+        if (encoders_.contains(client.bitrate)) {
+            repeatingBitrates.insert(client.bitrate);
+        } else {
+            newBitrates.insert(client.bitrate);
+        }
+    }
+
+    if (newBitrates.empty() && repeatingBitrates.size() == encoders_.size()) {
+        return;
+    }
+
+    std::erase_if(encoders_, [&](const auto& item) {
+        return !repeatingBitrates.contains(item.first);
+    });
+    for (auto&& it = newBitrates.begin(); it != newBitrates.end();) {
+        encoders_[*it] = std::make_unique<EncoderOpus>(*it, Audio::Opus::SampleRate::khz_48,
+            Audio::Opus::Channels::stereo);
+        ++it;
+    }
 }
 
 task CapturePipe::process() {

@@ -2,8 +2,6 @@
 #include <unordered_map>
 #include <boost/asio.hpp>
 
-#include "AudioUtil.h"
-#include "NetUtil.h"
 #include "Clients.h"
 
 Clients::Clients(int timeoutSeconds) : timeoutSeconds_(timeoutSeconds) {

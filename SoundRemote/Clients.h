@@ -1,5 +1,8 @@
 #pragma once
 
+#include "AudioUtil.h"
+#include "NetUtil.h"
+
 class ClientsListener;
 struct ClientInfo;
 
