@@ -44,7 +44,7 @@ private:
 };
 
 struct ClientInfo {
-	const Net::Address address;
-	const Audio::Bitrate bitrate;
+	Net::Address address;
+	Audio::Bitrate bitrate;
 	ClientInfo(Net::Address addr, Audio::Bitrate br) : address(addr), bitrate(br) {}
 };

@@ -3,6 +3,7 @@
 #include "keystroke.h"
 
 class Settings;
+struct ClientInfo;
 
 class Server {
 	using ClientsUpdateCallback = std::function<void(std::forward_list<std::string>)>;
@@ -11,6 +12,7 @@ class Server {
 public:
 	Server(boost::asio::io_context& ioContext, std::shared_ptr<Settings> settings);
 	~Server();
+	void onClientsUpdate(std::forward_list<ClientInfo> clients);
 	void sendOpusPacket(std::span<unsigned char> data);
 	void setClientListCallback(ClientsUpdateCallback callback);
 	void setKeystrokeCallback(KeystrokeCallback callback);
@@ -50,4 +52,5 @@ private:
 	boost::asio::steady_timer maintainenanceTimer_;
 	std::shared_ptr<Settings> settings_;
 	KeystrokeCallback keystrokeCallback_;
+	std::forward_list<ClientInfo> clients_;
 };

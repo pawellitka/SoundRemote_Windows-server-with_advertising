@@ -3,6 +3,7 @@
 #include "Settings.h"
 #include "NetUtil.h"
 #include "Util.h"
+#include "Clients.h"
 #include "Server.h"
 
 using boost::asio::ip::udp;
@@ -33,6 +34,10 @@ Server::~Server() {
     socketReceive_->close();
     socketSend_.shutdown(udp::socket::shutdown_send);
     socketSend_.close();
+}
+
+void Server::onClientsUpdate(std::forward_list<ClientInfo> clients) {
+    clients_ = clients;
 }
 
 void Server::sendOpusPacket(std::span<unsigned char> data) {
