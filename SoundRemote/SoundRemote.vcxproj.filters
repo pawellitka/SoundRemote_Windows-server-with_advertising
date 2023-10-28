@@ -78,6 +78,9 @@
     <ClInclude Include="Clients.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="NetDefines.h">
+      <Filter>Header Files\Network</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SoundRemoteApp.cpp">

@@ -178,6 +178,7 @@
     <ClInclude Include="Controls.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Keystroke.h" />
+    <ClInclude Include="NetDefines.h" />
     <ClInclude Include="NetUtil.h" />
     <ClInclude Include="EncoderOpus.h" />
     <ClInclude Include="Resource.h" />
