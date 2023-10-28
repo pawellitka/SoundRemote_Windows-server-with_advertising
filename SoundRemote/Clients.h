@@ -1,9 +1,8 @@
 #pragma once
 
 #include "AudioUtil.h"
-#include "NetUtil.h"
+#include "NetDefines.h"
 
-class ClientsListener;
 struct ClientInfo;
 
 class Clients {
@@ -39,7 +38,7 @@ private:
 	std::unordered_map<Net::Address, std::unique_ptr<Client>> clients_;
 	std::shared_mutex clientsMutex_;
 	std::set<Audio::Bitrate> usedBitrates_;
-	// listeners are not synchronized, modified only on program start
+	// listeners are not synchronized, they are modified only on program start
 	std::forward_list<ClientsUpdateCallback> clientsListeners_;
 	BitratesUpdateCallback bitratesListener_;
 };
