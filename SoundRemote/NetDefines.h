@@ -6,18 +6,18 @@
 namespace Net {
 	namespace Packet {
 		//Header fields
-		using Signature = uint16_t;
-		using PacketType = uint8_t;
-		using PacketSize = uint16_t;
+		using SignatureType = uint16_t;
+		using CategoryType = uint8_t;
+		using SizeType = uint16_t;
 
-		const int HEADER_SIZE = sizeof Signature + sizeof PacketType + sizeof PacketSize;
-		const int SIGNATURE_OFFSET = 0;
-		const int TYPE_OFFSET = sizeof Signature;
-		const int LEN_OFFSET = sizeof Signature + sizeof PacketType;
-		const int DATA_OFFSET = HEADER_SIZE;
+		const int headerSize = sizeof SignatureType + sizeof CategoryType + sizeof SizeType;
+		const int signatureOffset = 0;
+		const int categoryOffset = sizeof SignatureType;
+		const int sizeOffset = sizeof SignatureType + sizeof CategoryType;
+		const int dataOffset = headerSize;
 
-		const Signature PROTOCOL_SIGNATURE = 0xA571u;
-		enum Type : PacketType {
+		const SignatureType protocolSignature = 0xA571u;
+		enum Category: CategoryType {
 			Error = 0,
 			ClientKeepAlive = 0x01u,
 			ServerKeepAlive = 0x02u,
@@ -29,13 +29,13 @@ namespace Net {
 			using Key = uint32_t;
 			using Mods = uint32_t;
 
-			const int DATA_SIZE = sizeof Key + sizeof Mods;
+			const int dataSize = sizeof Key + sizeof Mods;
 		}
 	}
 	using Address = boost::asio::ip::address;
-	// Default ports
-	const uint16_t DEFAULT_PORT_IN = 15711u;
-	const uint16_t DEFAULT_PORT_OUT = 15712u;
-	// Incoming packet size limit
-	const int IN_PACKET_SIZE = 1024;
+
+	const uint16_t defaultServerPort = 15711u;
+	const uint16_t defaultClientPort = 15712u;
+
+	const int inputPacketSize = 1024;
 }

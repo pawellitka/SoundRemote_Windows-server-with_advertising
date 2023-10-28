@@ -363,8 +363,8 @@ void SoundRemoteApp::stopPeakMeter() {
 
 void SoundRemoteApp::initSettings() {
     auto settings = std::make_shared<SettingsImpl>();
-    settings->addSetting(Settings::ServerPort, Net::DEFAULT_PORT_IN);
-    settings->addSetting(Settings::ClientPort, Net::DEFAULT_PORT_OUT);
+    settings->addSetting(Settings::ServerPort, Net::defaultServerPort);
+    settings->addSetting(Settings::ClientPort, Net::defaultClientPort);
     settings->setFile("settings.ini");
     settings_ = settings;
 }

@@ -54,7 +54,7 @@ bool Server::hasClients() const {
 
 awaitable<void> Server::receive(udp::socket& socket) {
     //throw std::exception("Server::receive");
-    std::array<unsigned char, Net::IN_PACKET_SIZE> datagram;
+    std::array<unsigned char, Net::inputPacketSize> datagram;
     udp::endpoint sender;
     //Have to handle errors here or write custom completion handler for co_spawn()
     try {
@@ -86,7 +86,7 @@ bool Server::parsePacket(const std::span<unsigned char> packet) const {
     if (!Net::hasValidHeader(packet)) {
         return false;
     }
-    const auto packetType = Net::getPacketType(packet);
+    const auto packetType = Net::getPacketCategory(packet);
     switch (packetType) {
     case Net::Packet::ClientCommand: {
         const std::optional<Keystroke> keystroke = Net::getKeystroke(packet);
