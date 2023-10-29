@@ -12,7 +12,8 @@ struct ClientInfo;
 
 class CapturePipe {
 public:
-	CapturePipe(const std::wstring& deviceId, std::shared_ptr<Server> server, boost::asio::io_context& io_context, bool muted = false);
+	CapturePipe(const std::wstring& deviceId, std::shared_ptr<Server> server, boost::asio::io_context& io_context,
+		bool muted = false);
 	~CapturePipe();
 	void start();
 	float getPeakValue() const;
@@ -35,4 +36,5 @@ private:
 	boost::asio::streambuf pcmAudioBuffer_;
 	std::atomic_bool muted_ = false;
 	std::unordered_map<Audio::Bitrate, std::unique_ptr<EncoderOpus>> encoders_;
+	int opusInputSize_;
 };

@@ -45,6 +45,7 @@ CapturePipe::CapturePipe(const std::wstring& deviceId, std::shared_ptr<Server> s
         auto requestedWaveFormat = audioCapture_->requestedWaveFormat();
         audioResampler_ = std::make_unique<AudioResampler>(capturedWaveFormat, requestedWaveFormat, pcmAudioBuffer_);
     }
+    opusInputSize_ = EncoderOpus::getInputSize(EncoderOpus::getFrameSize(Audio::Opus::SampleRate::khz_48), Audio::Opus::Channels::stereo);
     encoder_ = std::make_unique<EncoderOpus>(Audio::Bitrate::kbps_192, Audio::Opus::SampleRate::khz_48, Audio::Opus::Channels::stereo);
 }
 
