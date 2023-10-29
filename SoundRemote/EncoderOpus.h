@@ -23,7 +23,10 @@ public:
 	int encode(const char* pcmAudio, unsigned char* encodedPacket);
 	//Required input data length in bytes for 16 bit sample size.
 	int inputLength() const;
+	static int getFrameSize(Audio::Opus::SampleRate sampleRate);
+	static int getInputSize(int frameSize, Audio::Opus::Channels channels);
 private:
+
 	encoder_ptr encoder_;
 	// Number of samples per frame
 	int frameSize_;

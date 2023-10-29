@@ -6,15 +6,15 @@
 #include "Util.h"
 #include "EncoderOpus.h"
 
-EncoderOpus::EncoderOpus(Audio::Bitrate bitrate, Audio::Opus::SampleRate fs, Audio::Opus::Channels channels) {
-    int sampleRate = static_cast<int>(fs);
-    int channelCount = static_cast<int>(channels);
-
-    frameSize_ = Audio::Opus::FRAME_LENGTH * sampleRate / 1000;
-    inputPacketSize_ = frameSize_ * channelCount * 2;   // 2 - sample size in bytes
+EncoderOpus::EncoderOpus(Audio::Bitrate bitrate, Audio::Opus::SampleRate sampleRate, Audio::Opus::Channels channels) {
+    frameSize_ = getFrameSize(sampleRate);
+    inputPacketSize_ = getInputSize(frameSize_, channels);
 
     int error{};
-    encoder_ = encoder_ptr(opus_encoder_create(sampleRate, channelCount, OPUS_APPLICATION_AUDIO, &error), EncoderDeleter());
+    encoder_ = encoder_ptr(
+        opus_encoder_create(static_cast<int>(sampleRate), static_cast<int>(channels), OPUS_APPLICATION_AUDIO, &error),
+        EncoderDeleter()
+    );
     if (OPUS_OK != error || nullptr == encoder_) {
         Audio::processError(error, Audio::Location::ENCODER_CREATE);
     }
@@ -39,6 +39,14 @@ int EncoderOpus::encode(const char* pcmAudio, unsigned char* encodedPacket) {
 
 int EncoderOpus::inputLength() const {
     return inputPacketSize_;
+}
+
+int EncoderOpus::getFrameSize(Audio::Opus::SampleRate sampleRate) {
+    return Audio::Opus::FRAME_LENGTH * static_cast<int>(sampleRate) / 1000;
+}
+
+int EncoderOpus::getInputSize(int frameSize, Audio::Opus::Channels channels) {
+    return frameSize * static_cast<int>(channels) * 2;   // 2 is sample size in bytes
 }
 
 //---EncoderDeleter---
