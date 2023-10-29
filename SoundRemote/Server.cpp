@@ -37,7 +37,14 @@ Server::~Server() {
 }
 
 void Server::onClientsUpdate(std::forward_list<ClientInfo> clients) {
-    clients_ = clients;
+    std::unordered_map<Audio::Bitrate, std::forward_list<Net::Address>> newClients;
+    for (auto&& client: clients) {
+        if (!newClients.contains(client.bitrate)) {
+            newClients[client.bitrate] = std::forward_list<Net::Address>();
+        }
+        newClients[client.bitrate].push_front(client.address);
+    }
+    clients_ = std::move(newClients);
 }
 
 void Server::sendOpusPacket(std::span<unsigned char> data) {

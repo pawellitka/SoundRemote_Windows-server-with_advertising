@@ -1,5 +1,6 @@
 #pragma once
 
+#include "NetDefines.h"
 #include "keystroke.h"
 
 class Settings;
@@ -52,5 +53,5 @@ private:
 	boost::asio::steady_timer maintainenanceTimer_;
 	std::shared_ptr<Settings> settings_;
 	KeystrokeCallback keystrokeCallback_;
-	std::forward_list<ClientInfo> clients_;
+	std::unordered_map<Audio::Bitrate, std::forward_list<Net::Address>> clients_;
 };
