@@ -132,6 +132,17 @@ void Server::send(std::shared_ptr<std::vector<char>> packet) {
     }
 }
 
+void Server::send(const Net::Address& address, std::shared_ptr<std::vector<char>> packet) {
+    auto destination = udp::endpoint(address, clientPort_);
+    socketSend_.async_send_to(boost::asio::buffer(packet->data(), packet->size()), destination,
+        //shared_ptr with the packet is passed to keep data alive until the handler call
+        [packet](boost::system::error_code ec, auto bytes) mutable {
+            if (ec) {
+                throw std::runtime_error(Util::contructAppExceptionText("Server send", ec.what()));
+            }
+        });
+}
+
 void Server::sendKeepAlive() {
     if (!hasClients()) { return; }
     auto packet = std::make_shared<std::vector<char>>(Net::assemblePacket(Net::Packet::ServerKeepAlive));
