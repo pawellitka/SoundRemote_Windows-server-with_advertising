@@ -47,8 +47,8 @@ void Server::onClientsUpdate(std::forward_list<ClientInfo> clients) {
     clients_ = std::move(newClients);
 }
 
-void Server::sendOpusPacket(std::span<unsigned char> data) {
-    auto opusPacket = std::make_shared<std::vector<unsigned char>>(Net::assemblePacket(Net::Packet::AudioDataOpus, data));
+void Server::sendOpusPacket(std::span<char> data) {
+    auto opusPacket = std::make_shared<std::vector<char>>(Net::assemblePacket(Net::Packet::AudioDataOpus, data));
     send(opusPacket);
 }
 
@@ -121,7 +121,7 @@ bool Server::parsePacket(const std::span<unsigned char> packet) const {
     return true;
 }
 
-void Server::send(std::shared_ptr<std::vector<unsigned char>> packet) {
+void Server::send(std::shared_ptr<std::vector<char>> packet) {
     const auto clientPort = settings_->get<int>(Settings::ClientPort);
     assert(clientPort);
     auto destination = udp::endpoint(udp::v4(), *clientPort);
@@ -139,7 +139,7 @@ void Server::send(std::shared_ptr<std::vector<unsigned char>> packet) {
 
 void Server::sendKeepAlive() {
     if (!hasClients()) { return; }
-    auto packet = std::make_shared<std::vector<unsigned char>>(Net::assemblePacket(Net::Packet::ServerKeepAlive));
+    auto packet = std::make_shared<std::vector<char>>(Net::assemblePacket(Net::Packet::ServerKeepAlive));
     send(packet);
 }
 

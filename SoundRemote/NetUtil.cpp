@@ -29,13 +29,13 @@ namespace {
 		return result;
 	}
 
-	void writeUInt16Le(uint16_t value, std::span<unsigned char> dest, size_t offset) {
+	void writeUInt16Le(uint16_t value, std::span<char> dest, size_t offset) {
 		assert((offset + 2) <= dest.size_bytes());
 		dest[offset] = value >> 0;
 		dest[offset + 1] = value >> 8;
 	}
 
-	void writeUInt8(uint8_t value, std::span<unsigned char> dest, size_t offset) {
+	void writeUInt8(uint8_t value, std::span<char> dest, size_t offset) {
 		assert((offset + 1) <= dest.size_bytes());
 		dest[offset] = value;
 	}
@@ -73,10 +73,10 @@ std::forward_list<std::wstring> Net::getLocalAddresses() {
 	return result;
 }
 
-std::vector<unsigned char> Net::assemblePacket(const Net::Packet::CategoryType category, std::span<unsigned char> packetData) {
+std::vector<char> Net::assemblePacket(const Net::Packet::CategoryType category, std::span<char> packetData) {
 	const Net::Packet::SizeType packetLen = Net::Packet::headerSize + static_cast<Net::Packet::SizeType>(packetData.size_bytes());
-	std::vector<unsigned char> result(packetLen);
-	std::span<unsigned char> resultData{ result.data(), packetLen };
+	std::vector<char> result(packetLen);
+	std::span<char> resultData{ result.data(), packetLen };
 	int offset = 0;
 	writeUInt16Le(Net::Packet::protocolSignature, resultData, Net::Packet::signatureOffset);
 	writeUInt8(category, resultData, Net::Packet::categoryOffset);

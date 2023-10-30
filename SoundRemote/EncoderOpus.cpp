@@ -24,9 +24,9 @@ EncoderOpus::EncoderOpus(Audio::Bitrate bitrate, Audio::Opus::SampleRate sampleR
     };
 }
 
-int EncoderOpus::encode(const char* pcmAudio, unsigned char* encodedPacket) {
+int EncoderOpus::encode(const char* pcmAudio, char* encodedPacket) {
     const opus_int32 encodeResult = opus_encode(encoder_.get(), reinterpret_cast<const opus_int16*>(pcmAudio), frameSize_,
-        encodedPacket, Audio::Opus::MAX_PACKET_SIZE);
+        reinterpret_cast<unsigned char*>(encodedPacket), Audio::Opus::MAX_PACKET_SIZE);
     // If DTX is on and the return value is 2 bytes or less, then the packet does not need to be transmitted.
     if (encodeResult >= 0 && encodeResult <= 2) {
         return 0;

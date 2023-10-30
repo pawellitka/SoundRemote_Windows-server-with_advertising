@@ -20,7 +20,7 @@ public:
 	/// <param name="encodedPacket">: Buffer to contain the encoded packet.
 	/// Must be at least <c>EncoderOpus::inputLength()</c> bytes size.</param>
 	/// <returns>Encoded packet length in bytes. If the return value is 0 encoded packet does not need to be transmitted (DTX).</returns>
-	int encode(const char* pcmAudio, unsigned char* encodedPacket);
+	int encode(const char* pcmAudio, char* encodedPacket);
 	//Required input data length in bytes for 16 bit sample size.
 	int inputLength() const;
 	static int getFrameSize(Audio::Opus::SampleRate sampleRate);
