@@ -15,6 +15,7 @@ public:
 	~Server();
 	void onClientsUpdate(std::forward_list<ClientInfo> clients);
 	void sendOpusPacket(std::span<char> data);
+	void sendAudio(Audio::Bitrate bitrate, std::vector<char> data);
 	void setClientListCallback(ClientsUpdateCallback callback);
 	void setKeystrokeCallback(KeystrokeCallback callback);
 	bool hasClients() const;

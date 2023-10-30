@@ -49,6 +49,19 @@ void Server::sendOpusPacket(std::span<char> data) {
     send(opusPacket);
 }
 
+void Server::sendAudio(Audio::Bitrate bitrate, std::vector<char> data) {
+    auto category = Net::Packet::AudioDataOpus;
+    if (bitrate == Audio::Bitrate::none) {
+        category = Net::Packet::AudioDataPcm;
+    }
+    auto packet = std::make_shared<std::vector<char>>(
+        Net::assemblePacket(category, { data.data(), data.size() })
+    );
+    for (auto&& address : clients_[bitrate]) {
+        send(address, packet);
+    }
+}
+
 void Server::setClientListCallback(ClientsUpdateCallback callback) {
     clientList_->setClientListCallback(callback);
 }
