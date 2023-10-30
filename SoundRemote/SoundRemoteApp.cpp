@@ -130,18 +130,18 @@ void SoundRemoteApp::addDefaultDevice(HWND comboBox, EDataFlow flow) {
     int newItemIndex, deviceId;
     if (flow == eRender) {
         newItemIndex = ComboBox_AddString(comboBox, defaultRenderDeviceLabel_.data());
-        deviceId = Audio::DEFAULT_RENDER_DEVICE_ID;
+        deviceId = Audio::defaultRenderDeviceId;
     } else {
         newItemIndex = ComboBox_AddString(comboBox, defaultCaptureDeviceLabel_.data());
-        deviceId = Audio::DEFAULT_CAPTURE_DEVICE_ID;
+        deviceId = Audio::defaultCaptureDeviceId;
     }
     ComboBox_SetItemData(comboBox, newItemIndex, (LPARAM)deviceId);
 }
 
 std::wstring SoundRemoteApp::getDeviceId(const int deviceIndex) const {
     if (!deviceIds_.contains(deviceIndex)) {
-        assert(deviceIndex == Audio::DEFAULT_CAPTURE_DEVICE_ID || deviceIndex == Audio::DEFAULT_RENDER_DEVICE_ID);
-        EDataFlow flow = (deviceIndex == Audio::DEFAULT_CAPTURE_DEVICE_ID) ? eCapture : eRender;
+        assert(deviceIndex == Audio::defaultCaptureDeviceId || deviceIndex == Audio::defaultRenderDeviceId);
+        EDataFlow flow = (deviceIndex == Audio::defaultCaptureDeviceId) ? eCapture : eRender;
         return Audio::getDefaultDevice(flow);
     }
     return deviceIds_.at(deviceIndex);
