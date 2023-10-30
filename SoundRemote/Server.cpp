@@ -13,15 +13,12 @@ using boost::asio::detached;
 using boost::asio::use_awaitable;
 using namespace std::chrono_literals;
 
-Server::Server(boost::asio::io_context& ioContext, std::shared_ptr<Settings> settings) :
-    settings_(settings),
+Server::Server(int clientPort, int serverPort, boost::asio::io_context& ioContext) :
+    clientPort_(clientPort),
     socketSend_(ioContext, udp::v4()),
     maintainenanceTimer_(ioContext) {
-
     // Create receiving socket
-    const auto serverPort = settings_->get<int>(Settings::ServerPort);
-    assert(serverPort);
-    socketReceive_ = std::make_unique<udp::socket>(ioContext, udp::endpoint(udp::v4(), *serverPort));
+    socketReceive_ = std::make_unique<udp::socket>(ioContext, udp::endpoint(udp::v4(), serverPort));
 
     //co_spawn(ioContext, receive(std::move(socket)), detached);
     clientList_ = std::make_unique<ClientList>();
@@ -122,9 +119,7 @@ bool Server::parsePacket(const std::span<unsigned char> packet) const {
 }
 
 void Server::send(std::shared_ptr<std::vector<char>> packet) {
-    const auto clientPort = settings_->get<int>(Settings::ClientPort);
-    assert(clientPort);
-    auto destination = udp::endpoint(udp::v4(), *clientPort);
+    auto destination = udp::endpoint(udp::v4(), clientPort_);
     for (const auto& clientAddress : clientList_->clients()) {
         destination.address(clientAddress);
         socketSend_.async_send_to(boost::asio::buffer(packet->data(), packet->size()), destination,

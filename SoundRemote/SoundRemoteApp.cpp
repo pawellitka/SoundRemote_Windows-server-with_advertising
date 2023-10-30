@@ -74,7 +74,16 @@ void SoundRemoteApp::run() {
     Util::setMainWindow(mainWindow_);
     initSettings();
     try {
-        server_ = std::make_shared<Server>(ioContext_, settings_);
+        const auto clientPort = settings_->get<int>(Settings::ClientPort);
+        if (!clientPort) {
+            throw std::runtime_error(Util::contructAppExceptionText("Settings", "Can't get client port"));
+        }
+        const auto serverPort = settings_->get<int>(Settings::ServerPort);
+        if (!serverPort) {
+            throw std::runtime_error(Util::contructAppExceptionText("Settings", "Can't get server port"));
+        }
+
+        server_ = std::make_shared<Server>(*clientPort, *serverPort, ioContext_);
         server_->setClientListCallback(std::bind(&SoundRemoteApp::onClientListUpdate, this, _1));
         server_->setKeystrokeCallback(std::bind(&SoundRemoteApp::onReceiveKeystroke, this, _1));
         // io_context will run as long as the server works and waiting for incoming packets.

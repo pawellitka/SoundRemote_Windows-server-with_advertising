@@ -11,7 +11,7 @@ class Server {
 	using KeystrokeCallback = std::function<void(const Keystroke& keystroke)>;
 	using address_t = boost::asio::ip::address;
 public:
-	Server(boost::asio::io_context& ioContext, std::shared_ptr<Settings> settings);
+	Server(int clientPort, int serverPort, boost::asio::io_context& ioContext);
 	~Server();
 	void onClientsUpdate(std::forward_list<ClientInfo> clients);
 	void sendOpusPacket(std::span<char> data);
@@ -51,7 +51,7 @@ private:
 	std::unique_ptr<boost::asio::ip::udp::socket> socketReceive_;
 	std::unique_ptr<ClientList> clientList_;
 	boost::asio::steady_timer maintainenanceTimer_;
-	std::shared_ptr<Settings> settings_;
+	int clientPort_;
 	KeystrokeCallback keystrokeCallback_;
 	std::unordered_map<Audio::Bitrate, std::forward_list<Net::Address>> clients_;
 };
