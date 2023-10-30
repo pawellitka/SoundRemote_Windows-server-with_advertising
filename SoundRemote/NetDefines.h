@@ -22,7 +22,8 @@ namespace Net {
 			ClientKeepAlive = 0x01u,
 			ServerKeepAlive = 0x02u,
 			ClientCommand = 0x10u,
-			AudioDataOpus = 0x20u
+			AudioDataOpus = 0x20u,
+			AudioDataPcm = 0x21u
 		};
 
 		namespace Keystroke {
