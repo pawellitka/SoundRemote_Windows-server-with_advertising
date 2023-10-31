@@ -16,19 +16,18 @@ Server::Server(int clientPort, int serverPort, boost::asio::io_context& ioContex
     clientPort_(clientPort),
     clients_(clients),
     socketSend_(ioContext, udp::v4()),
+    socketReceive_(ioContext, udp::endpoint(udp::v4(), serverPort)),
     maintainenanceTimer_(ioContext) {
-    // Create receiving socket
-    socketReceive_ = std::make_unique<udp::socket>(ioContext, udp::endpoint(udp::v4(), serverPort));
 
     //co_spawn(ioContext, receive(std::move(socket)), detached);
     clientList_ = std::make_unique<ClientList>();
-    co_spawn(ioContext, receive(*socketReceive_), detached);
+    co_spawn(ioContext, receive(socketReceive_), detached);
     startMaintenanceTimer();
 }
 
 Server::~Server() {
-    socketReceive_->shutdown(udp::socket::shutdown_receive);
-    socketReceive_->close();
+    socketReceive_.shutdown(udp::socket::shutdown_receive);
+    socketReceive_.close();
     socketSend_.shutdown(udp::socket::shutdown_send);
     socketSend_.close();
 }

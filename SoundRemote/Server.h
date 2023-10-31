@@ -51,7 +51,7 @@ private:
 	void maintain(boost::system::error_code ec);
 
 	boost::asio::ip::udp::socket socketSend_;
-	std::unique_ptr<boost::asio::ip::udp::socket> socketReceive_;
+	boost::asio::ip::udp::socket socketReceive_;
 	std::unique_ptr<ClientList> clientList_;
 	boost::asio::steady_timer maintainenanceTimer_;
 	int clientPort_;
