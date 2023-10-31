@@ -132,3 +132,28 @@ void CapturePipe::processAudio(std::span<char> pcmAudio, std::shared_ptr<Server>
 bool CapturePipe::haveClients() const {
     return !encoders_.empty();
 }
+
+void CapturePipe::process(std::span<char> pcmAudio, std::shared_ptr<Server> server) {
+    if (audioCapture_->resampleRequired()) {
+        audioResampler_->resample(pcmAudio);
+    } else {
+        pcmAudioBuffer_.sputn(pcmAudio.data(), pcmAudio.size());
+    }
+    while (pcmAudioBuffer_.data().size() >= encoder_->inputLength()) {
+        for (auto&& [bitrate, encoder] : encoders_) {
+            if (bitrate == Audio::Bitrate::none) {
+                std::vector<char> pcm(reinterpret_cast<const char*>(pcmAudioBuffer_.data().data())[0],
+                    reinterpret_cast<const char*>(pcmAudioBuffer_.data().data())[encoder_->inputLength()]);
+                server->sendAudio(bitrate, pcm);
+            } else {
+                std::vector<char> encodedPacket(Audio::Opus::maxPacketSize);
+                const auto packetSize = encoder->encode(static_cast<const char*>(pcmAudioBuffer_.data().data()), encodedPacket.data());
+                encodedPacket.resize(packetSize);
+                if (packetSize > 0) {
+                    server->sendAudio(bitrate, encodedPacket);
+                }
+            }
+        }
+        pcmAudioBuffer_.consume(encoder_->inputLength());
+    }
+}
