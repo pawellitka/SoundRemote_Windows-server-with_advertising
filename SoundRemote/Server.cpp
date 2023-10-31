@@ -180,6 +180,16 @@ void Server::maintain(boost::system::error_code ec) {
     startMaintenanceTimer();
 }
 
+void Server::keepalive() {
+    if (clientsCache_.empty()) { return; }
+    auto packet = std::make_shared<std::vector<char>>(Net::assemblePacket(Net::Packet::ServerKeepAlive));
+    for (auto&& [bitrate, addresses] : clientsCache_) {
+        for (auto&& address : addresses) {
+            send(address, packet);
+        }
+    }
+}
+
 //-------ClientList------
 
 Server::ClientList::ClientList(int clientTimeoutSeconds) :
