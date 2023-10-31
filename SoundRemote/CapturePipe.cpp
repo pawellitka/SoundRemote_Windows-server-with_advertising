@@ -97,7 +97,7 @@ task CapturePipe::process() {
         auto capturedAudio = co_await audioCapture;
         if (!muted_) {
             auto server = server_.lock();
-            if (server && server->hasClients()) {
+            if (server && haveClients()) {
                 processAudio(capturedAudio, server);
             }
         }
@@ -127,4 +127,8 @@ void CapturePipe::processAudio(std::span<char> pcmAudio, std::shared_ptr<Server>
         }
         pcmAudioBuffer_.consume(encoder_->inputLength());
     }
+}
+
+bool CapturePipe::haveClients() const {
+    return !encoders_.empty();
 }

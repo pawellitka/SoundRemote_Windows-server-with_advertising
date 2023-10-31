@@ -25,6 +25,7 @@ private:
 	// Destroys the capturing coroutine
 	void stop();
 	void processAudio(std::span<char> pcmAudio, std::shared_ptr<Server> server);
+	bool haveClients() const;
 
 	boost::asio::io_context& io_context_;
 	std::unique_ptr<task> pipeCoro_;
