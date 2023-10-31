@@ -10,6 +10,7 @@ Clients::Clients(int timeoutSeconds) : timeoutSeconds_(timeoutSeconds) {
 void Clients::add(Net::Address address, Audio::Bitrate bitrate) {
 	const std::unique_lock lock(clientsMutex_);
 	if (clients_.contains(address)) {
+		clients_[address]->updateLastContact();
 		if (clients_[address]->bitrate() == bitrate) {
 			return;
 		}

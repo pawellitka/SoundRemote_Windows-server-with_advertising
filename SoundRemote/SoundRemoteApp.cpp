@@ -88,7 +88,6 @@ void SoundRemoteApp::run() {
         clients_->addClientsListener(std::bind(&SoundRemoteApp::onClientsUpdate, this, _1));
         server_ = std::make_shared<Server>(*clientPort, *serverPort, ioContext_, clients_);
         clients_->addClientsListener(std::bind(&Server::onClientsUpdate, server_.get(), _1));
-        server_->setClientListCallback(std::bind(&SoundRemoteApp::onClientListUpdate, this, _1));
         server_->setKeystrokeCallback(std::bind(&SoundRemoteApp::onReceiveKeystroke, this, _1));
         // io_context will run as long as the server works and waiting for incoming packets.
         ioContextThread_ = std::make_unique<std::thread>(std::bind(&SoundRemoteApp::asioEventLoop, this, _1), std::ref(ioContext_));

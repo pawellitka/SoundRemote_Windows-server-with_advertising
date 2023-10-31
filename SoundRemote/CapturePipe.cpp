@@ -98,7 +98,7 @@ task CapturePipe::process() {
         if (!muted_) {
             auto server = server_.lock();
             if (server && haveClients()) {
-                processAudio(capturedAudio, server);
+                process(capturedAudio, server);
             }
         }
         //throw std::runtime_error("CapturePipe::process loop");

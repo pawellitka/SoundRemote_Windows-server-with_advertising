@@ -3,7 +3,6 @@
 #include "NetDefines.h"
 #include "keystroke.h"
 
-class Settings;
 class Clients;
 struct ClientInfo;
 

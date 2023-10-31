@@ -20,7 +20,6 @@ Server::Server(int clientPort, int serverPort, boost::asio::io_context& ioContex
     maintainenanceTimer_(ioContext) {
 
     //co_spawn(ioContext, receive(std::move(socket)), detached);
-    clientList_ = std::make_unique<ClientList>();
     co_spawn(ioContext, receive(socketReceive_), detached);
     startMaintenanceTimer();
 }
@@ -83,7 +82,7 @@ awaitable<void> Server::receive(udp::socket& socket) {
             auto nBytes = co_await socket.async_receive_from(boost::asio::buffer(datagram), sender, use_awaitable);
             const bool parseSuccess = parsePacket({ datagram.data(), nBytes });
             if (parseSuccess) {
-                clientList_->keepClient(sender.address());
+                clients_->add(sender.address(), Audio::Bitrate::kbps_192);
             }
         }
     }
@@ -174,8 +173,8 @@ void Server::maintain(boost::system::error_code ec) {
             throw std::runtime_error(Util::contructAppExceptionText("Timer maintain", ec.what()));
         }
     }
-    clientList_->maintain();
-    sendKeepAlive();
+    keepalive();
+    clients_->maintain();
 
     startMaintenanceTimer();
 }
