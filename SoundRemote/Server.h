@@ -4,6 +4,7 @@
 #include "keystroke.h"
 
 class Settings;
+class Clients;
 struct ClientInfo;
 
 class Server {
@@ -11,7 +12,7 @@ class Server {
 	using KeystrokeCallback = std::function<void(const Keystroke& keystroke)>;
 	using address_t = boost::asio::ip::address;
 public:
-	Server(int clientPort, int serverPort, boost::asio::io_context& ioContext);
+	Server(int clientPort, int serverPort, boost::asio::io_context& ioContext, std::shared_ptr<Clients> clients);
 	~Server();
 	void onClientsUpdate(std::forward_list<ClientInfo> clients);
 	void sendOpusPacket(std::span<char> data);
@@ -55,5 +56,6 @@ private:
 	boost::asio::steady_timer maintainenanceTimer_;
 	int clientPort_;
 	KeystrokeCallback keystrokeCallback_;
-	std::unordered_map<Audio::Bitrate, std::forward_list<Net::Address>> clients_;
+	std::shared_ptr<Clients> clients_;
+	std::unordered_map<Audio::Bitrate, std::forward_list<Net::Address>> clientsCache_;
 };

@@ -84,7 +84,10 @@ void SoundRemoteApp::run() {
             throw std::runtime_error(Util::contructAppExceptionText("Settings", "Can't get server port"));
         }
 
-        server_ = std::make_shared<Server>(*clientPort, *serverPort, ioContext_);
+        clients_ = std::make_shared<Clients>();
+        clients_->addClientsListener(std::bind(&SoundRemoteApp::onClientsUpdate, this, _1));
+        server_ = std::make_shared<Server>(*clientPort, *serverPort, ioContext_, clients_);
+        clients_->addClientsListener(std::bind(&Server::onClientsUpdate, server_.get(), _1));
         server_->setClientListCallback(std::bind(&SoundRemoteApp::onClientListUpdate, this, _1));
         server_->setKeystrokeCallback(std::bind(&SoundRemoteApp::onReceiveKeystroke, this, _1));
         // io_context will run as long as the server works and waiting for incoming packets.
@@ -204,6 +207,7 @@ void SoundRemoteApp::changeCaptureDevice(const std::wstring& deviceId) {
     currentDeviceId_.clear();
     stopCapture();
     capturePipe_ = std::make_unique<CapturePipe>(deviceId, server_, ioContext_);
+    clients_->addClientsListener(std::bind(&CapturePipe::onClientsUpdate, capturePipe_.get(), _1));
     currentDeviceId_ = deviceId;
     capturePipe_->start();
 }

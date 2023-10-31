@@ -43,6 +43,7 @@ private:
 	std::shared_ptr<Server> server_;
 	std::unique_ptr<CapturePipe> capturePipe_;
 	std::shared_ptr<Settings> settings_;
+	std::shared_ptr<Clients> clients_;
 
 	bool initInstance(int nCmdShow);
 	// UI related

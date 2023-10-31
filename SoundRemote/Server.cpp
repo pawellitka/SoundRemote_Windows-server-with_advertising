@@ -12,8 +12,9 @@ using boost::asio::detached;
 using boost::asio::use_awaitable;
 using namespace std::chrono_literals;
 
-Server::Server(int clientPort, int serverPort, boost::asio::io_context& ioContext) :
+Server::Server(int clientPort, int serverPort, boost::asio::io_context& ioContext, std::shared_ptr<Clients> clients) :
     clientPort_(clientPort),
+    clients_(clients),
     socketSend_(ioContext, udp::v4()),
     maintainenanceTimer_(ioContext) {
     // Create receiving socket
@@ -40,7 +41,7 @@ void Server::onClientsUpdate(std::forward_list<ClientInfo> clients) {
         }
         newClients[client.bitrate].push_front(client.address);
     }
-    clients_ = std::move(newClients);
+    clientsCache_ = std::move(newClients);
 }
 
 void Server::sendOpusPacket(std::span<char> data) {
@@ -56,7 +57,7 @@ void Server::sendAudio(Audio::Bitrate bitrate, std::vector<char> data) {
     auto packet = std::make_shared<std::vector<char>>(
         Net::assemblePacket(category, { data.data(), data.size() })
     );
-    for (auto&& address : clients_[bitrate]) {
+    for (auto&& address : clientsCache_[bitrate]) {
         send(address, packet);
     }
 }
