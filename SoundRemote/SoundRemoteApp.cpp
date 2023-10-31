@@ -18,6 +18,7 @@ processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #include "AudioUtil.h"
 #include "NetUtil.h"
 #include "Server.h"
+#include "Clients.h"
 #include "SettingsImpl.h"
 #include "Controls.h"
 
@@ -217,6 +218,14 @@ void SoundRemoteApp::onClientListUpdate(std::forward_list<std::string> clients) 
     std::ostringstream addresses;
     for (const auto& client : clients) {
         addresses << client << "\r\n";
+    }
+    SetWindowTextA(clientsList_, addresses.str().c_str());
+}
+
+void SoundRemoteApp::onClientsUpdate(std::forward_list<ClientInfo> clients) {
+    std::ostringstream addresses;
+    for (auto&& client : clients) {
+        addresses << client.address.to_string() << "\r\n";
     }
     SetWindowTextA(clientsList_, addresses.str().c_str());
 }

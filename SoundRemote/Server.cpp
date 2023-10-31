@@ -1,6 +1,5 @@
 #include <boost/asio.hpp>
 
-#include "Settings.h"
 #include "NetUtil.h"
 #include "Util.h"
 #include "Clients.h"

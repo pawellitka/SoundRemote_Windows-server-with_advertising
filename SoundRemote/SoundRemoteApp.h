@@ -81,6 +81,7 @@ private:
 	// Event handlers
 	void onDeviceSelect();
 	void onClientListUpdate(std::forward_list<std::string> clients);
+	void onClientsUpdate(std::forward_list<ClientInfo> clients);
 	void onAddressButtonClick() const;
 	void updatePeakMeter();
 	void onReceiveKeystroke(const Keystroke& keystroke);
