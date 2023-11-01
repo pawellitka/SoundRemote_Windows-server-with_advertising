@@ -50,7 +50,7 @@ void Server::sendOpusPacket(std::span<char> data) {
 void Server::sendAudio(Audio::Bitrate bitrate, std::vector<char> data) {
     auto category = Net::Packet::AudioDataOpus;
     if (bitrate == Audio::Bitrate::none) {
-        category = Net::Packet::AudioDataPcm;
+        category = Net::Packet::AudioDataUncompressed;
     }
     auto packet = std::make_shared<std::vector<char>>(
         Net::assemblePacket(category, { data.data(), data.size() })
@@ -108,7 +108,7 @@ bool Server::parsePacket(const std::span<unsigned char> packet) const {
     }
     const auto packetType = Net::getPacketCategory(packet);
     switch (packetType) {
-    case Net::Packet::ClientCommand: {
+    case Net::Packet::Keystroke: {
         const std::optional<Keystroke> keystroke = Net::getKeystroke(packet);
         if (keystroke) {
             keystroke->emulate();
