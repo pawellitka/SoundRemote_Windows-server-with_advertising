@@ -43,14 +43,14 @@ void Server::onClientsUpdate(std::forward_list<ClientInfo> clients) {
 }
 
 void Server::sendOpusPacket(std::span<char> data) {
-    auto opusPacket = std::make_shared<std::vector<char>>(Net::assemblePacket(Net::Packet::AudioDataOpus, data));
+    auto opusPacket = std::make_shared<std::vector<char>>(Net::assemblePacket(Net::Packet::Category::AudioDataOpus, data));
     send(opusPacket);
 }
 
 void Server::sendAudio(Audio::Bitrate bitrate, std::vector<char> data) {
-    auto category = Net::Packet::AudioDataOpus;
+    auto category = Net::Packet::Category::AudioDataOpus;
     if (bitrate == Audio::Bitrate::none) {
-        category = Net::Packet::AudioDataUncompressed;
+        category = Net::Packet::Category::AudioDataUncompressed;
     }
     auto packet = std::make_shared<std::vector<char>>(
         Net::assemblePacket(category, { data.data(), data.size() })
@@ -108,7 +108,7 @@ bool Server::parsePacket(const std::span<unsigned char> packet) const {
     }
     const auto packetType = Net::getPacketCategory(packet);
     switch (packetType) {
-    case Net::Packet::Keystroke: {
+    case Net::Packet::Category::Keystroke: {
         const std::optional<Keystroke> keystroke = Net::getKeystroke(packet);
         if (keystroke) {
             keystroke->emulate();
@@ -120,7 +120,7 @@ bool Server::parsePacket(const std::span<unsigned char> packet) const {
         }
     }
         break;
-    case Net::Packet::ClientKeepAlive:
+    case Net::Packet::Category::ClientKeepAlive:
         break;
     default:
         // Unrecognized packet
@@ -156,7 +156,7 @@ void Server::send(const Net::Address& address, std::shared_ptr<std::vector<char>
 
 void Server::sendKeepAlive() {
     if (!hasClients()) { return; }
-    auto packet = std::make_shared<std::vector<char>>(Net::assemblePacket(Net::Packet::ServerKeepAlive));
+    auto packet = std::make_shared<std::vector<char>>(Net::assemblePacket(Net::Packet::Category::ServerKeepAlive));
     send(packet);
 }
 
@@ -181,7 +181,7 @@ void Server::maintain(boost::system::error_code ec) {
 
 void Server::keepalive() {
     if (clientsCache_.empty()) { return; }
-    auto packet = std::make_shared<std::vector<char>>(Net::assemblePacket(Net::Packet::ServerKeepAlive));
+    auto packet = std::make_shared<std::vector<char>>(Net::assemblePacket(Net::Packet::Category::ServerKeepAlive));
     for (auto&& [bitrate, addresses] : clientsCache_) {
         for (auto&& address : addresses) {
             send(address, packet);

@@ -17,7 +17,7 @@ namespace Net {
 		const int dataOffset = headerSize;
 
 		const SignatureType protocolSignature = 0xA571u;
-		enum Category: CategoryType {
+		enum class Category: CategoryType {
 			Error = 0,
 			ClientKeepAlive = 0x01u,
 			ServerKeepAlive = 0x02u,

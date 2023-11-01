@@ -73,13 +73,13 @@ std::forward_list<std::wstring> Net::getLocalAddresses() {
 	return result;
 }
 
-std::vector<char> Net::assemblePacket(const Net::Packet::CategoryType category, std::span<char> packetData) {
+std::vector<char> Net::assemblePacket(const Net::Packet::Category category, std::span<char> packetData) {
 	const Net::Packet::SizeType packetLen = Net::Packet::headerSize + static_cast<Net::Packet::SizeType>(packetData.size_bytes());
 	std::vector<char> result(packetLen);
 	std::span<char> resultData{ result.data(), packetLen };
 	int offset = 0;
 	writeUInt16Le(Net::Packet::protocolSignature, resultData, Net::Packet::signatureOffset);
-	writeUInt8(category, resultData, Net::Packet::categoryOffset);
+	writeUInt8(static_cast<Net::Packet::CategoryType>(category), resultData, Net::Packet::categoryOffset);
 	writeUInt16Le(packetLen, resultData, Net::Packet::sizeOffset);
 	std::copy_n(packetData.data(), packetData.size_bytes(), result.data() + Net::Packet::dataOffset);
 	return result;
@@ -96,9 +96,8 @@ bool Net::hasValidHeader(std::span<unsigned char> packet) {
 	return true;
 }
 
-Net::Packet::CategoryType Net::getPacketCategory(std::span<unsigned char> packet) {
-	Packet::CategoryType result = readUInt8(packet, Packet::categoryOffset);
-	return result;
+Net::Packet::Category Net::getPacketCategory(std::span<unsigned char> packet) {
+	return static_cast<Net::Packet::Category>(readUInt8(packet, Net::Packet::categoryOffset));
 }
 
 std::optional<Keystroke> Net::getKeystroke(std::span<unsigned char> packet) {
