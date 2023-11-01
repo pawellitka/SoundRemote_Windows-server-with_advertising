@@ -30,8 +30,8 @@ namespace Net {
 		};
 
 		namespace Keystroke {
-			using Key = uint32_t;
-			using Mods = uint32_t;
+			using Key = uint8_t;
+			using Mods = uint8_t;
 
 			const int dataSize = sizeof Key + sizeof Mods;
 		}

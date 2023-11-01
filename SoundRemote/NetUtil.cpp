@@ -105,8 +105,8 @@ std::optional<Keystroke> Net::getKeystroke(std::span<unsigned char> packet) {
 		return std::nullopt;
 	}
 	int offset = Packet::dataOffset;
-	Packet::Keystroke::Key key = readUInt32Le(packet, offset);
+	Packet::Keystroke::Key key = readUInt8(packet, offset);
 	offset += sizeof(key);
-	Packet::Keystroke::Mods mods = readUInt32Le(packet, offset);
+	Packet::Keystroke::Mods mods = readUInt8(packet, offset);
 	return Keystroke{ static_cast<int>(key), static_cast<int>(mods) };
 }
