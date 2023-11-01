@@ -110,3 +110,12 @@ std::optional<Keystroke> Net::getKeystroke(std::span<unsigned char> packet) {
 	Packet::Keystroke::Mods mods = readUInt8(packet, offset);
 	return Keystroke{ static_cast<int>(key), static_cast<int>(mods) };
 }
+
+std::optional<Audio::Bitrate> Net::getBitrate(std::span<unsigned char> packet) {
+	if (static_cast<int>(packet.size()) < Packet::dataOffset + Packet::setFormatSize) {
+		return std::nullopt;
+	}
+	int offset = Packet::dataOffset;
+	Packet::BitrateType bitrate = readUInt8(packet, offset);
+	return static_cast<Audio::Bitrate>(bitrate);
+}

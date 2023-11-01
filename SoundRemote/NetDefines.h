@@ -9,12 +9,17 @@ namespace Net {
 		using SignatureType = uint16_t;
 		using CategoryType = uint8_t;
 		using SizeType = uint16_t;
+		// Data fields
+		using BitrateType = uint8_t;
 
 		const int headerSize = sizeof SignatureType + sizeof CategoryType + sizeof SizeType;
 		const int signatureOffset = 0;
 		const int categoryOffset = sizeof SignatureType;
 		const int sizeOffset = sizeof SignatureType + sizeof CategoryType;
 		const int dataOffset = headerSize;
+
+		constexpr int connectSize = sizeof BitrateType;
+		constexpr int setFormatSize = sizeof BitrateType;
 
 		const SignatureType protocolSignature = 0xA571u;
 		enum class Category: CategoryType {
