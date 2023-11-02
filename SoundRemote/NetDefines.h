@@ -5,7 +5,7 @@
 
 namespace Net {
 	namespace Packet {
-		//Header fields
+		// Header fields
 		using SignatureType = uint16_t;
 		using CategoryType = uint8_t;
 		using SizeType = uint16_t;
@@ -14,18 +14,27 @@ namespace Net {
 		using BitrateType = uint8_t;
 		using KeyType = uint8_t;
 		using ModsType = uint8_t;
-
+		// Header data
 		constexpr int headerSize = sizeof SignatureType + sizeof CategoryType + sizeof SizeType;
 		constexpr int signatureOffset = 0;
 		constexpr int categoryOffset = sizeof SignatureType;
 		constexpr int sizeOffset = sizeof SignatureType + sizeof CategoryType;
 		constexpr int dataOffset = headerSize;
-
-		constexpr int connectSize = sizeof BitrateType + sizeof RequestIdType;
-		constexpr int setFormatSize = sizeof BitrateType + sizeof RequestIdType;
+		// Packet data
 		constexpr int keystrokeSize = sizeof KeyType + sizeof ModsType;
+		struct ConnectData {
+			RequestIdType requestId;
+			BitrateType bitrate;
+			static const int size = sizeof BitrateType + sizeof RequestIdType;
+		};
+		struct SetFormatData {
+			RequestIdType requestId;
+			BitrateType bitrate;
+			static const int size = sizeof BitrateType + sizeof RequestIdType;
+		};
 
-		const SignatureType protocolSignature = 0xA571u;
+		constexpr SignatureType protocolSignature = 0xA571u;
+
 		enum class Category: CategoryType {
 			Error = 0,
 			Connect = 0x01u,
@@ -37,12 +46,6 @@ namespace Net {
 			ClientKeepAlive = 0x30u,
 			ServerKeepAlive = 0x31u,
 			Ack = 0xF0u
-		};
-
-		struct ConnectData {
-			RequestIdType requestId;
-			BitrateType bitrate;
-			static const int size = sizeof BitrateType + sizeof RequestIdType;
 		};
 	}
 	using Address = boost::asio::ip::address;

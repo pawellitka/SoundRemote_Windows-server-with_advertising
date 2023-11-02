@@ -128,3 +128,14 @@ std::optional<Net::Packet::ConnectData> Net::getConnectData(std::span<unsigned c
 	data.requestId = readUInt16Le(packet, offset);
 	return data;
 }
+
+std::optional<Net::Packet::SetFormatData> Net::getSetFormatData(std::span<unsigned char> packet) {
+	if (static_cast<int>(packet.size()) < Packet::dataOffset + Packet::SetFormatData::size) {
+		return std::nullopt;
+	}
+	int offset = Packet::dataOffset;
+	Net::Packet::SetFormatData data{};
+	data.bitrate = readUInt8(packet, offset);
+	data.requestId = readUInt16Le(packet, offset);
+	return data;
+}

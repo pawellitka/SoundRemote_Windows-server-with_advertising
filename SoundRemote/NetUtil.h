@@ -18,4 +18,5 @@ namespace Net {
 	Net::Packet::Category getPacketCategory(std::span<unsigned char> packet);
 	std::optional<Keystroke> getKeystroke(std::span<unsigned char> packet);
 	std::optional<Net::Packet::ConnectData> getConnectData(std::span<unsigned char> packet);
+	std::optional<Net::Packet::SetFormatData> getSetFormatData(std::span<unsigned char> packet);
 };
