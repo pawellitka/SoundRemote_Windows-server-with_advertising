@@ -22,6 +22,7 @@ namespace Net {
 		constexpr int dataOffset = headerSize;
 		// Packet data
 		constexpr int keystrokeSize = sizeof KeyType + sizeof ModsType;
+		constexpr int ackSize = sizeof RequestIdType;
 		struct ConnectData {
 			RequestIdType requestId;
 			BitrateType bitrate;

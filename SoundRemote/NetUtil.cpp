@@ -85,6 +85,13 @@ std::vector<char> Net::assemblePacket(const Net::Packet::Category category, std:
 	return result;
 }
 
+std::vector<char> Net::createAckPacket(Net::Packet::RequestIdType requestId) {
+	std::vector<char> result(Net::Packet::ackSize);
+	std::span<char> resultData{ result.data(), Net::Packet::ackSize };
+	writeUInt16Le(requestId, resultData, 0);
+	return result;
+}
+
 bool Net::hasValidHeader(std::span<unsigned char> packet) {
 	if (packet.size_bytes() < Packet::headerSize) {
 		return false;

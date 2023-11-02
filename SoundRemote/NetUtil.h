@@ -13,6 +13,7 @@ namespace Net {
 	std::forward_list<std::wstring> getLocalAddresses();
 
 	std::vector<char> assemblePacket(const Net::Packet::Category category, std::span<char> data = {});
+	std::vector<char> createAckPacket(Net::Packet::RequestIdType requestId);
 
 	bool hasValidHeader(std::span<unsigned char> packet);
 	Net::Packet::Category getPacketCategory(std::span<unsigned char> packet);
