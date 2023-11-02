@@ -101,13 +101,13 @@ Net::Packet::Category Net::getPacketCategory(std::span<unsigned char> packet) {
 }
 
 std::optional<Keystroke> Net::getKeystroke(std::span<unsigned char> packet) {
-	if (static_cast<int>(packet.size()) < Packet::dataOffset + Packet::Keystroke::dataSize) {
+	if (static_cast<int>(packet.size()) < Packet::dataOffset + Packet::keystrokeSize) {
 		return std::nullopt;
 	}
 	int offset = Packet::dataOffset;
-	Packet::Keystroke::Key key = readUInt8(packet, offset);
+	Packet::KeyType key = readUInt8(packet, offset);
 	offset += sizeof(key);
-	Packet::Keystroke::Mods mods = readUInt8(packet, offset);
+	Packet::ModsType mods = readUInt8(packet, offset);
 	return Keystroke{ static_cast<int>(key), static_cast<int>(mods) };
 }
 
