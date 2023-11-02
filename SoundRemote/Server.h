@@ -43,6 +43,8 @@ private:
 	/// <param name="packet">Packet contents.</param>
 	/// <returns>True if data recognized and parsed successfully. False otherwise.</returns>
 	bool parsePacket(const std::span<unsigned char> packet) const;
+	void processConnect(const Net::Address& address, const std::span<unsigned char> packet);
+	void processKeystroke(const std::span<unsigned char> packet) const;
 	void send(std::shared_ptr<std::vector<char>> packet);
 	void send(const Net::Address& address, std::shared_ptr<std::vector<char>> packet);
 	void sendKeepAlive();

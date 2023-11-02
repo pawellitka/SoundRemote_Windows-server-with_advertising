@@ -74,15 +74,29 @@ bool Server::hasClients() const {
 
 awaitable<void> Server::receive(udp::socket& socket) {
     //throw std::exception("Server::receive");
-    std::array<unsigned char, Net::inputPacketSize> datagram;
+    std::array<unsigned char, Net::inputPacketSize> datagram{};
     udp::endpoint sender;
     //Have to handle errors here or write custom completion handler for co_spawn()
     try {
         for (;;) {
             auto nBytes = co_await socket.async_receive_from(boost::asio::buffer(datagram), sender, use_awaitable);
-            const bool parseSuccess = parsePacket({ datagram.data(), nBytes });
-            if (parseSuccess) {
-                clients_->add(sender.address(), Audio::Bitrate::kbps_192);
+            std::span receivedData = { datagram.data(), nBytes };
+            auto category = Net::getPacketCategory(receivedData);
+            switch (category) {
+            case Net::Packet::Category::Connect:
+                processConnect(sender.address(), receivedData);
+                break;
+            case Net::Packet::Category::Disconnect:
+                break;
+            case Net::Packet::Category::SetFormat:
+                break;
+            case Net::Packet::Category::Keystroke:
+                processKeystroke(receivedData);
+                break;
+            case Net::Packet::Category::ClientKeepAlive:
+                break;
+            default:
+                break;
             }
         }
     }
@@ -140,6 +154,22 @@ void Server::send(std::shared_ptr<std::vector<char>> packet) {
                     throw std::runtime_error(Util::contructAppExceptionText("Send", ec.what()));
                 }
             });
+    }
+}
+
+void Server::processConnect(const Net::Address& address, const std::span<unsigned char> packet) {
+    const auto connectData = Net::getConnectData(packet);
+    if (!connectData) { return; }
+    clients_->add(address, static_cast<Audio::Bitrate>(connectData->bitrate));
+    //todo: send ACK
+}
+
+void Server::processKeystroke(const std::span<unsigned char> packet) const {
+    const std::optional<Keystroke> keystroke = Net::getKeystroke(packet);
+    if (!keystroke) { return; }
+    keystroke->emulate();
+    if (keystrokeCallback_) {
+        keystrokeCallback_(*keystroke);
     }
 }
 
