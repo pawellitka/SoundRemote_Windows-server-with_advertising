@@ -94,6 +94,7 @@ awaitable<void> Server::receive(udp::socket& socket) {
                 processKeystroke(receivedData);
                 break;
             case Net::Packet::Category::ClientKeepAlive:
+                processKeepAlive(sender.address());
                 break;
             default:
                 break;
@@ -144,6 +145,10 @@ void Server::processKeystroke(const std::span<unsigned char> packet) const {
     if (keystrokeCallback_) {
         keystrokeCallback_(*keystroke);
     }
+}
+
+void Server::processKeepAlive(const Net::Address& address) const {
+    clients_->keep(address);
 }
 
 void Server::send(const Net::Address& address, std::shared_ptr<std::vector<char>> packet) {
