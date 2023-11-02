@@ -38,6 +38,12 @@ namespace Net {
 			ServerKeepAlive = 0x31u,
 			Ack = 0xF0u
 		};
+
+		struct ConnectData {
+			RequestIdType requestId;
+			BitrateType bitrate;
+			static const int size = sizeof BitrateType + sizeof RequestIdType;
+		};
 	}
 	using Address = boost::asio::ip::address;
 

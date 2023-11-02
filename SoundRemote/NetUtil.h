@@ -17,5 +17,5 @@ namespace Net {
 	bool hasValidHeader(std::span<unsigned char> packet);
 	Net::Packet::Category getPacketCategory(std::span<unsigned char> packet);
 	std::optional<Keystroke> getKeystroke(std::span<unsigned char> packet);
-	std::optional<Audio::Bitrate> getBitrate(std::span<unsigned char> packet);
+	std::optional<Net::Packet::ConnectData> getConnectData(std::span<unsigned char> packet);
 };
