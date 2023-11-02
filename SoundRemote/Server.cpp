@@ -116,33 +116,6 @@ awaitable<void> Server::receive(udp::socket& socket) {
     }
 }
 
-bool Server::parsePacket(const std::span<unsigned char> packet) const {
-    if (!Net::hasValidHeader(packet)) {
-        return false;
-    }
-    const auto packetType = Net::getPacketCategory(packet);
-    switch (packetType) {
-    case Net::Packet::Category::Keystroke: {
-        const std::optional<Keystroke> keystroke = Net::getKeystroke(packet);
-        if (keystroke) {
-            keystroke->emulate();
-            if (keystrokeCallback_) {
-                keystrokeCallback_(keystroke.value());
-            }
-        } else {
-            return false;
-        }
-    }
-        break;
-    case Net::Packet::Category::ClientKeepAlive:
-        break;
-    default:
-        // Unrecognized packet
-        return false;
-    }
-    return true;
-}
-
 void Server::send(std::shared_ptr<std::vector<char>> packet) {
     auto destination = udp::endpoint(udp::v4(), clientPort_);
     for (const auto& clientAddress : clientList_->clients()) {

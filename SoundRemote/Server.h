@@ -37,12 +37,6 @@ private:
 	};
 private:
 	boost::asio::awaitable<void> receive(boost::asio::ip::udp::socket& socket);
-	/// <summary>
-	/// Parses received data packet.
-	/// </summary>
-	/// <param name="packet">Packet contents.</param>
-	/// <returns>True if data recognized and parsed successfully. False otherwise.</returns>
-	bool parsePacket(const std::span<unsigned char> packet) const;
 	void processConnect(const Net::Address& address, const std::span<unsigned char> packet);
 	void processKeystroke(const std::span<unsigned char> packet) const;
 	void send(std::shared_ptr<std::vector<char>> packet);
