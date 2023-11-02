@@ -97,6 +97,13 @@ bool Net::hasValidHeader(std::span<unsigned char> packet) {
 }
 
 Net::Packet::Category Net::getPacketCategory(std::span<unsigned char> packet) {
+	if (packet.size_bytes() < Packet::headerSize) {
+		return Net::Packet::Category::Error;
+	}
+	const Packet::SignatureType signature = readUInt16Le(packet, 0);
+	if (signature != Packet::protocolSignature) {
+		return Net::Packet::Category::Error;
+	}
 	return static_cast<Net::Packet::Category>(readUInt8(packet, Net::Packet::categoryOffset));
 }
 
