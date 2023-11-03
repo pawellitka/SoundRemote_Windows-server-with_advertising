@@ -89,6 +89,7 @@ awaitable<void> Server::receive(udp::socket& socket) {
             case Net::Packet::Category::Disconnect:
                 break;
             case Net::Packet::Category::SetFormat:
+                processSetFormat(sender.address(), receivedData);
                 break;
             case Net::Packet::Category::Keystroke:
                 processKeystroke(receivedData);
@@ -140,6 +141,18 @@ void Server::processConnect(const Net::Address& address, const std::span<unsigne
 
     send(address, std::make_shared<std::vector<char>>(
         Net::createAckPacket(connectData->requestId)
+    ));
+}
+
+void Server::processSetFormat(const Net::Address& address, const std::span<unsigned char> packet) {
+    const auto setFormatData = Net::getSetFormatData(packet);
+    if (!setFormatData) { return; }
+    auto bitrate = Net::bitrateFromNetworkValue(setFormatData->bitrate);
+    if (!bitrate) { return; }
+    clients_->setBitrate(address, *bitrate);
+
+    send(address, std::make_shared<std::vector<char>>(
+        Net::createAckPacket(setFormatData->requestId)
     ));
 }
 

@@ -38,6 +38,7 @@ private:
 private:
 	boost::asio::awaitable<void> receive(boost::asio::ip::udp::socket& socket);
 	void processConnect(const Net::Address& address, const std::span<unsigned char> packet);
+	void processSetFormat(const Net::Address& address, const std::span<unsigned char> packet);
 	void processKeystroke(const std::span<unsigned char> packet) const;
 	void processKeepAlive(const Net::Address& address) const;
 	void send(std::shared_ptr<std::vector<char>> packet);
