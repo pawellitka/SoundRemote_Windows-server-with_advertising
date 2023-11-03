@@ -1,17 +1,21 @@
 #pragma once
 
+#include "NetDefines.h"
 #include "keystroke.h"
 
-class Settings;
+class Clients;
+struct ClientInfo;
 
 class Server {
 	using ClientsUpdateCallback = std::function<void(std::forward_list<std::string>)>;
 	using KeystrokeCallback = std::function<void(const Keystroke& keystroke)>;
 	using address_t = boost::asio::ip::address;
 public:
-	Server(boost::asio::io_context& ioContext, std::shared_ptr<Settings> settings);
+	Server(int clientPort, int serverPort, boost::asio::io_context& ioContext, std::shared_ptr<Clients> clients);
 	~Server();
-	void sendOpusPacket(std::span<unsigned char> data);
+	void onClientsUpdate(std::forward_list<ClientInfo> clients);
+	void sendOpusPacket(std::span<char> data);
+	void sendAudio(Audio::Bitrate bitrate, std::vector<char> data);
 	void setClientListCallback(ClientsUpdateCallback callback);
 	void setKeystrokeCallback(KeystrokeCallback callback);
 	bool hasClients() const;
@@ -39,15 +43,19 @@ private:
 	/// <param name="packet">Packet contents.</param>
 	/// <returns>True if data recognized and parsed successfully. False otherwise.</returns>
 	bool parsePacket(const std::span<unsigned char> packet) const;
-	void send(std::shared_ptr<std::vector<unsigned char>> packet);
+	void send(std::shared_ptr<std::vector<char>> packet);
+	void send(const Net::Address& address, std::shared_ptr<std::vector<char>> packet);
 	void sendKeepAlive();
+	void keepalive();
 	void startMaintenanceTimer();
 	void maintain(boost::system::error_code ec);
 
 	boost::asio::ip::udp::socket socketSend_;
-	std::unique_ptr<boost::asio::ip::udp::socket> socketReceive_;
+	boost::asio::ip::udp::socket socketReceive_;
 	std::unique_ptr<ClientList> clientList_;
 	boost::asio::steady_timer maintainenanceTimer_;
-	std::shared_ptr<Settings> settings_;
+	int clientPort_;
 	KeystrokeCallback keystrokeCallback_;
+	std::shared_ptr<Clients> clients_;
+	std::unordered_map<Audio::Bitrate, std::forward_list<Net::Address>> clientsCache_;
 };

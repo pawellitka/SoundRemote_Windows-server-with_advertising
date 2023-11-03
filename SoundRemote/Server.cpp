@@ -1,8 +1,8 @@
 #include <boost/asio.hpp>
 
-#include "Settings.h"
 #include "NetUtil.h"
 #include "Util.h"
+#include "Clients.h"
 #include "Server.h"
 
 using boost::asio::ip::udp;
@@ -12,32 +12,52 @@ using boost::asio::detached;
 using boost::asio::use_awaitable;
 using namespace std::chrono_literals;
 
-Server::Server(boost::asio::io_context& ioContext, std::shared_ptr<Settings> settings) :
-    settings_(settings),
+Server::Server(int clientPort, int serverPort, boost::asio::io_context& ioContext, std::shared_ptr<Clients> clients) :
+    clientPort_(clientPort),
+    clients_(clients),
     socketSend_(ioContext, udp::v4()),
+    socketReceive_(ioContext, udp::endpoint(udp::v4(), serverPort)),
     maintainenanceTimer_(ioContext) {
 
-    // Create receiving socket
-    const auto serverPort = settings_->get<int>(Settings::ServerPort);
-    assert(serverPort);
-    socketReceive_ = std::make_unique<udp::socket>(ioContext, udp::endpoint(udp::v4(), *serverPort));
-
     //co_spawn(ioContext, receive(std::move(socket)), detached);
-    clientList_ = std::make_unique<ClientList>();
-    co_spawn(ioContext, receive(*socketReceive_), detached);
+    co_spawn(ioContext, receive(socketReceive_), detached);
     startMaintenanceTimer();
 }
 
 Server::~Server() {
-    socketReceive_->shutdown(udp::socket::shutdown_receive);
-    socketReceive_->close();
+    socketReceive_.shutdown(udp::socket::shutdown_receive);
+    socketReceive_.close();
     socketSend_.shutdown(udp::socket::shutdown_send);
     socketSend_.close();
 }
 
-void Server::sendOpusPacket(std::span<unsigned char> data) {
-    auto opusPacket = std::make_shared<std::vector<unsigned char>>(Net::assemblePacket(Net::Packet::AudioDataOpus, data));
+void Server::onClientsUpdate(std::forward_list<ClientInfo> clients) {
+    std::unordered_map<Audio::Bitrate, std::forward_list<Net::Address>> newClients;
+    for (auto&& client: clients) {
+        if (!newClients.contains(client.bitrate)) {
+            newClients[client.bitrate] = std::forward_list<Net::Address>();
+        }
+        newClients[client.bitrate].push_front(client.address);
+    }
+    clientsCache_ = std::move(newClients);
+}
+
+void Server::sendOpusPacket(std::span<char> data) {
+    auto opusPacket = std::make_shared<std::vector<char>>(Net::assemblePacket(Net::Packet::AudioDataOpus, data));
     send(opusPacket);
+}
+
+void Server::sendAudio(Audio::Bitrate bitrate, std::vector<char> data) {
+    auto category = Net::Packet::AudioDataOpus;
+    if (bitrate == Audio::Bitrate::none) {
+        category = Net::Packet::AudioDataPcm;
+    }
+    auto packet = std::make_shared<std::vector<char>>(
+        Net::assemblePacket(category, { data.data(), data.size() })
+    );
+    for (auto&& address : clientsCache_[bitrate]) {
+        send(address, packet);
+    }
 }
 
 void Server::setClientListCallback(ClientsUpdateCallback callback) {
@@ -54,7 +74,7 @@ bool Server::hasClients() const {
 
 awaitable<void> Server::receive(udp::socket& socket) {
     //throw std::exception("Server::receive");
-    std::array<unsigned char, Net::IN_PACKET_SIZE> datagram;
+    std::array<unsigned char, Net::inputPacketSize> datagram;
     udp::endpoint sender;
     //Have to handle errors here or write custom completion handler for co_spawn()
     try {
@@ -62,7 +82,7 @@ awaitable<void> Server::receive(udp::socket& socket) {
             auto nBytes = co_await socket.async_receive_from(boost::asio::buffer(datagram), sender, use_awaitable);
             const bool parseSuccess = parsePacket({ datagram.data(), nBytes });
             if (parseSuccess) {
-                clientList_->keepClient(sender.address());
+                clients_->add(sender.address(), Audio::Bitrate::kbps_192);
             }
         }
     }
@@ -86,7 +106,7 @@ bool Server::parsePacket(const std::span<unsigned char> packet) const {
     if (!Net::hasValidHeader(packet)) {
         return false;
     }
-    const auto packetType = Net::getPacketType(packet);
+    const auto packetType = Net::getPacketCategory(packet);
     switch (packetType) {
     case Net::Packet::ClientCommand: {
         const std::optional<Keystroke> keystroke = Net::getKeystroke(packet);
@@ -109,10 +129,8 @@ bool Server::parsePacket(const std::span<unsigned char> packet) const {
     return true;
 }
 
-void Server::send(std::shared_ptr<std::vector<unsigned char>> packet) {
-    const auto clientPort = settings_->get<int>(Settings::ClientPort);
-    assert(clientPort);
-    auto destination = udp::endpoint(udp::v4(), *clientPort);
+void Server::send(std::shared_ptr<std::vector<char>> packet) {
+    auto destination = udp::endpoint(udp::v4(), clientPort_);
     for (const auto& clientAddress : clientList_->clients()) {
         destination.address(clientAddress);
         socketSend_.async_send_to(boost::asio::buffer(packet->data(), packet->size()), destination,
@@ -125,9 +143,20 @@ void Server::send(std::shared_ptr<std::vector<unsigned char>> packet) {
     }
 }
 
+void Server::send(const Net::Address& address, std::shared_ptr<std::vector<char>> packet) {
+    auto destination = udp::endpoint(address, clientPort_);
+    socketSend_.async_send_to(boost::asio::buffer(packet->data(), packet->size()), destination,
+        //shared_ptr with the packet is passed to keep data alive until the handler call
+        [packet](boost::system::error_code ec, auto bytes) mutable {
+            if (ec) {
+                throw std::runtime_error(Util::contructAppExceptionText("Server send", ec.what()));
+            }
+        });
+}
+
 void Server::sendKeepAlive() {
     if (!hasClients()) { return; }
-    auto packet = std::make_shared<std::vector<unsigned char>>(Net::assemblePacket(Net::Packet::ServerKeepAlive));
+    auto packet = std::make_shared<std::vector<char>>(Net::assemblePacket(Net::Packet::ServerKeepAlive));
     send(packet);
 }
 
@@ -144,10 +173,20 @@ void Server::maintain(boost::system::error_code ec) {
             throw std::runtime_error(Util::contructAppExceptionText("Timer maintain", ec.what()));
         }
     }
-    clientList_->maintain();
-    sendKeepAlive();
+    keepalive();
+    clients_->maintain();
 
     startMaintenanceTimer();
+}
+
+void Server::keepalive() {
+    if (clientsCache_.empty()) { return; }
+    auto packet = std::make_shared<std::vector<char>>(Net::assemblePacket(Net::Packet::ServerKeepAlive));
+    for (auto&& [bitrate, addresses] : clientsCache_) {
+        for (auto&& address : addresses) {
+            send(address, packet);
+        }
+    }
 }
 
 //-------ClientList------

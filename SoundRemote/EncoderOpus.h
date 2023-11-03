@@ -11,7 +11,7 @@ struct EncoderDeleter {
 class EncoderOpus {
 	using encoder_ptr = std::unique_ptr<OpusEncoder, EncoderDeleter>;
 public:
-	EncoderOpus(Audio::Opus::SampleRate sampleRate, Audio::Opus::Channels channels);
+	EncoderOpus(Audio::Bitrate bitrate, Audio::Opus::SampleRate sampleRate, Audio::Opus::Channels channels);
 
 	/// <summary>
 	/// Encodes a frame of PCM audio.
@@ -20,15 +20,18 @@ public:
 	/// <param name="encodedPacket">: Buffer to contain the encoded packet.
 	/// Must be at least <c>EncoderOpus::inputLength()</c> bytes size.</param>
 	/// <returns>Encoded packet length in bytes. If the return value is 0 encoded packet does not need to be transmitted (DTX).</returns>
-	int encode(const char* pcmAudio, unsigned char* encodedPacket);
+	int encode(const char* pcmAudio, char* encodedPacket);
 	//Required input data length in bytes for 16 bit sample size.
-	size_t inputLength() const;
+	int inputLength() const;
+	static int getFrameSize(Audio::Opus::SampleRate sampleRate);
+	static int getInputSize(int frameSize, Audio::Opus::Channels channels);
 private:
+
 	encoder_ptr encoder_;
 	// Number of samples per frame
-	std::size_t frameSize_;
+	int frameSize_;
 	// Bytes per input packet for 16 bit sample size
-	std::size_t inputPacketSize_;
+	int inputPacketSize_;
 
 	EncoderOpus(const EncoderOpus&) = delete;
 	EncoderOpus& operator= (const EncoderOpus&) = delete;

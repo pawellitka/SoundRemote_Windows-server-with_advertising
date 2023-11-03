@@ -174,9 +174,11 @@
     <ClInclude Include="AudioResampler.h" />
     <ClInclude Include="AudioUtil.h" />
     <ClInclude Include="CapturePipe.h" />
+    <ClInclude Include="Clients.h" />
     <ClInclude Include="Controls.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Keystroke.h" />
+    <ClInclude Include="NetDefines.h" />
     <ClInclude Include="NetUtil.h" />
     <ClInclude Include="EncoderOpus.h" />
     <ClInclude Include="Resource.h" />
@@ -192,6 +194,7 @@
     <ClCompile Include="AudioResampler.cpp" />
     <ClCompile Include="AudioUtil.cpp" />
     <ClCompile Include="CapturePipe.cpp" />
+    <ClCompile Include="Clients.cpp" />
     <ClCompile Include="Controls.cpp" />
     <ClCompile Include="Keystroke.cpp" />
     <ClCompile Include="NetUtil.cpp" />

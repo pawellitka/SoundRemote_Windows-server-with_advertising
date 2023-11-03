@@ -43,6 +43,7 @@ private:
 	std::shared_ptr<Server> server_;
 	std::unique_ptr<CapturePipe> capturePipe_;
 	std::shared_ptr<Settings> settings_;
+	std::shared_ptr<Clients> clients_;
 
 	bool initInstance(int nCmdShow);
 	// UI related
@@ -81,6 +82,7 @@ private:
 	// Event handlers
 	void onDeviceSelect();
 	void onClientListUpdate(std::forward_list<std::string> clients);
+	void onClientsUpdate(std::forward_list<ClientInfo> clients);
 	void onAddressButtonClick() const;
 	void updatePeakMeter();
 	void onReceiveKeystroke(const Keystroke& keystroke);

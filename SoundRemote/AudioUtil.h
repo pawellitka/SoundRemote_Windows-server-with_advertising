@@ -23,21 +23,21 @@
 namespace Audio {
 // Constants, types, enums
 
-	constexpr auto DEFAULT_RENDER_DEVICE_ID = -1;
-	constexpr auto DEFAULT_CAPTURE_DEVICE_ID = -2;
+	constexpr auto defaultRenderDeviceId = -1;
+	constexpr auto defaultCaptureDeviceId = -2;
+
+	enum class Bitrate { kbps_64 = 64'000, kbps_128 = 128'000, kbps_192 = 192'000, kbps_256 = 256'000, kbps_320 = 320'000, none = 0 };
 
 	namespace Opus {
 		// Supported sample rates
-		enum class SampleRate { _8k = 8000, _12k = 12000, _16k = 16000, _24k = 24000, _48k = 48000 };
+		enum class SampleRate { khz_8 = 8'000, khz_12 = 12'000, khz_16 = 16'000, khz_24 = 24'000, khz_48 = 48'000 };
 		// Supported channels
 		enum class Channels { mono = 1, stereo = 2 };
-		// Bitrate for the Opus encoder.
-		constexpr int BITRATE = 192000;
 		// Opus frame length in ms. Opus can encode frames of 2.5, 5, 10, 20, 40, or 60 ms. This value determines Opus frame size.
 		// At 48 kHz the permitted values of Opus frame size are 120(2.5ms), 240(5ms), 480(10ms), 960(20ms), 1920(40ms), and 2880(60ms).
-		constexpr int FRAME_LENGTH = 10;
+		constexpr int frameLength = 10;
 		// Maximum Opus packet size in bytes.
-		constexpr int MAX_PACKET_SIZE = 2 * (BITRATE * FRAME_LENGTH) / (1000 * 8);
+		constexpr int maxPacketSize = 2 * static_cast<int>(Bitrate::kbps_320) * frameLength / (1000 * 8);
 	}
 
 	enum class SampleType {

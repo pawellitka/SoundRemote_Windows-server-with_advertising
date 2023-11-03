@@ -18,6 +18,7 @@ processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #include "AudioUtil.h"
 #include "NetUtil.h"
 #include "Server.h"
+#include "Clients.h"
 #include "SettingsImpl.h"
 #include "Controls.h"
 
@@ -74,8 +75,19 @@ void SoundRemoteApp::run() {
     Util::setMainWindow(mainWindow_);
     initSettings();
     try {
-        server_ = std::make_shared<Server>(ioContext_, settings_);
-        server_->setClientListCallback(std::bind(&SoundRemoteApp::onClientListUpdate, this, _1));
+        const auto clientPort = settings_->get<int>(Settings::ClientPort);
+        if (!clientPort) {
+            throw std::runtime_error(Util::contructAppExceptionText("Settings", "Can't get client port"));
+        }
+        const auto serverPort = settings_->get<int>(Settings::ServerPort);
+        if (!serverPort) {
+            throw std::runtime_error(Util::contructAppExceptionText("Settings", "Can't get server port"));
+        }
+
+        clients_ = std::make_shared<Clients>();
+        clients_->addClientsListener(std::bind(&SoundRemoteApp::onClientsUpdate, this, _1));
+        server_ = std::make_shared<Server>(*clientPort, *serverPort, ioContext_, clients_);
+        clients_->addClientsListener(std::bind(&Server::onClientsUpdate, server_.get(), _1));
         server_->setKeystrokeCallback(std::bind(&SoundRemoteApp::onReceiveKeystroke, this, _1));
         // io_context will run as long as the server works and waiting for incoming packets.
         ioContextThread_ = std::make_unique<std::thread>(std::bind(&SoundRemoteApp::asioEventLoop, this, _1), std::ref(ioContext_));
@@ -121,18 +133,18 @@ void SoundRemoteApp::addDefaultDevice(HWND comboBox, EDataFlow flow) {
     int newItemIndex, deviceId;
     if (flow == eRender) {
         newItemIndex = ComboBox_AddString(comboBox, defaultRenderDeviceLabel_.data());
-        deviceId = Audio::DEFAULT_RENDER_DEVICE_ID;
+        deviceId = Audio::defaultRenderDeviceId;
     } else {
         newItemIndex = ComboBox_AddString(comboBox, defaultCaptureDeviceLabel_.data());
-        deviceId = Audio::DEFAULT_CAPTURE_DEVICE_ID;
+        deviceId = Audio::defaultCaptureDeviceId;
     }
     ComboBox_SetItemData(comboBox, newItemIndex, (LPARAM)deviceId);
 }
 
 std::wstring SoundRemoteApp::getDeviceId(const int deviceIndex) const {
     if (!deviceIds_.contains(deviceIndex)) {
-        assert(deviceIndex == Audio::DEFAULT_CAPTURE_DEVICE_ID || deviceIndex == Audio::DEFAULT_RENDER_DEVICE_ID);
-        EDataFlow flow = (deviceIndex == Audio::DEFAULT_CAPTURE_DEVICE_ID) ? eCapture : eRender;
+        assert(deviceIndex == Audio::defaultCaptureDeviceId || deviceIndex == Audio::defaultRenderDeviceId);
+        EDataFlow flow = (deviceIndex == Audio::defaultCaptureDeviceId) ? eCapture : eRender;
         return Audio::getDefaultDevice(flow);
     }
     return deviceIds_.at(deviceIndex);
@@ -194,6 +206,7 @@ void SoundRemoteApp::changeCaptureDevice(const std::wstring& deviceId) {
     currentDeviceId_.clear();
     stopCapture();
     capturePipe_ = std::make_unique<CapturePipe>(deviceId, server_, ioContext_);
+    clients_->addClientsListener(std::bind(&CapturePipe::onClientsUpdate, capturePipe_.get(), _1));
     currentDeviceId_ = deviceId;
     capturePipe_->start();
 }
@@ -208,6 +221,14 @@ void SoundRemoteApp::onClientListUpdate(std::forward_list<std::string> clients) 
     std::ostringstream addresses;
     for (const auto& client : clients) {
         addresses << client << "\r\n";
+    }
+    SetWindowTextA(clientsList_, addresses.str().c_str());
+}
+
+void SoundRemoteApp::onClientsUpdate(std::forward_list<ClientInfo> clients) {
+    std::ostringstream addresses;
+    for (auto&& client : clients) {
+        addresses << client.address.to_string() << "\r\n";
     }
     SetWindowTextA(clientsList_, addresses.str().c_str());
 }
@@ -363,8 +384,8 @@ void SoundRemoteApp::stopPeakMeter() {
 
 void SoundRemoteApp::initSettings() {
     auto settings = std::make_shared<SettingsImpl>();
-    settings->addSetting(Settings::ServerPort, Net::DEFAULT_PORT_IN);
-    settings->addSetting(Settings::ClientPort, Net::DEFAULT_PORT_OUT);
+    settings->addSetting(Settings::ServerPort, Net::defaultServerPort);
+    settings->addSetting(Settings::ClientPort, Net::defaultClientPort);
     settings->setFile("settings.ini");
     settings_ = settings;
 }
