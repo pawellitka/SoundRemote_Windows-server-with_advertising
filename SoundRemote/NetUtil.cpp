@@ -111,17 +111,6 @@ std::vector<char> Net::createAckPacket(Net::Packet::RequestIdType requestId) {
 	return assemblePacket(Net::Packet::Category::Ack, resultData);
 }
 
-bool Net::hasValidHeader(std::span<unsigned char> packet) {
-	if (packet.size_bytes() < Packet::headerSize) {
-		return false;
-	}
-	const Packet::SignatureType signature = readUInt16Le(packet, 0);
-	if (signature != Packet::protocolSignature) {
-		return false;
-	}
-	return true;
-}
-
 Net::Packet::Category Net::getPacketCategory(std::span<unsigned char> packet) {
 	if (packet.size_bytes() < Packet::headerSize) {
 		return Net::Packet::Category::Error;

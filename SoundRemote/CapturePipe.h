@@ -24,7 +24,6 @@ private:
 	task process();
 	// Destroys the capturing coroutine
 	void stop();
-	void processAudio(std::span<char> pcmAudio, std::shared_ptr<Server> server);
 	void process(std::span<char> pcmAudio, std::shared_ptr<Server> server);
 	bool haveClients() const;
 

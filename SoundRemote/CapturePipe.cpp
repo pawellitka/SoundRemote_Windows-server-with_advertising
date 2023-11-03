@@ -112,22 +112,6 @@ void CapturePipe::stop() {
     }
 }
 
-void CapturePipe::processAudio(std::span<char> pcmAudio, std::shared_ptr<Server> server) {
-    if (audioCapture_->resampleRequired()) {
-        audioResampler_->resample(pcmAudio);
-    } else {
-        pcmAudioBuffer_.sputn(pcmAudio.data(), pcmAudio.size());
-    }
-    while (pcmAudioBuffer_.data().size() >= encoder_->inputLength()) {
-        std::array<char, Audio::Opus::maxPacketSize> encodedPacket;
-        const auto packetSize = encoder_->encode(static_cast<const char*>(pcmAudioBuffer_.data().data()), encodedPacket.data());
-        if (packetSize > 0) {
-            server->sendOpusPacket({ encodedPacket.data(), static_cast<size_t>(packetSize) });
-        }
-        pcmAudioBuffer_.consume(encoder_->inputLength());
-    }
-}
-
 bool CapturePipe::haveClients() const {
     return !encoders_.empty();
 }
