@@ -87,6 +87,7 @@ awaitable<void> Server::receive(udp::socket& socket) {
                 processConnect(sender.address(), receivedData);
                 break;
             case Net::Packet::Category::Disconnect:
+                processDisconnect(sender.address());
                 break;
             case Net::Packet::Category::SetFormat:
                 processSetFormat(sender.address(), receivedData);
@@ -142,6 +143,10 @@ void Server::processConnect(const Net::Address& address, const std::span<unsigne
     send(address, std::make_shared<std::vector<char>>(
         Net::createAckPacket(connectData->requestId)
     ));
+}
+
+void Server::processDisconnect(const Net::Address& address) {
+    clients_->remove(address);
 }
 
 void Server::processSetFormat(const Net::Address& address, const std::span<unsigned char> packet) {

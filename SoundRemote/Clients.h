@@ -11,9 +11,10 @@ class Clients {
 	using BitratesUpdateCallback = std::function<void(std::set<Audio::Bitrate>)>;
 public:
 	Clients(int timeoutSeconds = 5);
-	void add(Net::Address address, Audio::Bitrate bitrate);
-	void setBitrate(Net::Address address, Audio::Bitrate bitrate);
-	void keep(Net::Address address);
+	void add(const Net::Address& address, Audio::Bitrate bitrate);
+	void setBitrate(const Net::Address& address, Audio::Bitrate bitrate);
+	void keep(const Net::Address& address);
+	void remove(const Net::Address& address);
 	void addClientsListener(ClientsUpdateCallback listener);
 	void setBitrateListener(BitratesUpdateCallback listener);
 	void maintain();

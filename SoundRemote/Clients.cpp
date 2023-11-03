@@ -7,7 +7,7 @@
 Clients::Clients(int timeoutSeconds) : timeoutSeconds_(timeoutSeconds) {
 }
 
-void Clients::add(Net::Address address, Audio::Bitrate bitrate) {
+void Clients::add(const Net::Address& address, Audio::Bitrate bitrate) {
 	const std::unique_lock lock(clientsMutex_);
 	if (clients_.contains(address)) {
 		clients_[address]->updateLastContact();
@@ -22,7 +22,7 @@ void Clients::add(Net::Address address, Audio::Bitrate bitrate) {
 	}
 }
 
-void Clients::setBitrate(Net::Address address, Audio::Bitrate bitrate) {
+void Clients::setBitrate(const Net::Address& address, Audio::Bitrate bitrate) {
 	const std::unique_lock lock(clientsMutex_);
 	if (!clients_.contains(address) || clients_[address]->bitrate() == bitrate) {
 		return;
@@ -31,12 +31,19 @@ void Clients::setBitrate(Net::Address address, Audio::Bitrate bitrate) {
 	onClientsUpdate();
 }
 
-void Clients::keep(Net::Address address) {
+void Clients::keep(const Net::Address& address) {
 	const std::unique_lock lock(clientsMutex_);
 	if (!clients_.contains(address)) {
 		return;
 	}
 	clients_[address]->updateLastContact();
+}
+
+void Clients::remove(const Net::Address& address) {
+	const std::unique_lock lock(clientsMutex_);
+	if (clients_.erase(address)) {
+		onClientsUpdate();
+	}
 }
 
 void Clients::addClientsListener(ClientsUpdateCallback listener) {
