@@ -86,10 +86,10 @@ std::vector<char> Net::assemblePacket(const Net::Packet::Category category, std:
 }
 
 std::vector<char> Net::createAckPacket(Net::Packet::RequestIdType requestId) {
-	std::vector<char> result(Net::Packet::ackSize);
+	std::array<char, Net::Packet::ackSize> result;
 	std::span<char> resultData{ result.data(), Net::Packet::ackSize };
 	writeUInt16Le(requestId, resultData, 0);
-	return result;
+	return assemblePacket(Net::Packet::Category::Ack, resultData);
 }
 
 bool Net::hasValidHeader(std::span<unsigned char> packet) {
@@ -132,6 +132,7 @@ std::optional<Net::Packet::ConnectData> Net::getConnectData(std::span<unsigned c
 	int offset = Packet::dataOffset;
 	Net::Packet::ConnectData data{};
 	data.bitrate = readUInt8(packet, offset);
+	offset += sizeof(Net::Packet::BitrateType);
 	data.requestId = readUInt16Le(packet, offset);
 	return data;
 }
@@ -143,6 +144,7 @@ std::optional<Net::Packet::SetFormatData> Net::getSetFormatData(std::span<unsign
 	int offset = Packet::dataOffset;
 	Net::Packet::SetFormatData data{};
 	data.bitrate = readUInt8(packet, offset);
+	offset += sizeof(Net::Packet::BitrateType);
 	data.requestId = readUInt16Le(packet, offset);
 	return data;
 }
