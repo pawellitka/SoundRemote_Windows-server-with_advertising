@@ -73,6 +73,25 @@ std::forward_list<std::wstring> Net::getLocalAddresses() {
 	return result;
 }
 
+std::optional<Audio::Bitrate> Net::bitrateFromNetworkValue(Net::Packet::BitrateType bitrate) {
+	switch (bitrate) {
+	case 0:
+		return Audio::Bitrate::none;
+	case 1:
+		return Audio::Bitrate::kbps_64;
+	case 2:
+		return Audio::Bitrate::kbps_128;
+	case 3:
+		return Audio::Bitrate::kbps_192;
+	case 4:
+		return Audio::Bitrate::kbps_256;
+	case 5:
+		return Audio::Bitrate::kbps_320;
+	default:
+		return std::nullopt;
+	}
+}
+
 std::vector<char> Net::assemblePacket(const Net::Packet::Category category, std::span<char> packetData) {
 	const Net::Packet::SizeType packetLen = Net::Packet::headerSize + static_cast<Net::Packet::SizeType>(packetData.size_bytes());
 	std::vector<char> result(packetLen);
