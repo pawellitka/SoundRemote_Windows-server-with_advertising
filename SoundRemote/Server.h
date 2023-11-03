@@ -1,7 +1,7 @@
 #pragma once
 
 #include "NetDefines.h"
-#include "keystroke.h"
+#include "Keystroke.h"
 
 class Clients;
 struct ClientInfo;

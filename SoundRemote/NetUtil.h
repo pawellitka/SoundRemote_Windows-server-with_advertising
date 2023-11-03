@@ -3,7 +3,7 @@
 
 #include "AudioUtil.h"
 #include "NetDefines.h"
-#include "keystroke.h"
+#include "Keystroke.h"
 
 namespace Net {
 	/// <summary>
