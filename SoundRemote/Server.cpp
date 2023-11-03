@@ -134,7 +134,9 @@ void Server::send(std::shared_ptr<std::vector<char>> packet) {
 void Server::processConnect(const Net::Address& address, const std::span<unsigned char> packet) {
     const auto connectData = Net::getConnectData(packet);
     if (!connectData) { return; }
-    clients_->add(address, static_cast<Audio::Bitrate>(connectData->bitrate));
+    auto bitrate = Net::bitrateFromNetworkValue(connectData->bitrate);
+    if (!bitrate) { return; }
+    clients_->add(address, *bitrate);
 
     send(address, std::make_shared<std::vector<char>>(
         Net::createAckPacket(connectData->requestId)

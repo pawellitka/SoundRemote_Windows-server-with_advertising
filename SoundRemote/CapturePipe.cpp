@@ -83,10 +83,9 @@ void CapturePipe::onClientsUpdate(std::forward_list<ClientInfo> clients) {
     std::erase_if(encoders_, [&](const auto& item) {
         return !repeatingBitrates.contains(item.first);
     });
-    for (auto&& it = newBitrates.begin(); it != newBitrates.end();) {
-        encoders_[*it] = std::make_unique<EncoderOpus>(*it, Audio::Opus::SampleRate::khz_48,
+    for (auto&& it: newBitrates) {
+        encoders_[it] = std::make_unique<EncoderOpus>(it, Audio::Opus::SampleRate::khz_48,
             Audio::Opus::Channels::stereo);
-        ++it;
     }
 }
 
