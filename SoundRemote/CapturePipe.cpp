@@ -46,7 +46,6 @@ CapturePipe::CapturePipe(const std::wstring& deviceId, std::shared_ptr<Server> s
         audioResampler_ = std::make_unique<AudioResampler>(capturedWaveFormat, requestedWaveFormat, pcmAudioBuffer_);
     }
     opusInputSize_ = EncoderOpus::getInputSize(EncoderOpus::getFrameSize(Audio::Opus::SampleRate::khz_48), Audio::Opus::Channels::stereo);
-    encoder_ = std::make_unique<EncoderOpus>(Audio::Bitrate::kbps_192, Audio::Opus::SampleRate::khz_48, Audio::Opus::Channels::stereo);
 }
 
 CapturePipe::~CapturePipe() {
@@ -84,8 +83,12 @@ void CapturePipe::onClientsUpdate(std::forward_list<ClientInfo> clients) {
         return !repeatingBitrates.contains(item.first);
     });
     for (auto&& it: newBitrates) {
-        encoders_[it] = std::make_unique<EncoderOpus>(it, Audio::Opus::SampleRate::khz_48,
-            Audio::Opus::Channels::stereo);
+        if (it == Audio::Bitrate::none) {
+            encoders_[it] = std::unique_ptr<EncoderOpus>();
+        } else {
+            encoders_[it] = std::make_unique<EncoderOpus>(it, Audio::Opus::SampleRate::khz_48,
+                Audio::Opus::Channels::stereo);
+        }
     }
 }
 
@@ -122,21 +125,28 @@ void CapturePipe::process(std::span<char> pcmAudio, std::shared_ptr<Server> serv
     } else {
         pcmAudioBuffer_.sputn(pcmAudio.data(), pcmAudio.size());
     }
-    while (pcmAudioBuffer_.data().size() >= encoder_->inputLength()) {
+    while (pcmAudioBuffer_.data().size() >= opusInputSize_) {
         for (auto&& [bitrate, encoder] : encoders_) {
             if (bitrate == Audio::Bitrate::none) {
-                std::vector<char> pcm(reinterpret_cast<const char*>(pcmAudioBuffer_.data().data())[0],
-                    reinterpret_cast<const char*>(pcmAudioBuffer_.data().data())[encoder_->inputLength()]);
-                server->sendAudio(bitrate, pcm);
+                std::vector<char> uncompressed(opusInputSize_);
+                std::copy_n(
+                    reinterpret_cast<const char *>(pcmAudioBuffer_.data().data()),
+                    opusInputSize_,
+                    uncompressed.data()
+                );
+                server->sendAudio(bitrate, uncompressed);
             } else {
                 std::vector<char> encodedPacket(Audio::Opus::maxPacketSize);
-                const auto packetSize = encoder->encode(static_cast<const char*>(pcmAudioBuffer_.data().data()), encodedPacket.data());
+                const auto packetSize = encoder->encode(
+                    static_cast<const char*>(pcmAudioBuffer_.data().data()),
+                    encodedPacket.data()
+                );
                 encodedPacket.resize(packetSize);
                 if (packetSize > 0) {
                     server->sendAudio(bitrate, encodedPacket);
                 }
             }
         }
-        pcmAudioBuffer_.consume(encoder_->inputLength());
+        pcmAudioBuffer_.consume(opusInputSize_);
     }
 }

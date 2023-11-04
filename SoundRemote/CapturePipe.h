@@ -31,7 +31,6 @@ private:
 	std::unique_ptr<task> pipeCoro_;
 	std::unique_ptr<AudioCapture> audioCapture_;
 	std::unique_ptr<AudioResampler> audioResampler_;
-	std::unique_ptr<EncoderOpus> encoder_;
 	std::weak_ptr<Server> server_;
 	const std::wstring device_;
 	boost::asio::streambuf pcmAudioBuffer_;
