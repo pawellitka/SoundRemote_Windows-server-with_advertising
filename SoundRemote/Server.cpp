@@ -114,7 +114,7 @@ void Server::processConnect(const Net::Address& address, const std::span<unsigne
     clients_->add(address, *compression);
 
     send(address, std::make_shared<std::vector<char>>(
-        Net::createAckPacket(connectData->requestId)
+        Net::createAckConnectPacket(connectData->requestId)
     ));
 }
 
@@ -130,7 +130,7 @@ void Server::processSetFormat(const Net::Address& address, const std::span<unsig
     clients_->setCompression(address, *compression);
 
     send(address, std::make_shared<std::vector<char>>(
-        Net::createAckPacket(setFormatData->requestId)
+        Net::createAckSetFormatPacket(setFormatData->requestId)
     ));
 }
 

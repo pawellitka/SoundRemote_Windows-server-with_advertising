@@ -39,6 +39,16 @@ namespace {
 		assert((offset + 1) <= dest.size_bytes());
 		dest[offset] = value;
 	}
+
+	void writeHeader(Net::Packet::Category category, std::span<char> packetData) {
+		writeUInt16Le(Net::Packet::protocolSignature, packetData, Net::Packet::signatureOffset);
+		writeUInt8(static_cast<Net::Packet::CategoryType>(category), packetData, Net::Packet::categoryOffset);
+		writeUInt16Le(static_cast<Net::Packet::SizeType>(packetData.size_bytes()), packetData, Net::Packet::sizeOffset);
+	}
+
+	void writeAck(Net::Packet::RequestIdType requestId, std::span<char> packetData) {
+		writeUInt16Le(requestId, packetData, Net::Packet::dataOffset);
+	}
 };
 
 std::forward_list<std::wstring> Net::getLocalAddresses() {
@@ -111,6 +121,23 @@ std::vector<char> Net::createAckPacket(Net::Packet::RequestIdType requestId) {
 	return assemblePacket(Net::Packet::Category::Ack, resultData);
 }
 
+std::vector<char> Net::createAckConnectPacket(Net::Packet::RequestIdType requestId) {
+	std::vector<char> packet(Net::Packet::headerSize + Net::Packet::ackSize);
+	std::span<char> packetData{ packet.data(), packet.size() };
+	writeHeader(Net::Packet::Category::Ack, packetData);
+	writeAck(requestId, packetData);
+	writeUInt8(Net::protocolVersion, packetData, Net::Packet::ackCustomDataOffset);
+	return packet;
+}
+
+std::vector<char> Net::createAckSetFormatPacket(Net::Packet::RequestIdType requestId) {
+	std::vector<char> packet(Net::Packet::headerSize + Net::Packet::ackSize);
+	std::span<char> packetData{ packet.data(), packet.size() };
+	writeHeader(Net::Packet::Category::Ack, packetData);
+	writeAck(requestId, packetData);
+	return packet;
+}
+
 Net::Packet::Category Net::getPacketCategory(std::span<unsigned char> packet) {
 	if (packet.size_bytes() < Packet::headerSize) {
 		return Net::Packet::Category::Error;
@@ -139,9 +166,11 @@ std::optional<Net::Packet::ConnectData> Net::getConnectData(std::span<unsigned c
 	}
 	int offset = Packet::dataOffset;
 	Net::Packet::ConnectData data{};
-	data.compression = readUInt8(packet, offset);
-	offset += sizeof(Net::Packet::CompressionType);
+	data.protocol = readUInt8(packet, offset);
+	offset += sizeof(Net::Packet::ProtocolVersionType);
 	data.requestId = readUInt16Le(packet, offset);
+	offset += sizeof(Net::Packet::RequestIdType);
+	data.compression = readUInt8(packet, offset);
 	return data;
 }
 
@@ -151,8 +180,8 @@ std::optional<Net::Packet::SetFormatData> Net::getSetFormatData(std::span<unsign
 	}
 	int offset = Packet::dataOffset;
 	Net::Packet::SetFormatData data{};
-	data.compression = readUInt8(packet, offset);
-	offset += sizeof(Net::Packet::CompressionType);
 	data.requestId = readUInt16Le(packet, offset);
+	offset += sizeof(Net::Packet::RequestIdType);
+	data.compression = readUInt8(packet, offset);
 	return data;
 }

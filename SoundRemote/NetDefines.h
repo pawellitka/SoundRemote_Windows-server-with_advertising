@@ -10,10 +10,12 @@ namespace Net {
 		using CategoryType = uint8_t;
 		using SizeType = uint16_t;
 		// Data fields
+		using ProtocolVersionType = uint8_t;
 		using RequestIdType = uint16_t;
 		using CompressionType = uint8_t;
 		using KeyType = uint8_t;
 		using ModsType = uint8_t;
+		constexpr int ackCustomDataSize = 4;
 		// Header data
 		constexpr int headerSize = sizeof SignatureType + sizeof CategoryType + sizeof SizeType;
 		constexpr int signatureOffset = 0;
@@ -22,16 +24,18 @@ namespace Net {
 		constexpr int dataOffset = headerSize;
 		// Packet data
 		constexpr int keystrokeSize = sizeof KeyType + sizeof ModsType;
-		constexpr int ackSize = sizeof RequestIdType;
+		constexpr int ackSize = sizeof RequestIdType + ackCustomDataSize;
+		constexpr int ackCustomDataOffset = dataOffset + sizeof RequestIdType;
 		struct ConnectData {
+			ProtocolVersionType protocol;
 			RequestIdType requestId;
 			CompressionType compression;
-			static const int size = sizeof CompressionType + sizeof RequestIdType;
+			static const int size = sizeof ProtocolVersionType + sizeof RequestIdType + sizeof CompressionType;
 		};
 		struct SetFormatData {
 			RequestIdType requestId;
 			CompressionType compression;
-			static const int size = sizeof CompressionType + sizeof RequestIdType;
+			static const int size = sizeof RequestIdType + sizeof CompressionType;
 		};
 
 		constexpr SignatureType protocolSignature = 0xA571u;
@@ -49,10 +53,12 @@ namespace Net {
 			Ack = 0xF0u
 		};
 	}
+	constexpr Packet::ProtocolVersionType protocolVersion = 1u;
+
 	using Address = boost::asio::ip::address;
 
-	const uint16_t defaultServerPort = 15711u;
-	const uint16_t defaultClientPort = 15712u;
+	constexpr uint16_t defaultServerPort = 15711u;
+	constexpr uint16_t defaultClientPort = 15712u;
 
-	const int inputPacketSize = 1024;
+	constexpr int inputPacketSize = 1024;
 }

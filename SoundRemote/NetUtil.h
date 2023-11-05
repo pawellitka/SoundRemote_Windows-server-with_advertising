@@ -22,6 +22,8 @@ namespace Net {
 
 	std::vector<char> assemblePacket(const Net::Packet::Category category, std::span<char> data = {});
 	std::vector<char> createAckPacket(Net::Packet::RequestIdType requestId);
+	std::vector<char> createAckConnectPacket(Net::Packet::RequestIdType requestId);
+	std::vector<char> createAckSetFormatPacket(Net::Packet::RequestIdType requestId);
 
 	Net::Packet::Category getPacketCategory(std::span<unsigned char> packet);
 	std::optional<Keystroke> getKeystroke(std::span<unsigned char> packet);
