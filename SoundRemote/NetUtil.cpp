@@ -114,11 +114,12 @@ std::vector<char> Net::assemblePacket(const Net::Packet::Category category, std:
 	return result;
 }
 
-std::vector<char> Net::createAckPacket(Net::Packet::RequestIdType requestId) {
-	std::array<char, Net::Packet::ackSize> result;
-	std::span<char> resultData{ result.data(), Net::Packet::ackSize };
-	writeUInt16Le(requestId, resultData, 0);
-	return assemblePacket(Net::Packet::Category::Ack, resultData);
+std::vector<char> Net::createAudioPacket(Net::Packet::Category category, const std::span<char>& audioData) {
+	std::vector<char> packet(Net::Packet::headerSize + audioData.size_bytes());
+	std::span<char> packetData{ packet.data(), packet.size() };
+	writeHeader(category, packetData);
+	std::copy_n(audioData.data(), audioData.size_bytes(), packet.data() + Net::Packet::dataOffset);
+	return packet;
 }
 
 std::vector<char> Net::createAckConnectPacket(Net::Packet::RequestIdType requestId) {

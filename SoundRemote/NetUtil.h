@@ -21,7 +21,7 @@ namespace Net {
 	std::optional<Audio::Compression> compressionFromNetworkValue(Net::Packet::CompressionType compression);
 
 	std::vector<char> assemblePacket(const Net::Packet::Category category, std::span<char> data = {});
-	std::vector<char> createAckPacket(Net::Packet::RequestIdType requestId);
+	std::vector<char> createAudioPacket(Net::Packet::Category category, const std::span<char>& audioData);
 	std::vector<char> createAckConnectPacket(Net::Packet::RequestIdType requestId);
 	std::vector<char> createAckSetFormatPacket(Net::Packet::RequestIdType requestId);
 

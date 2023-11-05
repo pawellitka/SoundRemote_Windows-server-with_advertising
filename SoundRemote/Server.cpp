@@ -48,7 +48,7 @@ void Server::sendAudio(Audio::Compression compression, std::vector<char> data) {
         category = Net::Packet::Category::AudioDataUncompressed;
     }
     auto packet = std::make_shared<std::vector<char>>(
-        Net::assemblePacket(category, { data.data(), data.size() })
+        Net::createAudioPacket(category, { data.data(), data.size() })
     );
     for (auto&& address : clientsCache_[compression]) {
         send(address, packet);
