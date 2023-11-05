@@ -17,10 +17,10 @@ public:
 	void setKeystrokeCallback(KeystrokeCallback callback);
 private:
 	boost::asio::awaitable<void> receive(boost::asio::ip::udp::socket& socket);
-	void processConnect(const Net::Address& address, const std::span<unsigned char> packet);
+	void processConnect(const Net::Address& address, const std::span<char>& packet);
 	void processDisconnect(const Net::Address& address);
-	void processSetFormat(const Net::Address& address, const std::span<unsigned char> packet);
-	void processKeystroke(const std::span<unsigned char> packet) const;
+	void processSetFormat(const Net::Address& address, const std::span<char>& packet);
+	void processKeystroke(const std::span<char>& packet) const;
 	void processKeepAlive(const Net::Address& address) const;
 	void send(const Net::Address& address, std::shared_ptr<std::vector<char>> packet);
 	void keepalive();

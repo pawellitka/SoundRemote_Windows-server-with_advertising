@@ -11,42 +11,42 @@
 #pragma comment(lib, "iphlpapi.lib")
 
 namespace {
-	uint32_t readUInt32Le(std::span<unsigned char> data, size_t offset) {
+	uint32_t readUInt32Le(const std::span<char>& data, size_t offset) {
 		assert((offset + 4) <= data.size_bytes());
 		uint32_t result = (data[offset + 0] << 0) | (data[offset + 1] << 8) | (data[offset + 2] << 16) | (data[offset + 3] << 24);
 		return result;
 	}
 
-	uint16_t readUInt16Le(std::span<unsigned char> data, size_t offset) {
+	uint16_t readUInt16Le(const std::span<char>& data, size_t offset) {
 		assert((offset + 2) <= data.size_bytes());
 		uint16_t result = (data[offset + 0] << 0) | (data[offset + 1] << 8);
 		return result;
 	}
 
-	uint8_t readUInt8(std::span<unsigned char> data, size_t offset) {
+	uint8_t readUInt8(const std::span<char>& data, size_t offset) {
 		assert((offset + 1) <= data.size_bytes());
 		uint8_t result = data[offset];
 		return result;
 	}
 
-	void writeUInt16Le(uint16_t value, std::span<char> dest, size_t offset) {
+	void writeUInt16Le(uint16_t value, const std::span<char>& dest, size_t offset) {
 		assert((offset + 2) <= dest.size_bytes());
 		dest[offset] = value >> 0;
 		dest[offset + 1] = value >> 8;
 	}
 
-	void writeUInt8(uint8_t value, std::span<char> dest, size_t offset) {
+	void writeUInt8(uint8_t value, const std::span<char>& dest, size_t offset) {
 		assert((offset + 1) <= dest.size_bytes());
 		dest[offset] = value;
 	}
 
-	void writeHeader(Net::Packet::Category category, std::span<char> packetData) {
+	void writeHeader(Net::Packet::Category category, const std::span<char>& packetData) {
 		writeUInt16Le(Net::Packet::protocolSignature, packetData, Net::Packet::signatureOffset);
 		writeUInt8(static_cast<Net::Packet::CategoryType>(category), packetData, Net::Packet::categoryOffset);
 		writeUInt16Le(static_cast<Net::Packet::SizeType>(packetData.size_bytes()), packetData, Net::Packet::sizeOffset);
 	}
 
-	void writeAck(Net::Packet::RequestIdType requestId, std::span<char> packetData) {
+	void writeAck(Net::Packet::RequestIdType requestId, const std::span<char>& packetData) {
 		writeUInt16Le(requestId, packetData, Net::Packet::dataOffset);
 	}
 };
@@ -139,7 +139,7 @@ std::vector<char> Net::createAckSetFormatPacket(Net::Packet::RequestIdType reque
 	return packet;
 }
 
-Net::Packet::Category Net::getPacketCategory(std::span<unsigned char> packet) {
+Net::Packet::Category Net::getPacketCategory(const std::span<char>& packet) {
 	if (packet.size_bytes() < Packet::headerSize) {
 		return Net::Packet::Category::Error;
 	}
@@ -150,7 +150,7 @@ Net::Packet::Category Net::getPacketCategory(std::span<unsigned char> packet) {
 	return static_cast<Net::Packet::Category>(readUInt8(packet, Net::Packet::categoryOffset));
 }
 
-std::optional<Keystroke> Net::getKeystroke(std::span<unsigned char> packet) {
+std::optional<Keystroke> Net::getKeystroke(const std::span<char>& packet) {
 	if (static_cast<int>(packet.size()) < Packet::dataOffset + Packet::keystrokeSize) {
 		return std::nullopt;
 	}
@@ -161,7 +161,7 @@ std::optional<Keystroke> Net::getKeystroke(std::span<unsigned char> packet) {
 	return Keystroke{ static_cast<int>(key), static_cast<int>(mods) };
 }
 
-std::optional<Net::Packet::ConnectData> Net::getConnectData(std::span<unsigned char> packet) {
+std::optional<Net::Packet::ConnectData> Net::getConnectData(const std::span<char>& packet) {
 	if (static_cast<int>(packet.size()) < Packet::dataOffset + Packet::ConnectData::size) {
 		return std::nullopt;
 	}
@@ -175,7 +175,7 @@ std::optional<Net::Packet::ConnectData> Net::getConnectData(std::span<unsigned c
 	return data;
 }
 
-std::optional<Net::Packet::SetFormatData> Net::getSetFormatData(std::span<unsigned char> packet) {
+std::optional<Net::Packet::SetFormatData> Net::getSetFormatData(const std::span<char>& packet) {
 	if (static_cast<int>(packet.size()) < Packet::dataOffset + Packet::SetFormatData::size) {
 		return std::nullopt;
 	}

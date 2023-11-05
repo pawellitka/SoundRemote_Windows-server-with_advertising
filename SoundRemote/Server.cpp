@@ -61,7 +61,7 @@ void Server::setKeystrokeCallback(KeystrokeCallback callback) {
 
 awaitable<void> Server::receive(udp::socket& socket) {
     //throw std::exception("Server::receive");
-    std::array<unsigned char, Net::inputPacketSize> datagram{};
+    std::array<char, Net::inputPacketSize> datagram{};
     udp::endpoint sender;
     //Have to handle errors here or write custom completion handler for co_spawn()
     try {
@@ -106,7 +106,7 @@ awaitable<void> Server::receive(udp::socket& socket) {
     }
 }
 
-void Server::processConnect(const Net::Address& address, const std::span<unsigned char> packet) {
+void Server::processConnect(const Net::Address& address, const std::span<char>& packet) {
     const auto connectData = Net::getConnectData(packet);
     if (!connectData) { return; }
     auto compression = Net::compressionFromNetworkValue(connectData->compression);
@@ -122,7 +122,7 @@ void Server::processDisconnect(const Net::Address& address) {
     clients_->remove(address);
 }
 
-void Server::processSetFormat(const Net::Address& address, const std::span<unsigned char> packet) {
+void Server::processSetFormat(const Net::Address& address, const std::span<char>& packet) {
     const auto setFormatData = Net::getSetFormatData(packet);
     if (!setFormatData) { return; }
     auto compression = Net::compressionFromNetworkValue(setFormatData->compression);
@@ -134,7 +134,7 @@ void Server::processSetFormat(const Net::Address& address, const std::span<unsig
     ));
 }
 
-void Server::processKeystroke(const std::span<unsigned char> packet) const {
+void Server::processKeystroke(const std::span<char>& packet) const {
     const std::optional<Keystroke> keystroke = Net::getKeystroke(packet);
     if (!keystroke) { return; }
     keystroke->emulate();
