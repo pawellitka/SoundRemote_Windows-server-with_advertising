@@ -11,7 +11,7 @@ namespace Net {
 		using SizeType = uint16_t;
 		// Data fields
 		using RequestIdType = uint16_t;
-		using BitrateType = uint8_t;
+		using CompressionType = uint8_t;
 		using KeyType = uint8_t;
 		using ModsType = uint8_t;
 		// Header data
@@ -25,13 +25,13 @@ namespace Net {
 		constexpr int ackSize = sizeof RequestIdType;
 		struct ConnectData {
 			RequestIdType requestId;
-			BitrateType bitrate;
-			static const int size = sizeof BitrateType + sizeof RequestIdType;
+			CompressionType compression;
+			static const int size = sizeof CompressionType + sizeof RequestIdType;
 		};
 		struct SetFormatData {
 			RequestIdType requestId;
-			BitrateType bitrate;
-			static const int size = sizeof BitrateType + sizeof RequestIdType;
+			CompressionType compression;
+			static const int size = sizeof CompressionType + sizeof RequestIdType;
 		};
 
 		constexpr SignatureType protocolSignature = 0xA571u;

@@ -13,12 +13,12 @@ namespace Net {
 	std::forward_list<std::wstring> getLocalAddresses();
 
 	/// <summary>
-	/// Converts a bitrate value used in the network protocol to a value of the <c>Audio::Bitrate</c> enum.
+	/// Converts a compression value used in the network protocol to a value of the <c>Audio::Compression</c> enum.
 	/// </summary>
-	/// <param name="bitrate">Network protocol bitrate value</param>
-	/// <returns><c>std::optional</c> containing an <c>Audio::Bitrate</c> value or <c>std::nullopt</c> if the passed
-	/// argument is not a valid bitrate value.</returns>
-	std::optional<Audio::Bitrate> bitrateFromNetworkValue(Net::Packet::BitrateType bitrate);
+	/// <param name="compression">Network protocol compression value</param>
+	/// <returns><c>std::optional</c> containing an <c>Audio::Compression</c> value or <c>std::nullopt</c> if the passed
+	/// argument is not a valid compression value.</returns>
+	std::optional<Audio::Compression> compressionFromNetworkValue(Net::Packet::CompressionType compression);
 
 	std::vector<char> assemblePacket(const Net::Packet::Category category, std::span<char> data = {});
 	std::vector<char> createAckPacket(Net::Packet::RequestIdType requestId);

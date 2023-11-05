@@ -73,20 +73,20 @@ std::forward_list<std::wstring> Net::getLocalAddresses() {
 	return result;
 }
 
-std::optional<Audio::Bitrate> Net::bitrateFromNetworkValue(Net::Packet::BitrateType bitrate) {
-	switch (bitrate) {
+std::optional<Audio::Compression> Net::compressionFromNetworkValue(Net::Packet::CompressionType compression) {
+	switch (compression) {
 	case 0:
-		return Audio::Bitrate::none;
+		return Audio::Compression::none;
 	case 1:
-		return Audio::Bitrate::kbps_64;
+		return Audio::Compression::kbps_64;
 	case 2:
-		return Audio::Bitrate::kbps_128;
+		return Audio::Compression::kbps_128;
 	case 3:
-		return Audio::Bitrate::kbps_192;
+		return Audio::Compression::kbps_192;
 	case 4:
-		return Audio::Bitrate::kbps_256;
+		return Audio::Compression::kbps_256;
 	case 5:
-		return Audio::Bitrate::kbps_320;
+		return Audio::Compression::kbps_320;
 	default:
 		return std::nullopt;
 	}
@@ -139,8 +139,8 @@ std::optional<Net::Packet::ConnectData> Net::getConnectData(std::span<unsigned c
 	}
 	int offset = Packet::dataOffset;
 	Net::Packet::ConnectData data{};
-	data.bitrate = readUInt8(packet, offset);
-	offset += sizeof(Net::Packet::BitrateType);
+	data.compression = readUInt8(packet, offset);
+	offset += sizeof(Net::Packet::CompressionType);
 	data.requestId = readUInt16Le(packet, offset);
 	return data;
 }
@@ -151,8 +151,8 @@ std::optional<Net::Packet::SetFormatData> Net::getSetFormatData(std::span<unsign
 	}
 	int offset = Packet::dataOffset;
 	Net::Packet::SetFormatData data{};
-	data.bitrate = readUInt8(packet, offset);
-	offset += sizeof(Net::Packet::BitrateType);
+	data.compression = readUInt8(packet, offset);
+	offset += sizeof(Net::Packet::CompressionType);
 	data.requestId = readUInt16Le(packet, offset);
 	return data;
 }

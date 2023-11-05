@@ -35,6 +35,6 @@ private:
 	const std::wstring device_;
 	boost::asio::streambuf pcmAudioBuffer_;
 	std::atomic_bool muted_ = false;
-	std::unordered_map<Audio::Bitrate, std::unique_ptr<EncoderOpus>> encoders_;
+	std::unordered_map<Audio::Compression, std::unique_ptr<EncoderOpus>> encoders_;
 	int opusInputSize_;
 };

@@ -13,7 +13,7 @@ public:
 	Server(int clientPort, int serverPort, boost::asio::io_context& ioContext, std::shared_ptr<Clients> clients);
 	~Server();
 	void onClientsUpdate(std::forward_list<ClientInfo> clients);
-	void sendAudio(Audio::Bitrate bitrate, std::vector<char> data);
+	void sendAudio(Audio::Compression compression, std::vector<char> data);
 	void setKeystrokeCallback(KeystrokeCallback callback);
 private:
 	boost::asio::awaitable<void> receive(boost::asio::ip::udp::socket& socket);
@@ -34,5 +34,5 @@ private:
 	int clientPort_;
 	KeystrokeCallback keystrokeCallback_;
 	std::shared_ptr<Clients> clients_;
-	std::unordered_map<Audio::Bitrate, std::forward_list<Net::Address>> clientsCache_;
+	std::unordered_map<Audio::Compression, std::forward_list<Net::Address>> clientsCache_;
 };

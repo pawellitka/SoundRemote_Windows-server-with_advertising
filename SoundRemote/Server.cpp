@@ -32,25 +32,25 @@ Server::~Server() {
 }
 
 void Server::onClientsUpdate(std::forward_list<ClientInfo> clients) {
-    std::unordered_map<Audio::Bitrate, std::forward_list<Net::Address>> newClients;
+    std::unordered_map<Audio::Compression, std::forward_list<Net::Address>> newClients;
     for (auto&& client: clients) {
-        if (!newClients.contains(client.bitrate)) {
-            newClients[client.bitrate] = std::forward_list<Net::Address>();
+        if (!newClients.contains(client.compression)) {
+            newClients[client.compression] = std::forward_list<Net::Address>();
         }
-        newClients[client.bitrate].push_front(client.address);
+        newClients[client.compression].push_front(client.address);
     }
     clientsCache_ = std::move(newClients);
 }
 
-void Server::sendAudio(Audio::Bitrate bitrate, std::vector<char> data) {
+void Server::sendAudio(Audio::Compression compression, std::vector<char> data) {
     auto category = Net::Packet::Category::AudioDataOpus;
-    if (bitrate == Audio::Bitrate::none) {
+    if (compression == Audio::Compression::none) {
         category = Net::Packet::Category::AudioDataUncompressed;
     }
     auto packet = std::make_shared<std::vector<char>>(
         Net::assemblePacket(category, { data.data(), data.size() })
     );
-    for (auto&& address : clientsCache_[bitrate]) {
+    for (auto&& address : clientsCache_[compression]) {
         send(address, packet);
     }
 }
@@ -109,9 +109,9 @@ awaitable<void> Server::receive(udp::socket& socket) {
 void Server::processConnect(const Net::Address& address, const std::span<unsigned char> packet) {
     const auto connectData = Net::getConnectData(packet);
     if (!connectData) { return; }
-    auto bitrate = Net::bitrateFromNetworkValue(connectData->bitrate);
-    if (!bitrate) { return; }
-    clients_->add(address, *bitrate);
+    auto compression = Net::compressionFromNetworkValue(connectData->compression);
+    if (!compression) { return; }
+    clients_->add(address, *compression);
 
     send(address, std::make_shared<std::vector<char>>(
         Net::createAckPacket(connectData->requestId)
@@ -125,9 +125,9 @@ void Server::processDisconnect(const Net::Address& address) {
 void Server::processSetFormat(const Net::Address& address, const std::span<unsigned char> packet) {
     const auto setFormatData = Net::getSetFormatData(packet);
     if (!setFormatData) { return; }
-    auto bitrate = Net::bitrateFromNetworkValue(setFormatData->bitrate);
-    if (!bitrate) { return; }
-    clients_->setBitrate(address, *bitrate);
+    auto compression = Net::compressionFromNetworkValue(setFormatData->compression);
+    if (!compression) { return; }
+    clients_->setCompression(address, *compression);
 
     send(address, std::make_shared<std::vector<char>>(
         Net::createAckPacket(setFormatData->requestId)
@@ -180,7 +180,7 @@ void Server::maintain(boost::system::error_code ec) {
 void Server::keepalive() {
     if (clientsCache_.empty()) { return; }
     auto packet = std::make_shared<std::vector<char>>(Net::assemblePacket(Net::Packet::Category::ServerKeepAlive));
-    for (auto&& [bitrate, addresses] : clientsCache_) {
+    for (auto&& [compression, addresses] : clientsCache_) {
         for (auto&& address : addresses) {
             send(address, packet);
         }

@@ -8,44 +8,39 @@ struct ClientInfo;
 class Clients {
 	using TimePoint = std::chrono::steady_clock::time_point;
 	using ClientsUpdateCallback = std::function<void(std::forward_list<ClientInfo>)>;
-	using BitratesUpdateCallback = std::function<void(std::set<Audio::Bitrate>)>;
 public:
 	Clients(int timeoutSeconds = 5);
-	void add(const Net::Address& address, Audio::Bitrate bitrate);
-	void setBitrate(const Net::Address& address, Audio::Bitrate bitrate);
+	void add(const Net::Address& address, Audio::Compression compression);
+	void setCompression(const Net::Address& address, Audio::Compression compression);
 	void keep(const Net::Address& address);
 	void remove(const Net::Address& address);
 	void addClientsListener(ClientsUpdateCallback listener);
-	void setBitrateListener(BitratesUpdateCallback listener);
 	void maintain();
 
 private:
 	class Client {
 	public:
-		Client(Audio::Bitrate bitrate);
+		Client(Audio::Compression compression);
 		void updateLastContact();
-		void setBitrate(Audio::Bitrate bitrate);
+		void setCompression(Audio::Compression compression);
 		TimePoint lastContact() const;
-		Audio::Bitrate bitrate() const;
+		Audio::Compression compression() const;
 	private:
-		Audio::Bitrate bitrate_ = Audio::Bitrate::none;
+		Audio::Compression compression_ = Audio::Compression::none;
 		TimePoint lastContact_{};
 	};
 	
 	void onClientsUpdate();
-	void onBitratesUpdate();
 
 	const int timeoutSeconds_;
 	std::unordered_map<Net::Address, std::unique_ptr<Client>> clients_;
 	std::shared_mutex clientsMutex_;
-	std::set<Audio::Bitrate> usedBitrates_;
 	// listeners are not synchronized, they are modified only on program start
 	std::forward_list<ClientsUpdateCallback> clientsListeners_;
-	BitratesUpdateCallback bitratesListener_;
 };
 
 struct ClientInfo {
 	Net::Address address;
-	Audio::Bitrate bitrate;
-	ClientInfo(Net::Address addr, Audio::Bitrate br) : address(addr), bitrate(br) {}
+	Audio::Compression compression;
+	ClientInfo(Net::Address addr, Audio::Compression br) : address(addr), compression(br) {}
 };

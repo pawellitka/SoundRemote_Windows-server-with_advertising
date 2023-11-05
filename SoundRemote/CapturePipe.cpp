@@ -65,25 +65,25 @@ void CapturePipe::setMuted(bool muted) {
 }
 
 void CapturePipe::onClientsUpdate(std::forward_list<ClientInfo> clients) {
-    std::unordered_set<Audio::Bitrate> newBitrates;
-    std::unordered_set<Audio::Bitrate> repeatingBitrates;
+    std::unordered_set<Audio::Compression> newCompressions;
+    std::unordered_set<Audio::Compression> existingCompressions;
     for (auto&& client : clients) {
-        if (encoders_.contains(client.bitrate)) {
-            repeatingBitrates.insert(client.bitrate);
+        if (encoders_.contains(client.compression)) {
+            existingCompressions.insert(client.compression);
         } else {
-            newBitrates.insert(client.bitrate);
+            newCompressions.insert(client.compression);
         }
     }
 
-    if (newBitrates.empty() && repeatingBitrates.size() == encoders_.size()) {
+    if (newCompressions.empty() && existingCompressions.size() == encoders_.size()) {
         return;
     }
 
     std::erase_if(encoders_, [&](const auto& item) {
-        return !repeatingBitrates.contains(item.first);
+        return !existingCompressions.contains(item.first);
     });
-    for (auto&& it: newBitrates) {
-        if (it == Audio::Bitrate::none) {
+    for (auto&& it: newCompressions) {
+        if (it == Audio::Compression::none) {
             encoders_[it] = std::unique_ptr<EncoderOpus>();
         } else {
             encoders_[it] = std::make_unique<EncoderOpus>(it, Audio::Opus::SampleRate::khz_48,
@@ -126,15 +126,15 @@ void CapturePipe::process(std::span<char> pcmAudio, std::shared_ptr<Server> serv
         pcmAudioBuffer_.sputn(pcmAudio.data(), pcmAudio.size());
     }
     while (pcmAudioBuffer_.data().size() >= opusInputSize_) {
-        for (auto&& [bitrate, encoder] : encoders_) {
-            if (bitrate == Audio::Bitrate::none) {
+        for (auto&& [compression, encoder] : encoders_) {
+            if (compression == Audio::Compression::none) {
                 std::vector<char> uncompressed(opusInputSize_);
                 std::copy_n(
                     reinterpret_cast<const char *>(pcmAudioBuffer_.data().data()),
                     opusInputSize_,
                     uncompressed.data()
                 );
-                server->sendAudio(bitrate, uncompressed);
+                server->sendAudio(compression, uncompressed);
             } else {
                 std::vector<char> encodedPacket(Audio::Opus::maxPacketSize);
                 const auto packetSize = encoder->encode(
@@ -143,7 +143,7 @@ void CapturePipe::process(std::span<char> pcmAudio, std::shared_ptr<Server> serv
                 );
                 encodedPacket.resize(packetSize);
                 if (packetSize > 0) {
-                    server->sendAudio(bitrate, encodedPacket);
+                    server->sendAudio(compression, encodedPacket);
                 }
             }
         }

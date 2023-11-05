@@ -6,7 +6,7 @@
 #include "Util.h"
 #include "EncoderOpus.h"
 
-EncoderOpus::EncoderOpus(Audio::Bitrate bitrate, Audio::Opus::SampleRate sampleRate, Audio::Opus::Channels channels) {
+EncoderOpus::EncoderOpus(Audio::Compression compression, Audio::Opus::SampleRate sampleRate, Audio::Opus::Channels channels) {
     frameSize_ = getFrameSize(sampleRate);
     inputPacketSize_ = getInputSize(frameSize_, channels);
 
@@ -18,7 +18,7 @@ EncoderOpus::EncoderOpus(Audio::Bitrate bitrate, Audio::Opus::SampleRate sampleR
     if (OPUS_OK != error || nullptr == encoder_) {
         Audio::processError(error, Audio::Location::ENCODER_CREATE);
     }
-    auto ret = opus_encoder_ctl(encoder_.get(), OPUS_SET_BITRATE(static_cast<int>(bitrate)));
+    auto ret = opus_encoder_ctl(encoder_.get(), OPUS_SET_BITRATE(static_cast<int>(compression)));
     if (ret != OPUS_OK) {
         Audio::processError(ret, Audio::Location::ENCODER_SET_BITRATE);
     };
