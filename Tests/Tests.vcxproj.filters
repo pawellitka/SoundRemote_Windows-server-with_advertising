@@ -14,6 +14,9 @@
       <Filter>gtest Package Files</Filter>
     </ClCompile>
     <ClCompile Include="NetUtilTest.cpp" />
+    <ClCompile Include="header_tests\NetUtilHTest.cpp">
+      <Filter>Header Tests</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -21,6 +24,9 @@
   <ItemGroup>
     <Filter Include="gtest Package Files">
       <UniqueIdentifier>{f58def6f-26f7-414c-a9f0-ffc861515233}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Tests">
+      <UniqueIdentifier>{b33345fd-7398-4173-a616-d15c66103f4c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
