@@ -4,12 +4,7 @@
 
 struct OpusEncoder;
 
-struct EncoderDeleter {
-	void operator()(OpusEncoder* enc) const;
-};
-
 class EncoderOpus {
-	using encoder_ptr = std::unique_ptr<OpusEncoder, EncoderDeleter>;
 public:
 	EncoderOpus(Audio::Compression compression, Audio::Opus::SampleRate sampleRate, Audio::Opus::Channels channels);
 
@@ -26,8 +21,12 @@ public:
 	static int getFrameSize(Audio::Opus::SampleRate sampleRate);
 	static int getInputSize(int frameSize, Audio::Opus::Channels channels);
 private:
+	struct EncoderDeleter {
+		void operator()(OpusEncoder* enc) const;
+	};
+	using Encoder = std::unique_ptr<OpusEncoder, EncoderDeleter>;
 
-	encoder_ptr encoder_;
+	Encoder encoder_;
 	// Number of samples per frame
 	int frameSize_;
 	// Bytes per input packet for 16 bit sample size

@@ -11,7 +11,7 @@ EncoderOpus::EncoderOpus(Audio::Compression compression, Audio::Opus::SampleRate
     inputPacketSize_ = getInputSize(frameSize_, channels);
 
     int error{};
-    encoder_ = encoder_ptr(
+    encoder_ = Encoder(
         opus_encoder_create(static_cast<int>(sampleRate), static_cast<int>(channels), OPUS_APPLICATION_AUDIO, &error),
         EncoderDeleter()
     );
@@ -51,6 +51,6 @@ int EncoderOpus::getInputSize(int frameSize, Audio::Opus::Channels channels) {
 
 //---EncoderDeleter---
 
-void EncoderDeleter::operator()(OpusEncoder* enc) const {
+void EncoderOpus::EncoderDeleter::operator()(OpusEncoder* enc) const {
     opus_encoder_destroy(enc);
 }
