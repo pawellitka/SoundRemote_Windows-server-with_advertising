@@ -122,6 +122,12 @@ std::vector<char> Net::createAudioPacket(Net::Packet::Category category, const s
 	return packet;
 }
 
+std::vector<char> Net::createKeepAlivePacket() {
+	std::vector<char> packet(Net::Packet::headerSize);
+	writeHeader(Net::Packet::Category::Ack, { packet.data(), packet.size() });
+	return packet;
+}
+
 std::vector<char> Net::createAckConnectPacket(Net::Packet::RequestIdType requestId) {
 	std::vector<char> packet(Net::Packet::headerSize + Net::Packet::ackSize);
 	std::span<char> packetData{ packet.data(), packet.size() };

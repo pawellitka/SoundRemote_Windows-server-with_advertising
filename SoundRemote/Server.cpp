@@ -179,7 +179,7 @@ void Server::maintain(boost::system::error_code ec) {
 
 void Server::keepalive() {
     if (clientsCache_.empty()) { return; }
-    auto packet = std::make_shared<std::vector<char>>(Net::assemblePacket(Net::Packet::Category::ServerKeepAlive));
+    auto packet = std::make_shared<std::vector<char>>(Net::createKeepAlivePacket());
     for (auto&& [compression, addresses] : clientsCache_) {
         for (auto&& address : addresses) {
             send(address, packet);
