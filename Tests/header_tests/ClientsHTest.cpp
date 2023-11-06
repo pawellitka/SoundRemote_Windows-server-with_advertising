@@ -1,8 +1,8 @@
 #include "../pch.h"
-#include "NetUtil.h"
+#include "Clients.h"
 
 namespace {
-	TEST(HeaderTest, NetUtilCompiles) {
+	TEST(HeaderTest, ClientsCompiles) {
 		EXPECT_TRUE(true);
 	}
 }

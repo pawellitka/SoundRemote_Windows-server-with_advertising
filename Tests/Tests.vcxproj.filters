@@ -14,7 +14,25 @@
       <Filter>gtest Package Files</Filter>
     </ClCompile>
     <ClCompile Include="NetUtilTest.cpp" />
+    <ClCompile Include="header_tests\AudioCaptureHTest.cpp">
+      <Filter>Header Tests</Filter>
+    </ClCompile>
     <ClCompile Include="header_tests\NetUtilHTest.cpp">
+      <Filter>Header Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="header_tests\AudioResamplerHTest.cpp">
+      <Filter>Header Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="header_tests\AudioUtilHTest.cpp">
+      <Filter>Header Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="header_tests\CapturePipeHTest.cpp">
+      <Filter>Header Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="header_tests\ClientsHTest.cpp">
+      <Filter>Header Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="header_tests\ControlsHTest.cpp">
       <Filter>Header Tests</Filter>
     </ClCompile>
   </ItemGroup>
