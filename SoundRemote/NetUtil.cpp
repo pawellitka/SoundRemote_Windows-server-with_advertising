@@ -128,6 +128,12 @@ std::vector<char> Net::createKeepAlivePacket() {
 	return packet;
 }
 
+std::vector<char> Net::createDisconnectPacket() {
+	std::vector<char> packet(Net::Packet::headerSize);
+	writeHeader(Net::Packet::Category::Disconnect, { packet.data(), packet.size() });
+	return packet;
+}
+
 std::vector<char> Net::createAckConnectPacket(Net::Packet::RequestIdType requestId) {
 	std::vector<char> packet(Net::Packet::headerSize + Net::Packet::ackSize);
 	std::span<char> packetData{ packet.data(), packet.size() };
