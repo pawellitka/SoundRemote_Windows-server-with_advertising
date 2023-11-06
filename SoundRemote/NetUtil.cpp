@@ -13,20 +13,21 @@
 namespace {
 	uint32_t readUInt32Le(const std::span<char>& data, size_t offset) {
 		assert((offset + 4) <= data.size_bytes());
-		uint32_t result = (data[offset + 0] << 0) | (data[offset + 1] << 8) | (data[offset + 2] << 16) | (data[offset + 3] << 24);
-		return result;
+		return static_cast<unsigned char>(data[offset])
+			| (static_cast<unsigned char>(data[offset + 1]) << 8)
+			| (static_cast<unsigned char>(data[offset + 2]) << 16)
+			| (static_cast<unsigned char>(data[offset + 3]) << 24);
 	}
 
 	uint16_t readUInt16Le(const std::span<char>& data, size_t offset) {
 		assert((offset + 2) <= data.size_bytes());
-		uint16_t result = (data[offset + 0] << 0) | (data[offset + 1] << 8);
-		return result;
+		return static_cast<unsigned char>(data[offset])
+			| (static_cast<unsigned char>(data[offset + 1]) << 8);
 	}
 
 	uint8_t readUInt8(const std::span<char>& data, size_t offset) {
 		assert((offset + 1) <= data.size_bytes());
-		uint8_t result = data[offset];
-		return result;
+		return data[offset];
 	}
 
 	void writeUInt16Le(uint16_t value, const std::span<char>& dest, size_t offset) {
