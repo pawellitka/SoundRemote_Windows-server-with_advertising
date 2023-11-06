@@ -7,7 +7,6 @@ class Clients;
 struct ClientInfo;
 
 class Server {
-	using ClientsUpdateCallback = std::function<void(std::forward_list<std::string>)>;
 	using KeystrokeCallback = std::function<void(const Keystroke& keystroke)>;
 public:
 	Server(int clientPort, int serverPort, boost::asio::io_context& ioContext, std::shared_ptr<Clients> clients);
@@ -22,7 +21,8 @@ private:
 	void processSetFormat(const Net::Address& address, const std::span<char>& packet);
 	void processKeystroke(const std::span<char>& packet) const;
 	void processKeepAlive(const Net::Address& address) const;
-	void send(const Net::Address& address, std::shared_ptr<std::vector<char>> packet);
+	void send(const Net::Address& address, const std::shared_ptr<std::vector<char>> packet);
+	void handleSend(const std::shared_ptr<std::vector<char>> packet, const boost::system::error_code& ec, std::size_t bytes);
 	void keepalive();
 
 	void startMaintenanceTimer();

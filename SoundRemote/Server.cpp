@@ -11,6 +11,7 @@ using boost::asio::co_spawn;
 using boost::asio::detached;
 using boost::asio::use_awaitable;
 using namespace std::chrono_literals;
+using namespace std::placeholders;
 
 Server::Server(int clientPort, int serverPort, boost::asio::io_context& ioContext, std::shared_ptr<Clients> clients) :
     clientPort_(clientPort),
@@ -147,15 +148,18 @@ void Server::processKeepAlive(const Net::Address& address) const {
     clients_->keep(address);
 }
 
-void Server::send(const Net::Address& address, std::shared_ptr<std::vector<char>> packet) {
+void Server::send(const Net::Address& address, const std::shared_ptr<std::vector<char>> packet) {
     auto destination = udp::endpoint(address, clientPort_);
+    destination.address(address);
     socketSend_.async_send_to(boost::asio::buffer(packet->data(), packet->size()), destination,
-        //shared_ptr with the packet is passed to keep data alive until the handler call
-        [packet](boost::system::error_code ec, auto bytes) mutable {
-            if (ec) {
-                throw std::runtime_error(Util::contructAppExceptionText("Server send", ec.what()));
-            }
-        });
+        std::bind(&Server::handleSend, this, packet, _1, _2));
+}
+
+// std::shared_ptr with the packet is passed to keep data alive until the handler call
+void Server::handleSend(const std::shared_ptr<std::vector<char>> packet, const boost::system::error_code& ec, std::size_t bytes) {
+    if (ec) {
+        throw std::runtime_error(Util::contructAppExceptionText("Server send", ec.what()));
+    }
 }
 
 void Server::startMaintenanceTimer() {
