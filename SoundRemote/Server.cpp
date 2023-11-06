@@ -56,6 +56,18 @@ void Server::sendAudio(Audio::Compression compression, std::vector<char> data) {
     }
 }
 
+void Server::sendDisconnectBlocking() {
+    if (clientsCache_.empty()) { return; }
+    auto destination = udp::endpoint(udp::v4(), clientPort_);
+    auto packet = std::make_shared<std::vector<char>>(Net::createDisconnectPacket());
+    for (auto&& [compression, addresses] : clientsCache_) {
+        for (auto&& address : addresses) {
+            destination.address(address);
+            socketSend_.send_to(boost::asio::buffer(packet->data(), packet->size()), destination);
+        }
+    }
+}
+
 void Server::setKeystrokeCallback(KeystrokeCallback callback) {
     keystrokeCallback_ = callback;
 }

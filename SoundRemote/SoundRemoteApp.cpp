@@ -105,6 +105,7 @@ void SoundRemoteApp::run() {
 }
 
 void SoundRemoteApp::shutdown() {
+    server_->sendDisconnectBlocking();
     stopCapture();
     ioContext_.stop();
 }

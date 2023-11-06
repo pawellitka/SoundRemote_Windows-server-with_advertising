@@ -7,12 +7,19 @@ class Clients;
 struct ClientInfo;
 
 class Server {
-	using KeystrokeCallback = std::function<void(const Keystroke& keystroke)>;
 public:
+	using KeystrokeCallback = std::function<void(const Keystroke& keystroke)>;
+
 	Server(int clientPort, int serverPort, boost::asio::io_context& ioContext, std::shared_ptr<Clients> clients);
 	~Server();
 	void onClientsUpdate(std::forward_list<ClientInfo> clients);
 	void sendAudio(Audio::Compression compression, std::vector<char> data);
+	/*
+	* Sends disconnect packet to all the clients blocking the current thread.
+	*
+	* @throws boost::system::system_error Thrown on failure.
+	*/
+	void sendDisconnectBlocking();
 	void setKeystrokeCallback(KeystrokeCallback callback);
 private:
 	boost::asio::awaitable<void> receive(boost::asio::ip::udp::socket& socket);
