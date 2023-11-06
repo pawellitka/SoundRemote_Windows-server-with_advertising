@@ -11,13 +11,13 @@
 #include "Clients.h"
 #include "CapturePipe.h"
 
-struct task {
+struct [[nodiscard]] PipeCoroutine {
     struct promise_type;
-    using handle_t = std::coroutine_handle<promise_type>;
+    using Handle = std::coroutine_handle<promise_type>;
 
     struct promise_type {
-        task get_return_object() {
-            return handle_t::from_promise(*this);
+        PipeCoroutine get_return_object() {
+            return Handle::from_promise(*this);
         }
         std::suspend_never initial_suspend() { return {}; }
         std::suspend_never final_suspend() noexcept { return {}; }
@@ -28,11 +28,11 @@ struct task {
         }
     };
 
-    handle_t h_;
-    task(handle_t h) :h_{ h } {}
-    ~task() { /*h_.destroy();*/ }
-    operator handle_t() const { return h_; }
-    //task(const task&) = delete;
+    Handle h_;
+    PipeCoroutine(Handle h) :h_{ h } {}
+    ~PipeCoroutine() { /*h_.destroy();*/ }
+    operator Handle() const { return h_; }
+    //PipeCoroutine(const PipeCoroutine&) = delete;
 };
 
 CapturePipe::CapturePipe(const std::wstring& deviceId, std::shared_ptr<Server> server, boost::asio::io_context& ioContext, bool muted):
@@ -53,7 +53,7 @@ CapturePipe::~CapturePipe() {
 }
 
 void CapturePipe::start() {
-    pipeCoro_ = std::make_unique<task>(process());
+    pipeCoro_ = std::make_unique<PipeCoroutine>(process());
 }
 
 float CapturePipe::getPeakValue() const {
@@ -92,7 +92,7 @@ void CapturePipe::onClientsUpdate(std::forward_list<ClientInfo> clients) {
     }
 }
 
-task CapturePipe::process() {
+PipeCoroutine CapturePipe::process() {
     //throw std::runtime_error("CapturePipe::process start");
     auto audioCapture = audioCapture_->capture();
     for (;;) {

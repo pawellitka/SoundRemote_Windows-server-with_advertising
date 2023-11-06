@@ -7,7 +7,7 @@ class AudioCapture;
 class AudioResampler;
 class EncoderOpus;
 class Server;
-struct task;
+struct PipeCoroutine;
 struct ClientInfo;
 
 class CapturePipe {
@@ -21,14 +21,14 @@ public:
 	void onClientsUpdate(std::forward_list<ClientInfo> clients);
 private:
 	// Capturing coroutine
-	task process();
+	PipeCoroutine process();
 	// Destroys the capturing coroutine
 	void stop();
 	void process(std::span<char> pcmAudio, std::shared_ptr<Server> server);
 	bool haveClients() const;
 
 	boost::asio::io_context& io_context_;
-	std::unique_ptr<task> pipeCoro_;
+	std::unique_ptr<PipeCoroutine> pipeCoro_;
 	std::unique_ptr<AudioCapture> audioCapture_;
 	std::unique_ptr<AudioResampler> audioResampler_;
 	std::weak_ptr<Server> server_;

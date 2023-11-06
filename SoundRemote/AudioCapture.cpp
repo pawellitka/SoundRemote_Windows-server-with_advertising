@@ -11,7 +11,6 @@
 #include "AudioCapture.h"
 
 using namespace boost::asio;
-using time_point = std::chrono::steady_clock::time_point;
 using namespace std::chrono_literals;
 
 using namespace Audio;
@@ -219,7 +218,7 @@ AudioCapture::AudioCapture(const std::wstring& deviceId, Audio::Format requested
 AudioCapture::~AudioCapture() {
 }
 
-PcmAudioSource AudioCapture::capture() {
+CaptureCoroutine AudioCapture::capture() {
     //throw Audio::Error("AudioCapture::capture start");
     HRESULT hr;
 

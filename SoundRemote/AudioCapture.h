@@ -5,7 +5,7 @@
 #include <atlcomcli.h>	//CComPtr
 #include <mmreg.h>      //WAVEFORMATEXTENSIBLE
 
-struct PcmAudioSource;
+struct CaptureCoroutine;
 
 struct IAudioCaptureClient;
 struct IAudioClient;
@@ -25,7 +25,7 @@ public:
     /// <summary>
     /// Awaitable capture coroutine.
     /// </summary>
-    PcmAudioSource capture();
+    CaptureCoroutine capture();
 
     /// <summary>
     /// Is resampling of the captured audio required, i.e. requested audio format is not supported by the audio device.
@@ -69,17 +69,17 @@ private:
     CComPtr<IAudioMeterInformation> meterInfo_;
 };
 
-struct [[nodiscard]] PcmAudioSource {
+struct [[nodiscard]] CaptureCoroutine {
     struct promise_type;
-    using handle_type = std::coroutine_handle<promise_type>;
+    using Handle = std::coroutine_handle<promise_type>;
 
     struct promise_type {
         std::span<char> pcmAudio;
         std::coroutine_handle<> awaiting_coroutine_;
         //std::exception_ptr exception_;
 
-        PcmAudioSource get_return_object() {
-            return { handle_type::from_promise(*this) };
+        CaptureCoroutine get_return_object() {
+            return { Handle::from_promise(*this) };
         }
         std::suspend_never initial_suspend() { return {}; }
         std::suspend_never final_suspend() noexcept { return {}; }
@@ -104,10 +104,10 @@ struct [[nodiscard]] PcmAudioSource {
         }
     };
 
-    handle_type h_;
-    PcmAudioSource(handle_type h) :h_{ h } {}
-    ~PcmAudioSource() { h_.destroy(); }
-    operator handle_type() const { return h_; }
+    Handle h_;
+    CaptureCoroutine(Handle h) :h_{ h } {}
+    ~CaptureCoroutine() { h_.destroy(); }
+    operator Handle() const { return h_; }
 
     //explicit operator bool() {
     //    return !h_.done();
@@ -115,7 +115,7 @@ struct [[nodiscard]] PcmAudioSource {
 
     template<typename PromiseType = void>
     struct AudioAwaiter {
-        handle_type captureCoro;
+        Handle captureCoro;
         bool await_ready() {
             return captureCoro.promise().pcmAudio.size() > 0;
         }
