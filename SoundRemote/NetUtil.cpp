@@ -124,7 +124,7 @@ std::vector<char> Net::createAudioPacket(Net::Packet::Category category, const s
 
 std::vector<char> Net::createKeepAlivePacket() {
 	std::vector<char> packet(Net::Packet::headerSize);
-	writeHeader(Net::Packet::Category::Ack, { packet.data(), packet.size() });
+	writeHeader(Net::Packet::Category::ServerKeepAlive, { packet.data(), packet.size() });
 	return packet;
 }
 
