@@ -102,18 +102,6 @@ std::optional<Audio::Compression> Net::compressionFromNetworkValue(Net::Packet::
 	}
 }
 
-std::vector<char> Net::assemblePacket(const Net::Packet::Category category, std::span<char> packetData) {
-	const Net::Packet::SizeType packetLen = Net::Packet::headerSize + static_cast<Net::Packet::SizeType>(packetData.size_bytes());
-	std::vector<char> result(packetLen);
-	std::span<char> resultData{ result.data(), packetLen };
-	int offset = 0;
-	writeUInt16Le(Net::Packet::protocolSignature, resultData, Net::Packet::signatureOffset);
-	writeUInt8(static_cast<Net::Packet::CategoryType>(category), resultData, Net::Packet::categoryOffset);
-	writeUInt16Le(packetLen, resultData, Net::Packet::sizeOffset);
-	std::copy_n(packetData.data(), packetData.size_bytes(), result.data() + Net::Packet::dataOffset);
-	return result;
-}
-
 std::vector<char> Net::createAudioPacket(Net::Packet::Category category, const std::span<char>& audioData) {
 	std::vector<char> packet(Net::Packet::headerSize + audioData.size_bytes());
 	std::span<char> packetData{ packet.data(), packet.size() };
