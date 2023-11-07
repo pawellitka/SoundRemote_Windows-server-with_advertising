@@ -30,6 +30,15 @@ namespace {
 		EXPECT_EQ(actual, expected);
 	}
 
+	// createDisconnectPacket
+	TEST(Net_createDisconnectPacket, createsValidPacket) {
+		std::vector<char> expected = initPacket({ 0x71, 0xA5, 0x02, 0x05, 0 });
+
+		const auto actual = Net::createDisconnectPacket();
+
+		EXPECT_EQ(actual, expected);
+	}
+
 	// compressionFromNetworkValue
 	using Audio::Compression;
 	class CompressionFromNetworkValue : public TestWithParam<std::tuple<Net::Packet::CompressionType, std::optional<Compression>>> {
