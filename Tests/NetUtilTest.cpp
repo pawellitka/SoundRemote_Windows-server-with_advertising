@@ -1,6 +1,7 @@
 #include <vector>
 #include <sstream>
 #include <tuple>
+#include <span>
 
 #include "pch.h"
 #include "NetUtil.h"
@@ -13,6 +14,9 @@ namespace {
 		}
 		return result;
 	}
+
+	constexpr char audioDataArr[]{ 0xfau, 0xfbu, 0x01u, 0x12u };
+	constexpr std::span<const char> audioData{ audioDataArr };
 }
 
 namespace {
@@ -20,6 +24,23 @@ namespace {
 	using ::testing::TestWithParam;
 	using ::testing::Values;
 	using ::testing::TestParamInfo;
+
+	// createAudioPacket
+	TEST(Net_createAudioPacket, createsValidPacketUncompressed) {
+		std::vector<char> expected = initPacket({ 0x71, 0xA5, 0x20, 0x09, 0, 0xfa, 0xfb, 0x01, 0x12 });
+
+		const auto actual = Net::createAudioPacket(Net::Packet::Category::AudioDataUncompressed, audioData);
+
+		EXPECT_EQ(actual, expected);
+	}
+
+	TEST(Net_createAudioPacket, createsValidPacketOpus) {
+		std::vector<char> expected = initPacket({ 0x71, 0xA5, 0x21, 0x09, 0, 0xfa, 0xfb, 0x01, 0x12 });
+
+		const auto actual = Net::createAudioPacket(Net::Packet::Category::AudioDataOpus, audioData);
+
+		EXPECT_EQ(actual, expected);
+	}
 
 	// createKeepAlivePacket
 	TEST(Net_createKeepAlivePacket, createsValidPacket) {

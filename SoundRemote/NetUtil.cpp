@@ -100,7 +100,7 @@ std::optional<Audio::Compression> Net::compressionFromNetworkValue(Net::Packet::
 	}
 }
 
-std::vector<char> Net::createAudioPacket(Net::Packet::Category category, const std::span<char>& audioData) {
+std::vector<char> Net::createAudioPacket(Net::Packet::Category category, const std::span<const char>& audioData) {
 	std::vector<char> packet(Net::Packet::headerSize + audioData.size_bytes());
 	std::span<char> packetData{ packet.data(), packet.size() };
 	writeHeader(category, packetData);

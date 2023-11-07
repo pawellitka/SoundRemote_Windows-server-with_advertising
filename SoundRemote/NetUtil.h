@@ -23,7 +23,7 @@ namespace Net {
 	/// argument is not a valid compression value.</returns>
 	std::optional<Audio::Compression> compressionFromNetworkValue(Net::Packet::CompressionType compression);
 
-	std::vector<char> createAudioPacket(Net::Packet::Category category, const std::span<char>& audioData);
+	std::vector<char> createAudioPacket(Net::Packet::Category category, const std::span<const char>& audioData);
 	std::vector<char> createKeepAlivePacket();
 	std::vector<char> createDisconnectPacket();
 	std::vector<char> createAckConnectPacket(Net::Packet::RequestIdType requestId);
