@@ -24,6 +24,13 @@ processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
 using namespace std::placeholders;
 
+namespace {
+    constexpr int windowWidth = 300;            // main window width
+    constexpr int windowHeight = 300;			// main window height
+    constexpr int timerIdPeakMeter = 1;
+    constexpr int timerPeriodPeakMeter = 33;    // in milliseconds
+}
+
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
                      _In_ LPWSTR    lpCmdLine,
@@ -373,11 +380,11 @@ void SoundRemoteApp::initControls() {
 }
 
 void SoundRemoteApp::startPeakMeter() {
-    SetTimer(mainWindow_, TIMER_ID_PEAK_METER, TIMER_PERIOD_PEAK_METER, nullptr);
+    SetTimer(mainWindow_, timerIdPeakMeter, timerPeriodPeakMeter, nullptr);
 }
 
 void SoundRemoteApp::stopPeakMeter() {
-    KillTimer(mainWindow_, TIMER_ID_PEAK_METER);
+    KillTimer(mainWindow_, timerIdPeakMeter);
     SendMessage(peakMeterProgress_, PBM_SETPOS, 0, 0);
 }
 
@@ -420,7 +427,7 @@ bool SoundRemoteApp::initInstance(int nCmdShow) {
     initStrings();
 
     mainWindow_ = CreateWindowW(CLASS_NAME, mainWindowTitle_.data(), WS_OVERLAPPED | WS_SYSMENU | WS_MINIMIZEBOX,
-        CW_USEDEFAULT, 0, WINDOW_WIDTH, WINDOW_HEIGHT, nullptr, nullptr, hInst_, this);
+        CW_USEDEFAULT, 0, windowWidth, windowHeight, nullptr, nullptr, hInst_, this);
     if (mainWindow_ == NULL) {
         return false;
     }
@@ -529,7 +536,7 @@ LRESULT SoundRemoteApp::wndProc(UINT message, WPARAM wParam, LPARAM lParam) {
     case WM_TIMER:
     {
         switch ((int)wParam) {
-        case TIMER_ID_PEAK_METER:
+        case timerIdPeakMeter:
             updatePeakMeter();
             return 0;
 

@@ -25,11 +25,6 @@ public:
 	static std::unique_ptr<SoundRemoteApp> create(_In_ HINSTANCE hInstance);
 	int exec(int nCmdShow);
 private:
-	static const int WINDOW_WIDTH = 300;            // main window width
-	static const int WINDOW_HEIGHT = 300;			// main window height
-	static const int TIMER_ID_PEAK_METER = 1;
-	static const int TIMER_PERIOD_PEAK_METER = 33;	// in milliseconds
-
 	HINSTANCE hInst_ = nullptr;						// current instance
 	// Strings
 	std::wstring mainWindowTitle_;
