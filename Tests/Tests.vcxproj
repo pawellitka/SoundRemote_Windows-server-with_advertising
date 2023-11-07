@@ -146,7 +146,15 @@
     <ClCompile Include="header_tests\CapturePipeHTest.cpp" />
     <ClCompile Include="header_tests\ClientsHTest.cpp" />
     <ClCompile Include="header_tests\ControlsHTest.cpp" />
+    <ClCompile Include="header_tests\EncoderOpusHTest.cpp" />
+    <ClCompile Include="header_tests\KeystrokeHTest.cpp" />
+    <ClCompile Include="header_tests\NetDefinesHTest.cpp" />
     <ClCompile Include="header_tests\NetUtilHTest.cpp" />
+    <ClCompile Include="header_tests\ServerHTest.cpp" />
+    <ClCompile Include="header_tests\SettingsHTest.cpp" />
+    <ClCompile Include="header_tests\SettingsImplHTest.cpp" />
+    <ClCompile Include="header_tests\SoundRemoteAppHTest.cpp" />
+    <ClCompile Include="header_tests\UtilHTest.cpp" />
     <ClCompile Include="KeystrokeTest.cpp" />
     <ClCompile Include="NetUtilTest.cpp" />
     <ClCompile Include="pch.cpp">

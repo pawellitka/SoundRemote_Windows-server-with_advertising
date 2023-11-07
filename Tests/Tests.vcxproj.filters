@@ -35,6 +35,30 @@
     <ClCompile Include="header_tests\ControlsHTest.cpp">
       <Filter>Header Tests</Filter>
     </ClCompile>
+    <ClCompile Include="header_tests\EncoderOpusHTest.cpp">
+      <Filter>Header Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="header_tests\KeystrokeHTest.cpp">
+      <Filter>Header Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="header_tests\NetDefinesHTest.cpp">
+      <Filter>Header Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="header_tests\ServerHTest.cpp">
+      <Filter>Header Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="header_tests\SettingsHTest.cpp">
+      <Filter>Header Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="header_tests\SettingsImplHTest.cpp">
+      <Filter>Header Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="header_tests\SoundRemoteAppHTest.cpp">
+      <Filter>Header Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="header_tests\UtilHTest.cpp">
+      <Filter>Header Tests</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
