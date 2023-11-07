@@ -1,5 +1,12 @@
 #pragma once
 
+#include <chrono>
+#include <forward_list>
+#include <functional>
+#include <memory>
+#include <shared_mutex>
+#include <unordered_map>
+
 #include "AudioUtil.h"
 #include "NetDefines.h"
 

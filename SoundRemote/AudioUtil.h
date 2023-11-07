@@ -1,9 +1,11 @@
 #pragma once
 
-#include <unordered_map>
 #include <stdexcept>
+#include <string>
+#include <unordered_map>
 
 #include <mmdeviceapi.h>	// EDataFlow
+#include <functiondiscoverykeys_devpkey.h>
 
 #include "Util.h"
 

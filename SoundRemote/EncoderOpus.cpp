@@ -1,6 +1,6 @@
-#include <stdexcept>
 #include <set>
-#include <memory>
+#include <stdexcept>
+
 #include <opus/opus.h>
 
 #include "Util.h"

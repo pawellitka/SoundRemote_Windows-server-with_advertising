@@ -1,5 +1,11 @@
 #pragma once
 
+#include <string>
+#include <functional>
+
+#include <Windows.h>
+#include <CommCtrl.h>
+
 struct Rect;
 
 class MuteButton {

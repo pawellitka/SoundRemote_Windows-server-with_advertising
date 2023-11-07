@@ -2,16 +2,13 @@
 #include <wmcodecdsp.h>
 #include <initguid.h>   // MUST INCLUDE BEFORE <mfapi.h>
 #include <mfapi.h>
-#include <mferror.h>
-#include <mmreg.h>      //WAVEFORMATEXTENSIBLE
-
-#include <boost/asio/streambuf.hpp>
+#include <Mferror.h>
 
 #include "AudioUtil.h"
 #include "AudioResampler.h"
 
-AudioResampler::AudioResampler(_In_ const WAVEFORMATEXTENSIBLE* inputFormat, _In_ const WAVEFORMATEXTENSIBLE* outputFormat, _In_ boost::asio::streambuf& outBuffer):
-        outBuffer_(outBuffer) {
+AudioResampler::AudioResampler(_In_ const WAVEFORMATEXTENSIBLE* inputFormat, _In_ const WAVEFORMATEXTENSIBLE* outputFormat,
+    _In_ boost::asio::streambuf& outBuffer): outBuffer_(outBuffer) {
     HRESULT hr;
     CComPtr<IUnknown> transformUnk;
     hr = transformUnk.CoCreateInstance(__uuidof(CResamplerMediaObject));
@@ -29,7 +26,8 @@ AudioResampler::AudioResampler(_In_ const WAVEFORMATEXTENSIBLE* inputFormat, _In
     CComPtr<IMFMediaType> inMediaType;
     hr = MFCreateMediaType(&inMediaType);
     throwOnError(hr, Audio::Location::RESAMPLER_CREATEMEDIATYPE_INPUT);
-    hr = MFInitMediaTypeFromWaveFormatEx(inMediaType, reinterpret_cast<const WAVEFORMATEX*>(inputFormat), sizeof(WAVEFORMATEXTENSIBLE));
+    hr = MFInitMediaTypeFromWaveFormatEx(inMediaType, reinterpret_cast<const WAVEFORMATEX*>(inputFormat),
+        sizeof(WAVEFORMATEXTENSIBLE));
     throwOnError(hr, Audio::Location::RESAMPLER_INITMEDIATYPE_INPUT);
     hr = transform_->SetInputType(0, inMediaType, 0);
     throwOnError(hr, Audio::Location::RESAMPLER_TRANSFORM_SETINPUTTYPE);
@@ -37,7 +35,8 @@ AudioResampler::AudioResampler(_In_ const WAVEFORMATEXTENSIBLE* inputFormat, _In
     CComPtr<IMFMediaType> outMediaType;
     hr = MFCreateMediaType(&outMediaType);
     throwOnError(hr, Audio::Location::RESAMPLER_CREATEMEDIATYPE_OUTPUT);
-    hr = MFInitMediaTypeFromWaveFormatEx(outMediaType, reinterpret_cast<const WAVEFORMATEX*>(outputFormat), sizeof(WAVEFORMATEXTENSIBLE));
+    hr = MFInitMediaTypeFromWaveFormatEx(outMediaType, reinterpret_cast<const WAVEFORMATEX*>(outputFormat),
+        sizeof(WAVEFORMATEXTENSIBLE));
     throwOnError(hr, Audio::Location::RESAMPLER_INITMEDIATYPE_OUTPUT);
     transform_->SetOutputType(0, outMediaType, 0);
     throwOnError(hr, Audio::Location::RESAMPLER_TRANSFORM_SETOUTPUTTYPE);
@@ -46,7 +45,8 @@ AudioResampler::AudioResampler(_In_ const WAVEFORMATEXTENSIBLE* inputFormat, _In
     throwOnError(hr, Audio::Location::RESAMPLER_TRANSFORM_MESSAGE_BEGIN);
     hr = transform_->ProcessMessage(MFT_MESSAGE_NOTIFY_START_OF_STREAM, 0);
     throwOnError(hr, Audio::Location::RESAMPLER_TRANSFORM_MESSAGE_START);
-    outBufferSizeMultiplier_ = 2 * static_cast<double>(outputFormat->Format.nAvgBytesPerSec) / static_cast<double>(inputFormat->Format.nAvgBytesPerSec);
+    outBufferSizeMultiplier_ = 2 * static_cast<double>(outputFormat->Format.nAvgBytesPerSec) /
+        static_cast<double>(inputFormat->Format.nAvgBytesPerSec);
 }
 
 AudioResampler::~AudioResampler() {
@@ -88,7 +88,8 @@ void AudioResampler::resample(_In_ const std::span<char>& pcmAudio) {
     CComPtr<IMFMediaBuffer> outSampleBuffer;
     CComPtr<IMFSample> outSample;
     // If the MFT does not set one of this flags, the client must allocate the samples for the output stream.
-    const bool outSampleProvided = 0 != (outStreamInfo.dwFlags & (MFT_OUTPUT_STREAM_PROVIDES_SAMPLES | MFT_OUTPUT_STREAM_CAN_PROVIDE_SAMPLES));
+    const bool outSampleProvided = 0 != (outStreamInfo.dwFlags & (MFT_OUTPUT_STREAM_PROVIDES_SAMPLES |
+        MFT_OUTPUT_STREAM_CAN_PROVIDE_SAMPLES));
     if (!outSampleProvided) {
         const DWORD outSampleBufferSize = static_cast<DWORD>(outBufferSizeMultiplier_ * pcmAudio.size_bytes());
         hr = MFCreateMemoryBuffer(outSampleBufferSize, &outSampleBuffer);

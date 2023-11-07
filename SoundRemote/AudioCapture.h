@@ -1,15 +1,23 @@
 #pragma once
 
+#include <chrono>
+#include <coroutine>
+#include <memory>
+#include <string>
 #include <span>
+
+#include <boost/asio/io_context.hpp>
 
 #include <atlcomcli.h>	//CComPtr
 #include <mmreg.h>      //WAVEFORMATEXTENSIBLE
 
-struct CaptureCoroutine;
+#include "AudioUtil.h"
 
 struct IAudioCaptureClient;
 struct IAudioClient;
 struct IAudioMeterInformation;
+
+struct CaptureCoroutine;
 
 class AudioCapture {
 public:

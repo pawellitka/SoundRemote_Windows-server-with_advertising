@@ -1,7 +1,18 @@
 #pragma once
 
-#include "NetDefines.h"
+#include <forward_list>
+#include <memory>
+#include <span>
+#include <unordered_map>
+
+#include <boost/asio/awaitable.hpp>
+#include <boost/asio/io_context.hpp>
+#include <boost/asio/ip/udp.hpp>
+#include <boost/asio/steady_timer.hpp>
+
+#include "AudioUtil.h"
 #include "Keystroke.h"
+#include "NetDefines.h"
 
 class Clients;
 struct ClientInfo;

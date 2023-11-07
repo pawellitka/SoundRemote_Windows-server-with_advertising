@@ -1,6 +1,15 @@
 #pragma once
 
+#include <atomic>
+#include <forward_list>
+#include <memory>
 #include <span>
+#include <string>
+#include <unordered_map>
+
+#include <boost/asio/io_context.hpp>
+#include <boost/asio/streambuf.hpp>
+
 #include "AudioUtil.h"
 
 class AudioCapture;

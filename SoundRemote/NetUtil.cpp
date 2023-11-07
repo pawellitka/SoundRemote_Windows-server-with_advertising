@@ -1,9 +1,6 @@
-#include <vector>
-#include <forward_list>
-#include <string>
 #include <cassert>
 
-#include <ws2tcpip.h>
+#include <WS2tcpip.h>
 #include <iphlpapi.h>
 
 #include "NetUtil.h"

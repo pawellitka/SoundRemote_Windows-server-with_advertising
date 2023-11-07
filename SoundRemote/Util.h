@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 struct Util {
     enum class Endian {
         Big,

@@ -1,11 +1,6 @@
-#include <set>
-#include <unordered_map>
-#include <boost/asio.hpp>
-
 #include "Clients.h"
 
-Clients::Clients(int timeoutSeconds) : timeoutSeconds_(timeoutSeconds) {
-}
+Clients::Clients(int timeoutSeconds) : timeoutSeconds_(timeoutSeconds) {}
 
 void Clients::add(const Net::Address& address, Audio::Compression compression) {
 	const std::unique_lock lock(clientsMutex_);

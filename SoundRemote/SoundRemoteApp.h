@@ -1,9 +1,22 @@
 #pragma once
 
-#include <memory>
 #include <atomic>
+#include <memory>
+#include <string>
+
+#include <boost/asio/io_context.hpp>
+
+#include <mmdeviceapi.h>	// EDataFlow
 
 #include "resource.h"
+
+class MuteButton;
+class CapturePipe;
+class Clients;
+struct ClientInfo;
+class Keystroke;
+class Server;
+class Settings;
 
 class SoundRemoteApp {
 public:

@@ -1,9 +1,12 @@
-#include <span>
+#include <forward_list>
 #include <optional>
+#include <span>
+#include <string>
+#include <vector>
 
 #include "AudioUtil.h"
-#include "NetDefines.h"
 #include "Keystroke.h"
+#include "NetDefines.h"
 
 namespace Net {
 	/// <summary>

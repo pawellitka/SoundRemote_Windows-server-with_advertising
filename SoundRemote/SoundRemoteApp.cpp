@@ -5,23 +5,21 @@
 name='Microsoft.Windows.Common-Controls' version='6.0.0.0' \
 processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
-#include <boost/asio.hpp>
+//#include "framework.h"
+#include <boost/asio/post.hpp>
 
-#include <windows.h>
 #include <CommCtrl.h>
+#include <Windows.h>
 #include <Windowsx.h>
 
-#include "framework.h"
-
-#include "Util.h"
-#include "CapturePipe.h"
 #include "AudioUtil.h"
+#include "CapturePipe.h"
+#include "Clients.h"
+#include "Controls.h"
 #include "NetUtil.h"
 #include "Server.h"
-#include "Clients.h"
 #include "SettingsImpl.h"
-#include "Controls.h"
-
+#include "Util.h"
 #include "SoundRemoteApp.h"
 
 using namespace std::placeholders;
