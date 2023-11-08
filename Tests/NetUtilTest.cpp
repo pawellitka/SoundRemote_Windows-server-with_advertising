@@ -27,7 +27,7 @@ namespace {
 	using namespace Net::Packet;
 
 	// createAudioPacket
-	TEST(Net_createAudioPacket, createsValidPacketUncompressed) {
+	TEST(Net, createAudioPacketUncompressed) {
 		std::vector<char> expected = initPacket({ 0x71, 0xA5, 0x20, 0x09, 0, 0xFA, 0xFB, 0x01, 0x12 });
 
 		const auto actual = Net::createAudioPacket(Category::AudioDataUncompressed, audioData);
@@ -35,7 +35,7 @@ namespace {
 		EXPECT_EQ(actual, expected);
 	}
 
-	TEST(Net_createAudioPacket, createsValidPacketOpus) {
+	TEST(Net, createAudioPacketOpus) {
 		std::vector<char> expected = initPacket({ 0x71, 0xA5, 0x21, 0x09, 0, 0xFA, 0xFB, 0x01, 0x12 });
 
 		const auto actual = Net::createAudioPacket(Category::AudioDataOpus, audioData);
@@ -44,7 +44,7 @@ namespace {
 	}
 
 	// createKeepAlivePacket
-	TEST(Net_createKeepAlivePacket, createsValidPacket) {
+	TEST(Net, createKeepAlivePacket) {
 		std::vector<char> expected = initPacket({ 0x71, 0xA5, 0x31, 0x05, 0 });
 
 		const auto actual = Net::createKeepAlivePacket();
@@ -53,7 +53,7 @@ namespace {
 	}
 
 	// createDisconnectPacket
-	TEST(Net_createDisconnectPacket, createsValidPacket) {
+	TEST(Net, createDisconnectPacket) {
 		std::vector<char> expected = initPacket({ 0x71, 0xA5, 0x02, 0x05, 0 });
 
 		const auto actual = Net::createDisconnectPacket();
@@ -90,7 +90,7 @@ namespace {
 	);
 
 	// createAckConnectPacket
-	TEST(Net_createAckConnectPacket, createsValidPacket) {
+	TEST(Net, createAckConnectPacket) {
 		std::vector<char> expected = initPacket({ 0x71, 0xA5, 0xF0, 0x0B, 0, 0xD5, 0xDD, Net::protocolVersion, 0, 0, 0 });
 
 		RequestIdType requestId = 0xDDD5;
@@ -100,7 +100,7 @@ namespace {
 	}
 
 	// createAckSetFormatPacket
-	TEST(Net_createAckSetFormatPacket, createsValidPacket) {
+	TEST(Net, createAckSetFormatPacket) {
 		std::vector<char> expected = initPacket({ 0x71, 0xA5, 0xF0, 0x0B, 0, 0xF1, 0xF0, 0, 0, 0, 0 });
 
 		RequestIdType requestId = 0xF0F1;
