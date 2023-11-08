@@ -98,4 +98,14 @@ namespace {
 
 		EXPECT_EQ(actual, expected);
 	}
+
+	// createAckSetFormatPacket
+	TEST(Net_createAckSetFormatPacket, createsValidPacket) {
+		std::vector<char> expected = initPacket({ 0x71, 0xA5, 0xF0, 0x0B, 0, 0xF1, 0xF0, 0, 0, 0, 0 });
+
+		RequestIdType requestId = 0xF0F1;
+		const auto actual = Net::createAckSetFormatPacket(requestId);
+
+		EXPECT_EQ(actual, expected);
+	}
 }
