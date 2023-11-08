@@ -51,4 +51,37 @@ namespace {
 			threads.emplace_back(addClients, i);
 		}
 	}
+
+	TEST_F(ClientsTest, SetCompression) {
+		using Audio::Compression;
+		const auto compressions = {
+			Compression::kbps_64,
+			Compression::kbps_128,
+			Compression::kbps_192,
+			Compression::kbps_256,
+			Compression::kbps_320
+		};
+		const auto threadCount = 5;
+		MockClientsListener listener;
+		const auto address = boost::asio::ip::make_address_v4("127.0.0.1");
+		std::forward_list<ClientInfo> clients;
+		clients.push_front(ClientInfo(address, Compression::none));
+		EXPECT_CALL(listener, onClientsUpdate(clients));
+		for (auto&& c : compressions) {
+			clients.front().compression = c;
+			EXPECT_CALL(listener, onClientsUpdate(clients));
+		}
+
+		clients_->addClientsListener(std::bind(&MockClientsListener::onClientsUpdate, &listener, _1));
+		clients_->add(address, Compression::none);
+		std::barrier barrier(threadCount);
+		auto compressionsSetter = [&](Audio::Compression compression) {
+			barrier.arrive_and_wait();
+			clients_->setCompression(address, compression);
+			};
+		std::vector<std::jthread> threads(threadCount);
+		for (auto&& c : compressions) {
+			threads.emplace_back(compressionsSetter, c);
+		}
+	}
 }
