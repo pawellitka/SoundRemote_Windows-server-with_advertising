@@ -67,7 +67,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>opus.lib;AudioUtil.obj;EncoderOpus.obj;Keystroke.obj;NetUtil.obj;Util.obj;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opus.lib;AudioUtil.obj;Clients.obj;EncoderOpus.obj;Keystroke.obj;NetUtil.obj;Util.obj;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)lib\opus\$(Platform);$(SolutionDir)$(Platform)\$(Configuration)\SoundRemote;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>libcmt.lib</IgnoreSpecificDefaultLibraries>
     </Link>
@@ -87,7 +87,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>opus.lib;AudioUtil.obj;EncoderOpus.obj;Keystroke.obj;NetUtil.obj;Util.obj;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opus.lib;AudioUtil.obj;Clients.obj;EncoderOpus.obj;Keystroke.obj;NetUtil.obj;Util.obj;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)lib\opus\$(Platform);$(SolutionDir)$(Platform)\$(Configuration)\SoundRemote;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>libcmt.lib</IgnoreSpecificDefaultLibraries>
     </Link>
@@ -108,7 +108,7 @@
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <AdditionalDependencies>opus.lib;AudioUtil.obj;EncoderOpus.obj;Keystroke.obj;NetUtil.obj;Util.obj;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opus.lib;AudioUtil.obj;Clients.obj;EncoderOpus.obj;Keystroke.obj;NetUtil.obj;Util.obj;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)lib\opus\$(Platform);$(SolutionDir)$(Platform)\$(Configuration)\SoundRemote;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>libcmt.lib</IgnoreSpecificDefaultLibraries>
     </Link>
@@ -129,7 +129,7 @@
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <AdditionalDependencies>opus.lib;AudioUtil.obj;EncoderOpus.obj;Keystroke.obj;NetUtil.obj;Util.obj;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opus.lib;AudioUtil.obj;Clients.obj;EncoderOpus.obj;Keystroke.obj;NetUtil.obj;Util.obj;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)lib\opus\$(Platform);$(SolutionDir)$(Platform)\$(Configuration)\SoundRemote;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>libcmt.lib</IgnoreSpecificDefaultLibraries>
     </Link>
@@ -139,6 +139,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\packages\gmock.1.11.0\lib\native\src\gtest\src\gtest_main.cc" />
+    <ClCompile Include="ClientsTest.cpp" />
     <ClCompile Include="EncoderOpusTest.cpp" />
     <ClCompile Include="header_tests\AudioCaptureHTest.cpp" />
     <ClCompile Include="header_tests\AudioResamplerHTest.cpp" />
