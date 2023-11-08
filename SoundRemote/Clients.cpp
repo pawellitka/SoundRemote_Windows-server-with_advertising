@@ -95,3 +95,8 @@ Clients::TimePoint Clients::Client::lastContact() const {
 Audio::Compression Clients::Client::compression() const {
 	return compression_;
 }
+
+bool operator==(const ClientInfo& lhs, const ClientInfo& rhs) {
+	return lhs.address == rhs.address &&
+		lhs.compression == rhs.compression;
+}

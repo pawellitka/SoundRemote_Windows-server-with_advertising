@@ -50,4 +50,5 @@ struct ClientInfo {
 	Net::Address address;
 	Audio::Compression compression;
 	ClientInfo(Net::Address addr, Audio::Compression br) : address(addr), compression(br) {}
+	friend bool operator==(const ClientInfo& lhs, const ClientInfo& rhs);
 };
