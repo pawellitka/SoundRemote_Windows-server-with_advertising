@@ -15,7 +15,7 @@ namespace {
 		return result;
 	}
 
-	constexpr char audioDataArr[]{ 0xfau, 0xfbu, 0x01u, 0x12u };
+	constexpr char audioDataArr[]{ 0xFAu, 0xFBu, 0x01u, 0x12u };
 	constexpr std::span<const char> audioData{ audioDataArr };
 }
 
@@ -24,20 +24,21 @@ namespace {
 	using ::testing::TestWithParam;
 	using ::testing::Values;
 	using ::testing::TestParamInfo;
+	using namespace Net::Packet;
 
 	// createAudioPacket
 	TEST(Net_createAudioPacket, createsValidPacketUncompressed) {
-		std::vector<char> expected = initPacket({ 0x71, 0xA5, 0x20, 0x09, 0, 0xfa, 0xfb, 0x01, 0x12 });
+		std::vector<char> expected = initPacket({ 0x71, 0xA5, 0x20, 0x09, 0, 0xFA, 0xFB, 0x01, 0x12 });
 
-		const auto actual = Net::createAudioPacket(Net::Packet::Category::AudioDataUncompressed, audioData);
+		const auto actual = Net::createAudioPacket(Category::AudioDataUncompressed, audioData);
 
 		EXPECT_EQ(actual, expected);
 	}
 
 	TEST(Net_createAudioPacket, createsValidPacketOpus) {
-		std::vector<char> expected = initPacket({ 0x71, 0xA5, 0x21, 0x09, 0, 0xfa, 0xfb, 0x01, 0x12 });
+		std::vector<char> expected = initPacket({ 0x71, 0xA5, 0x21, 0x09, 0, 0xFA, 0xFB, 0x01, 0x12 });
 
-		const auto actual = Net::createAudioPacket(Net::Packet::Category::AudioDataOpus, audioData);
+		const auto actual = Net::createAudioPacket(Category::AudioDataOpus, audioData);
 
 		EXPECT_EQ(actual, expected);
 	}
@@ -62,12 +63,12 @@ namespace {
 
 	// compressionFromNetworkValue
 	using Audio::Compression;
-	class CompressionFromNetworkValue : public TestWithParam<std::tuple<Net::Packet::CompressionType, std::optional<Compression>>> {
+	class CompressionFromNetworkValue : public TestWithParam<std::tuple<CompressionType, std::optional<Compression>>> {
 	protected:
 		void SetUp() override {
 			std::tie(netCompression_, expected_) = GetParam();
 		}
-		Net::Packet::CompressionType netCompression_ = {};
+		CompressionType netCompression_ = {};
 		std::optional<Compression> expected_ = {};
 	};
 
@@ -87,4 +88,14 @@ namespace {
 		return std::to_string(static_cast<int>(std::get<1>(info.param).value()));
 		}
 	);
+
+	// createAckConnectPacket
+	TEST(Net_createAckConnectPacket, createsValidPacket) {
+		std::vector<char> expected = initPacket({ 0x71, 0xA5, 0xF0, 0x0B, 0, 0xD5, 0xDD, Net::protocolVersion, 0, 0, 0 });
+
+		RequestIdType requestId = 0xDDD5;
+		const auto actual = Net::createAckConnectPacket(requestId);
+
+		EXPECT_EQ(actual, expected);
+	}
 }
