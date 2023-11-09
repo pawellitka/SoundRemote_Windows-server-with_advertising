@@ -8,6 +8,7 @@
 #include "Clients.h"
 
 namespace {
+	using boost::asio::ip::make_address_v4;
 	using namespace std::placeholders;
 
 	class ClientsListener {
@@ -31,6 +32,18 @@ namespace {
         std::unique_ptr<Clients> clients_;
     };
 
+	TEST_F(ClientsTest, AddClientsListener) {
+		std::vector<MockClientsListener> listeners(10);
+		for (auto&& listener : listeners) {
+			EXPECT_CALL(listener, onClientsUpdate);
+		}
+
+		for (auto&& listener : listeners) {
+			clients_->addClientsListener(std::bind(&MockClientsListener::onClientsUpdate, &listener, _1));
+		}
+		clients_->add(make_address_v4("127.0.0.1"), Audio::Compression::none);
+	}
+
 	TEST_F(ClientsTest, Add) {
 		const auto threadCount = 5;
 		const auto threadAdds = 50;
@@ -43,7 +56,7 @@ namespace {
 			barrier.arrive_and_wait();
 			for (int i = start; i < start + threadAdds; i++) {
 				auto address = "192.168.0." + std::to_string(i);
-				clients_->add(boost::asio::ip::make_address_v4(address), Audio::Compression::none);
+				clients_->add(make_address_v4(address), Audio::Compression::none);
 			}
 			};
 		std::vector<std::jthread> threads(threadCount);
@@ -63,7 +76,7 @@ namespace {
 		};
 		const auto threadCount = 5;
 		MockClientsListener listener;
-		const auto address = boost::asio::ip::make_address_v4("127.0.0.1");
+		const auto address = make_address_v4("127.0.0.1");
 		std::forward_list<ClientInfo> clients;
 		clients.push_front(ClientInfo(address, Compression::none));
 		EXPECT_CALL(listener, onClientsUpdate(clients));
@@ -93,7 +106,7 @@ namespace {
 		EXPECT_CALL(listener, onClientsUpdate).Times(removesCount);
 		for (int i = 0; i < removesCount; i++) {
 			auto address = "192.168.0." + std::to_string(i);
-			clients_->add(boost::asio::ip::make_address_v4(address), Audio::Compression::none);
+			clients_->add(make_address_v4(address), Audio::Compression::none);
 		}
 
 		clients_->addClientsListener(std::bind(&MockClientsListener::onClientsUpdate, &listener, _1));
@@ -102,7 +115,7 @@ namespace {
 			barrier.arrive_and_wait();
 			for (int i = start; i < start + threadRemoves; i++) {
 				auto address = "192.168.0." + std::to_string(i);
-				clients_->remove(boost::asio::ip::make_address_v4(address));
+				clients_->remove(make_address_v4(address));
 			}
 			};
 		std::vector<std::jthread> threads(threadCount);
