@@ -84,4 +84,30 @@ namespace {
 			threads.emplace_back(compressionsSetter, c);
 		}
 	}
+
+	TEST_F(ClientsTest, Remove) {
+		const auto threadCount = 5;
+		const auto threadRemoves = 50;
+		const auto removesCount = threadCount * threadRemoves;
+		MockClientsListener listener;
+		EXPECT_CALL(listener, onClientsUpdate).Times(removesCount);
+		for (int i = 0; i < removesCount; i++) {
+			auto address = "192.168.0." + std::to_string(i);
+			clients_->add(boost::asio::ip::make_address_v4(address), Audio::Compression::none);
+		}
+
+		clients_->addClientsListener(std::bind(&MockClientsListener::onClientsUpdate, &listener, _1));
+		std::barrier barrier(threadCount);
+		auto removeClients = [&](int start) {
+			barrier.arrive_and_wait();
+			for (int i = start; i < start + threadRemoves; i++) {
+				auto address = "192.168.0." + std::to_string(i);
+				clients_->remove(boost::asio::ip::make_address_v4(address));
+			}
+			};
+		std::vector<std::jthread> threads(threadCount);
+		for (auto i = 0; i < removesCount; i += threadRemoves) {
+			threads.emplace_back(removeClients, i);
+		}
+	}
 }
