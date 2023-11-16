@@ -1,24 +1,24 @@
-#include <stdexcept>
 #include <set>
-#include <memory>
+#include <stdexcept>
+
 #include <opus/opus.h>
 
 #include "Util.h"
 #include "EncoderOpus.h"
 
-EncoderOpus::EncoderOpus(Audio::Bitrate bitrate, Audio::Opus::SampleRate sampleRate, Audio::Opus::Channels channels) {
+EncoderOpus::EncoderOpus(Audio::Compression compression, Audio::Opus::SampleRate sampleRate, Audio::Opus::Channels channels) {
     frameSize_ = getFrameSize(sampleRate);
     inputPacketSize_ = getInputSize(frameSize_, channels);
 
     int error{};
-    encoder_ = encoder_ptr(
+    encoder_ = Encoder(
         opus_encoder_create(static_cast<int>(sampleRate), static_cast<int>(channels), OPUS_APPLICATION_AUDIO, &error),
         EncoderDeleter()
     );
     if (OPUS_OK != error || nullptr == encoder_) {
         Audio::processError(error, Audio::Location::ENCODER_CREATE);
     }
-    auto ret = opus_encoder_ctl(encoder_.get(), OPUS_SET_BITRATE(static_cast<int>(bitrate)));
+    auto ret = opus_encoder_ctl(encoder_.get(), OPUS_SET_BITRATE(static_cast<int>(compression)));
     if (ret != OPUS_OK) {
         Audio::processError(ret, Audio::Location::ENCODER_SET_BITRATE);
     };
@@ -51,6 +51,6 @@ int EncoderOpus::getInputSize(int frameSize, Audio::Opus::Channels channels) {
 
 //---EncoderDeleter---
 
-void EncoderDeleter::operator()(OpusEncoder* enc) const {
+void EncoderOpus::EncoderDeleter::operator()(OpusEncoder* enc) const {
     opus_encoder_destroy(enc);
 }

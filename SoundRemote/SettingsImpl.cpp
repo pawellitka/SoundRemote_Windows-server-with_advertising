@@ -1,5 +1,5 @@
-#include <fstream>
 #include <array>
+#include <fstream>
 #include <sstream>
 
 #include "Util.h"
@@ -12,8 +12,7 @@ std::string toLower(std::string s) {
     return s;
 }
 
-SettingsImpl::SettingsImpl() {
-}
+SettingsImpl::SettingsImpl() {}
 
 std::optional<Settings::Value> SettingsImpl::getValue(const std::string& settingName) const {
     if (settings_.contains(settingName)) {

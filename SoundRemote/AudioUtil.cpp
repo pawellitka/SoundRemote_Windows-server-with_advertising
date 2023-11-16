@@ -1,11 +1,7 @@
-#include <stdexcept>
 #include <sstream>
 
-#include <mmdeviceapi.h>
-#include <functiondiscoverykeys_devpkey.h>
 #include <atlcomcli.h>	// CComPtr
 
-#include "Util.h"
 #include "AudioUtil.h"
 
 std::unordered_map<std::wstring, std::wstring> Audio::getEndpointDevices(const EDataFlow dataFlow) {

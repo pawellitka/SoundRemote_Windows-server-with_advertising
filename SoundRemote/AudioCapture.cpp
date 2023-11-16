@@ -1,19 +1,16 @@
-#include <boost/asio.hpp>
-#include <coroutine>
+#include <boost/asio/error.hpp>
+#include <boost/asio/steady_timer.hpp>
 
 #include <mmdeviceapi.h>
 #include <functiondiscoverykeys_devpkey.h>
-#include <audioclient.h>
+#include <Audioclient.h>
 #include <endpointvolume.h> //IAudioMeterInformation
 
 #include "Util.h"
-#include "AudioUtil.h"
 #include "AudioCapture.h"
 
 using namespace boost::asio;
-using time_point = std::chrono::steady_clock::time_point;
 using namespace std::chrono_literals;
-
 using namespace Audio;
 
 template <typename Duration>
@@ -219,7 +216,7 @@ AudioCapture::AudioCapture(const std::wstring& deviceId, Audio::Format requested
 AudioCapture::~AudioCapture() {
 }
 
-PcmAudioSource AudioCapture::capture() {
+CaptureCoroutine AudioCapture::capture() {
     //throw Audio::Error("AudioCapture::capture start");
     HRESULT hr;
 

@@ -1,10 +1,5 @@
-#include <windows.h>
-#include <CommCtrl.h>
-#include <functional>
-#include <string>
-
-#include "Controls.h"
 #include "resource.h"
+#include "Controls.h"
 
 MuteButton::MuteButton(HWND hParent, const Rect& rect, const std::wstring& name) {
 	HINSTANCE hInst = GetModuleHandle(nullptr);

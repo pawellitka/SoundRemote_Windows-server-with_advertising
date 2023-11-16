@@ -1,8 +1,9 @@
-#include <boost/asio.hpp>
+#include <boost/asio/co_spawn.hpp>
+#include <boost/asio/detached.hpp>
 
+#include "Clients.h"
 #include "NetUtil.h"
 #include "Util.h"
-#include "Clients.h"
 #include "Server.h"
 
 using boost::asio::ip::udp;
@@ -11,6 +12,7 @@ using boost::asio::co_spawn;
 using boost::asio::detached;
 using boost::asio::use_awaitable;
 using namespace std::chrono_literals;
+using namespace std::placeholders;
 
 Server::Server(int clientPort, int serverPort, boost::asio::io_context& ioContext, std::shared_ptr<Clients> clients) :
     clientPort_(clientPort),
@@ -32,57 +34,73 @@ Server::~Server() {
 }
 
 void Server::onClientsUpdate(std::forward_list<ClientInfo> clients) {
-    std::unordered_map<Audio::Bitrate, std::forward_list<Net::Address>> newClients;
+    std::unordered_map<Audio::Compression, std::forward_list<Net::Address>> newClients;
     for (auto&& client: clients) {
-        if (!newClients.contains(client.bitrate)) {
-            newClients[client.bitrate] = std::forward_list<Net::Address>();
+        if (!newClients.contains(client.compression)) {
+            newClients[client.compression] = std::forward_list<Net::Address>();
         }
-        newClients[client.bitrate].push_front(client.address);
+        newClients[client.compression].push_front(client.address);
     }
     clientsCache_ = std::move(newClients);
 }
 
-void Server::sendOpusPacket(std::span<char> data) {
-    auto opusPacket = std::make_shared<std::vector<char>>(Net::assemblePacket(Net::Packet::AudioDataOpus, data));
-    send(opusPacket);
-}
-
-void Server::sendAudio(Audio::Bitrate bitrate, std::vector<char> data) {
-    auto category = Net::Packet::AudioDataOpus;
-    if (bitrate == Audio::Bitrate::none) {
-        category = Net::Packet::AudioDataPcm;
+void Server::sendAudio(Audio::Compression compression, std::vector<char> data) {
+    auto category = Net::Packet::Category::AudioDataOpus;
+    if (compression == Audio::Compression::none) {
+        category = Net::Packet::Category::AudioDataUncompressed;
     }
     auto packet = std::make_shared<std::vector<char>>(
-        Net::assemblePacket(category, { data.data(), data.size() })
+        Net::createAudioPacket(category, { data.data(), data.size() })
     );
-    for (auto&& address : clientsCache_[bitrate]) {
+    for (auto&& address : clientsCache_[compression]) {
         send(address, packet);
     }
 }
 
-void Server::setClientListCallback(ClientsUpdateCallback callback) {
-    clientList_->setClientListCallback(callback);
+void Server::sendDisconnectBlocking() {
+    if (clientsCache_.empty()) { return; }
+    auto destination = udp::endpoint(udp::v4(), clientPort_);
+    auto packet = std::make_shared<std::vector<char>>(Net::createDisconnectPacket());
+    for (auto&& [compression, addresses] : clientsCache_) {
+        for (auto&& address : addresses) {
+            destination.address(address);
+            socketSend_.send_to(boost::asio::buffer(packet->data(), packet->size()), destination);
+        }
+    }
 }
 
 void Server::setKeystrokeCallback(KeystrokeCallback callback) {
     keystrokeCallback_ = callback;
 }
 
-bool Server::hasClients() const {
-    return !clientList_->empty();
-}
-
 awaitable<void> Server::receive(udp::socket& socket) {
     //throw std::exception("Server::receive");
-    std::array<unsigned char, Net::inputPacketSize> datagram;
+    std::array<char, Net::inputPacketSize> datagram{};
     udp::endpoint sender;
     //Have to handle errors here or write custom completion handler for co_spawn()
     try {
         for (;;) {
             auto nBytes = co_await socket.async_receive_from(boost::asio::buffer(datagram), sender, use_awaitable);
-            const bool parseSuccess = parsePacket({ datagram.data(), nBytes });
-            if (parseSuccess) {
-                clients_->add(sender.address(), Audio::Bitrate::kbps_192);
+            std::span receivedData = { datagram.data(), nBytes };
+            auto category = Net::getPacketCategory(receivedData);
+            switch (category) {
+            case Net::Packet::Category::Connect:
+                processConnect(sender.address(), receivedData);
+                break;
+            case Net::Packet::Category::Disconnect:
+                processDisconnect(sender.address());
+                break;
+            case Net::Packet::Category::SetFormat:
+                processSetFormat(sender.address(), receivedData);
+                break;
+            case Net::Packet::Category::Keystroke:
+                processKeystroke(receivedData);
+                break;
+            case Net::Packet::Category::ClientKeepAlive:
+                processKeepAlive(sender.address());
+                break;
+            default:
+                break;
             }
         }
     }
@@ -102,62 +120,59 @@ awaitable<void> Server::receive(udp::socket& socket) {
     }
 }
 
-bool Server::parsePacket(const std::span<unsigned char> packet) const {
-    if (!Net::hasValidHeader(packet)) {
-        return false;
-    }
-    const auto packetType = Net::getPacketCategory(packet);
-    switch (packetType) {
-    case Net::Packet::ClientCommand: {
-        const std::optional<Keystroke> keystroke = Net::getKeystroke(packet);
-        if (keystroke) {
-            keystroke->emulate();
-            if (keystrokeCallback_) {
-                keystrokeCallback_(keystroke.value());
-            }
-        } else {
-            return false;
-        }
-    }
-        break;
-    case Net::Packet::ClientKeepAlive:
-        break;
-    default:
-        // Unrecognized packet
-        return false;
-    }
-    return true;
+void Server::processConnect(const Net::Address& address, const std::span<char>& packet) {
+    const auto connectData = Net::getConnectData(packet);
+    if (!connectData) { return; }
+    auto compression = Net::compressionFromNetworkValue(connectData->compression);
+    if (!compression) { return; }
+    clients_->add(address, *compression);
+
+    send(address, std::make_shared<std::vector<char>>(
+        Net::createAckConnectPacket(connectData->requestId)
+    ));
 }
 
-void Server::send(std::shared_ptr<std::vector<char>> packet) {
-    auto destination = udp::endpoint(udp::v4(), clientPort_);
-    for (const auto& clientAddress : clientList_->clients()) {
-        destination.address(clientAddress);
-        socketSend_.async_send_to(boost::asio::buffer(packet->data(), packet->size()), destination,
-            //shared_ptr with the packet is passed to keep data alive until the handler call
-            [packet](boost::system::error_code ec, auto bytes) mutable {
-                if (ec) {
-                    throw std::runtime_error(Util::contructAppExceptionText("Send", ec.what()));
-                }
-            });
+void Server::processDisconnect(const Net::Address& address) {
+    clients_->remove(address);
+}
+
+void Server::processSetFormat(const Net::Address& address, const std::span<char>& packet) {
+    const auto setFormatData = Net::getSetFormatData(packet);
+    if (!setFormatData) { return; }
+    auto compression = Net::compressionFromNetworkValue(setFormatData->compression);
+    if (!compression) { return; }
+    clients_->setCompression(address, *compression);
+
+    send(address, std::make_shared<std::vector<char>>(
+        Net::createAckSetFormatPacket(setFormatData->requestId)
+    ));
+}
+
+void Server::processKeystroke(const std::span<char>& packet) const {
+    const std::optional<Keystroke> keystroke = Net::getKeystroke(packet);
+    if (!keystroke) { return; }
+    keystroke->emulate();
+    if (keystrokeCallback_) {
+        keystrokeCallback_(*keystroke);
     }
 }
 
-void Server::send(const Net::Address& address, std::shared_ptr<std::vector<char>> packet) {
+void Server::processKeepAlive(const Net::Address& address) const {
+    clients_->keep(address);
+}
+
+void Server::send(const Net::Address& address, const std::shared_ptr<std::vector<char>> packet) {
     auto destination = udp::endpoint(address, clientPort_);
+    destination.address(address);
     socketSend_.async_send_to(boost::asio::buffer(packet->data(), packet->size()), destination,
-        //shared_ptr with the packet is passed to keep data alive until the handler call
-        [packet](boost::system::error_code ec, auto bytes) mutable {
-            if (ec) {
-                throw std::runtime_error(Util::contructAppExceptionText("Server send", ec.what()));
-            }
-        });
+        std::bind(&Server::handleSend, this, packet, _1, _2));
 }
 
-void Server::sendKeepAlive() {
-    if (!hasClients()) { return; }
-    auto packet = std::make_shared<std::vector<char>>(Net::assemblePacket(Net::Packet::ServerKeepAlive));
-    send(packet);
+// std::shared_ptr with the packet is passed to keep data alive until the handler call
+void Server::handleSend(const std::shared_ptr<std::vector<char>> packet, const boost::system::error_code& ec, std::size_t bytes) {
+    if (ec) {
+        throw std::runtime_error(Util::contructAppExceptionText("Server send", ec.what()));
+    }
 }
 
 void Server::startMaintenanceTimer() {
@@ -181,65 +196,10 @@ void Server::maintain(boost::system::error_code ec) {
 
 void Server::keepalive() {
     if (clientsCache_.empty()) { return; }
-    auto packet = std::make_shared<std::vector<char>>(Net::assemblePacket(Net::Packet::ServerKeepAlive));
-    for (auto&& [bitrate, addresses] : clientsCache_) {
+    auto packet = std::make_shared<std::vector<char>>(Net::createKeepAlivePacket());
+    for (auto&& [compression, addresses] : clientsCache_) {
         for (auto&& address : addresses) {
             send(address, packet);
         }
-    }
-}
-
-//-------ClientList------
-
-Server::ClientList::ClientList(int clientTimeoutSeconds) :
-    timeoutSeconds_(clientTimeoutSeconds) {
-}
-
-void Server::ClientList::maintain() {
-    bool updated = false;
-    const auto now = std::chrono::steady_clock::now();
-    for (auto it = clients_.begin(); it != clients_.end();) {
-        std::chrono::duration<double> elapsedSeconds = now - it->second;
-        if (elapsedSeconds.count() > timeoutSeconds_) {
-            it = clients_.erase(it);
-            updated = true;
-        } else {
-            ++it;
-        }
-    }
-    if (updated) onUpdate();
-}
-
-std::forward_list<Server::address_t> Server::ClientList::clients() const {
-    std::forward_list<address_t> result;
-    for (auto&& elem : clients_) {
-        result.push_front(elem.first);
-    }
-    return result;
-}
-
-bool Server::ClientList::empty() const {
-    return clients_.empty();
-}
-
-void Server::ClientList::keepClient(address_t clientAddress) {
-    const bool newClient = !clients_.contains(clientAddress);
-    clients_[clientAddress] = std::chrono::steady_clock::now();
-    if (newClient) {
-        onUpdate();
-    }
-}
-
-void Server::ClientList::setClientListCallback(ClientsUpdateCallback callback) {
-    updateCallback_ = callback;
-}
-
-void Server::ClientList::onUpdate() const {
-    if (updateCallback_) {
-        std::forward_list<std::string> addresses;
-        for (auto&& elem : clients_) {
-            addresses.push_front(elem.first.to_string());
-        }
-        updateCallback_(addresses);
     }
 }

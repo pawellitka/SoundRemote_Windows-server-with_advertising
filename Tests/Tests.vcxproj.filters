@@ -13,6 +13,53 @@
     <ClCompile Include="..\packages\gmock.1.11.0\lib\native\src\gtest\src\gtest_main.cc">
       <Filter>gtest Package Files</Filter>
     </ClCompile>
+    <ClCompile Include="NetUtilTest.cpp" />
+    <ClCompile Include="header_tests\AudioCaptureHTest.cpp">
+      <Filter>Header Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="header_tests\NetUtilHTest.cpp">
+      <Filter>Header Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="header_tests\AudioResamplerHTest.cpp">
+      <Filter>Header Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="header_tests\AudioUtilHTest.cpp">
+      <Filter>Header Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="header_tests\CapturePipeHTest.cpp">
+      <Filter>Header Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="header_tests\ClientsHTest.cpp">
+      <Filter>Header Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="header_tests\ControlsHTest.cpp">
+      <Filter>Header Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="header_tests\EncoderOpusHTest.cpp">
+      <Filter>Header Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="header_tests\KeystrokeHTest.cpp">
+      <Filter>Header Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="header_tests\NetDefinesHTest.cpp">
+      <Filter>Header Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="header_tests\ServerHTest.cpp">
+      <Filter>Header Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="header_tests\SettingsHTest.cpp">
+      <Filter>Header Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="header_tests\SettingsImplHTest.cpp">
+      <Filter>Header Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="header_tests\SoundRemoteAppHTest.cpp">
+      <Filter>Header Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="header_tests\UtilHTest.cpp">
+      <Filter>Header Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientsTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -20,6 +67,9 @@
   <ItemGroup>
     <Filter Include="gtest Package Files">
       <UniqueIdentifier>{f58def6f-26f7-414c-a9f0-ffc861515233}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Tests">
+      <UniqueIdentifier>{b33345fd-7398-4173-a616-d15c66103f4c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

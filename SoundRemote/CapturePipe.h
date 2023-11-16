@@ -1,13 +1,22 @@
 #pragma once
 
+#include <atomic>
+#include <forward_list>
+#include <memory>
 #include <span>
+#include <string>
+#include <unordered_map>
+
+#include <boost/asio/io_context.hpp>
+#include <boost/asio/streambuf.hpp>
+
 #include "AudioUtil.h"
 
 class AudioCapture;
 class AudioResampler;
 class EncoderOpus;
 class Server;
-struct task;
+struct PipeCoroutine;
 struct ClientInfo;
 
 class CapturePipe {
@@ -21,22 +30,20 @@ public:
 	void onClientsUpdate(std::forward_list<ClientInfo> clients);
 private:
 	// Capturing coroutine
-	task process();
+	PipeCoroutine process();
 	// Destroys the capturing coroutine
 	void stop();
-	void processAudio(std::span<char> pcmAudio, std::shared_ptr<Server> server);
 	void process(std::span<char> pcmAudio, std::shared_ptr<Server> server);
 	bool haveClients() const;
 
 	boost::asio::io_context& io_context_;
-	std::unique_ptr<task> pipeCoro_;
+	std::unique_ptr<PipeCoroutine> pipeCoro_;
 	std::unique_ptr<AudioCapture> audioCapture_;
 	std::unique_ptr<AudioResampler> audioResampler_;
-	std::unique_ptr<EncoderOpus> encoder_;
 	std::weak_ptr<Server> server_;
 	const std::wstring device_;
 	boost::asio::streambuf pcmAudioBuffer_;
 	std::atomic_bool muted_ = false;
-	std::unordered_map<Audio::Bitrate, std::unique_ptr<EncoderOpus>> encoders_;
+	std::unordered_map<Audio::Compression, std::unique_ptr<EncoderOpus>> encoders_;
 	int opusInputSize_;
 };

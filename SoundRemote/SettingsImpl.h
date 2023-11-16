@@ -1,7 +1,9 @@
 #pragma once
 
-#include <unordered_map>
+#include <optional>
 #include <regex>
+#include <string>
+#include <unordered_map>
 
 #include "Settings.h"
 

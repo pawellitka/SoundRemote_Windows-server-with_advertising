@@ -13,8 +13,8 @@ namespace {
 	};
 
 	TEST_P(SampleRates, CreatesWithValidSampleRate)  {
-		EXPECT_NO_THROW(EncoderOpus(Bitrate::kbps_128, sampleRate_, Opus::Channels::mono));
-		EXPECT_NO_THROW(EncoderOpus(Bitrate::kbps_128, sampleRate_, Opus::Channels::stereo));
+		EXPECT_NO_THROW(EncoderOpus(Compression::kbps_128, sampleRate_, Opus::Channels::mono));
+		EXPECT_NO_THROW(EncoderOpus(Compression::kbps_128, sampleRate_, Opus::Channels::stereo));
 	}
 
 	INSTANTIATE_TEST_SUITE_P(EncoderOpusTest, SampleRates, ::testing::Values(
@@ -28,25 +28,25 @@ namespace {
 		return std::to_string(value);
 	});
 
-	class Bitrates : public testing::TestWithParam<Bitrate> {
+	class Compressions : public testing::TestWithParam<Compression> {
 	public:
-		void SetUp() override { bitrate_ = GetParam(); }
+		void SetUp() override { compression_ = GetParam(); }
 	protected:
-		Bitrate bitrate_ = {};
+		Compression compression_ = {};
 	};
 
-	TEST_P(Bitrates, CreatesWithValidBitrate) {
-		EXPECT_NO_THROW(EncoderOpus(bitrate_, Opus::SampleRate::khz_48, Opus::Channels::mono));
-		EXPECT_NO_THROW(EncoderOpus(bitrate_, Opus::SampleRate::khz_48, Opus::Channels::stereo));
+	TEST_P(Compressions, CreatesWithValidCompression) {
+		EXPECT_NO_THROW(EncoderOpus(compression_, Opus::SampleRate::khz_48, Opus::Channels::mono));
+		EXPECT_NO_THROW(EncoderOpus(compression_, Opus::SampleRate::khz_48, Opus::Channels::stereo));
 	}
 
-	INSTANTIATE_TEST_SUITE_P(EncoderOpusTest, Bitrates, ::testing::Values(
-		Bitrate::kbps_64,
-		Bitrate::kbps_128,
-		Bitrate::kbps_192,
-		Bitrate::kbps_256,
-		Bitrate::kbps_320
-		), [](const testing::TestParamInfo<Bitrates::ParamType>& info) {
+	INSTANTIATE_TEST_SUITE_P(EncoderOpusTest, Compressions, ::testing::Values(
+		Compression::kbps_64,
+		Compression::kbps_128,
+		Compression::kbps_192,
+		Compression::kbps_256,
+		Compression::kbps_320
+		), [](const testing::TestParamInfo<Compressions::ParamType>& info) {
 		const int value = static_cast<int>(info.param);
 		return std::to_string(value);
 	});
