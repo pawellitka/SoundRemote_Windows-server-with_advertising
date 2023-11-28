@@ -3,7 +3,7 @@ Desktop app that pairs up with Android device via [SoundRemote client](https://g
 * Capture and send audio to the client device.
 * Emulate keyboard shortcuts received from the client. Certain shortcuts like `Ctrl + Alt + Delete` or `Win + L` aren't currently supported.
 
-![Main window](https://github.com/ashipo/SoundRemote-server/assets/24320267/9d3bf544-05eb-46b4-a1f4-8c89917c8913 "Main window")
+![Main window](https://github.com/ashipo/SoundRemote-server/assets/24320267/be5120e6-f8fd-4232-9869-5d7c96d2d50e "Main window")
 
 ## Build
 Prerequisites:
