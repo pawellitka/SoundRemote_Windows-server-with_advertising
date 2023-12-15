@@ -28,37 +28,41 @@ namespace {
 
 	// createAudioPacket
 	TEST(Net, createAudioPacketUncompressed) {
-		std::vector<char> expected = initPacket({ 0x71, 0xA5, 0x20, 0x09, 0, 0xFA, 0xFB, 0x01, 0x12 });
+		//std::vector<char> expectedLE = initPacket({ 0x71, 0xA5, 0x20, 0x09, 0, 0xFA, 0xFB, 0x01, 0x12 });
+		std::vector<char> expectedBE = initPacket({ 0xA5, 0x71, 0x20, 0, 0x09, 0xFA, 0xFB, 0x01, 0x12 });
 
 		const auto actual = Net::createAudioPacket(Category::AudioDataUncompressed, audioData);
 
-		EXPECT_EQ(actual, expected);
+		EXPECT_EQ(actual, expectedBE);
 	}
 
 	TEST(Net, createAudioPacketOpus) {
-		std::vector<char> expected = initPacket({ 0x71, 0xA5, 0x21, 0x09, 0, 0xFA, 0xFB, 0x01, 0x12 });
+		//std::vector<char> expectedLE = initPacket({ 0x71, 0xA5, 0x21, 0x09, 0, 0xFA, 0xFB, 0x01, 0x12 });
+		std::vector<char> expectedBE = initPacket({ 0xA5, 0x71, 0x21, 0, 0x09, 0xFA, 0xFB, 0x01, 0x12 });
 
 		const auto actual = Net::createAudioPacket(Category::AudioDataOpus, audioData);
 
-		EXPECT_EQ(actual, expected);
+		EXPECT_EQ(actual, expectedBE);
 	}
 
 	// createKeepAlivePacket
 	TEST(Net, createKeepAlivePacket) {
-		std::vector<char> expected = initPacket({ 0x71, 0xA5, 0x31, 0x05, 0 });
+		//std::vector<char> expectedLE = initPacket({ 0x71, 0xA5, 0x31, 0x05, 0 });
+		std::vector<char> expectedBE = initPacket({ 0xA5, 0x71, 0x31, 0 , 0x05 });
 
 		const auto actual = Net::createKeepAlivePacket();
 
-		EXPECT_EQ(actual, expected);
+		EXPECT_EQ(actual, expectedBE);
 	}
 
 	// createDisconnectPacket
 	TEST(Net, createDisconnectPacket) {
-		std::vector<char> expected = initPacket({ 0x71, 0xA5, 0x02, 0x05, 0 });
+		//std::vector<char> expectedLE = initPacket({ 0x71, 0xA5, 0x02, 0x05, 0 });
+		std::vector<char> expectedBE = initPacket({ 0xA5, 0x71, 0x02, 0, 0x05 });
 
 		const auto actual = Net::createDisconnectPacket();
 
-		EXPECT_EQ(actual, expected);
+		EXPECT_EQ(actual, expectedBE);
 	}
 
 	// compressionFromNetworkValue
@@ -91,21 +95,23 @@ namespace {
 
 	// createAckConnectPacket
 	TEST(Net, createAckConnectPacket) {
-		std::vector<char> expected = initPacket({ 0x71, 0xA5, 0xF0, 0x0B, 0, 0xD5, 0xDD, Net::protocolVersion, 0, 0, 0 });
+		//std::vector<char> expectedLE = initPacket({ 0x71, 0xA5, 0xF0, 0x0B, 0, 0xD5, 0xDD, Net::protocolVersion, 0, 0, 0 });
+		std::vector<char> expectedBE = initPacket({ 0xA5, 0x71, 0xF0, 0, 0x0B, 0xDD, 0xD5, Net::protocolVersion, 0, 0, 0 });
 
 		RequestIdType requestId = 0xDDD5;
 		const auto actual = Net::createAckConnectPacket(requestId);
 
-		EXPECT_EQ(actual, expected);
+		EXPECT_EQ(actual, expectedBE);
 	}
 
 	// createAckSetFormatPacket
 	TEST(Net, createAckSetFormatPacket) {
-		std::vector<char> expected = initPacket({ 0x71, 0xA5, 0xF0, 0x0B, 0, 0xF1, 0xF0, 0, 0, 0, 0 });
+		//std::vector<char> expectedLE = initPacket({ 0x71, 0xA5, 0xF0, 0x0B, 0, 0xF1, 0xF0, 0, 0, 0, 0 });
+		std::vector<char> expectedBE = initPacket({ 0xA5, 0x71, 0xF0, 0, 0x0B, 0xF0, 0xF1, 0, 0, 0, 0 });
 
 		RequestIdType requestId = 0xF0F1;
 		const auto actual = Net::createAckSetFormatPacket(requestId);
 
-		EXPECT_EQ(actual, expected);
+		EXPECT_EQ(actual, expectedBE);
 	}
 }
