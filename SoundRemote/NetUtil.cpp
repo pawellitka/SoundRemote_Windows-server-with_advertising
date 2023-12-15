@@ -16,7 +16,7 @@ namespace {
 			| (static_cast<unsigned char>(data[offset + 3]));
 	}
 
-	uint32_t readUInt32Le(const std::span<char>& data, size_t offset) {
+	uint32_t readUInt32L(const std::span<char>& data, size_t offset) {
 		assert((offset + 4) <= data.size_bytes());
 		return static_cast<unsigned char>(data[offset])
 			| (static_cast<unsigned char>(data[offset + 1]) << 8)
@@ -30,7 +30,7 @@ namespace {
 			| (static_cast<unsigned char>(data[offset + 1]));
 	}
 
-	uint16_t readUInt16Le(const std::span<char>& data, size_t offset) {
+	uint16_t readUInt16L(const std::span<char>& data, size_t offset) {
 		assert((offset + 2) <= data.size_bytes());
 		return static_cast<unsigned char>(data[offset])
 			| (static_cast<unsigned char>(data[offset + 1]) << 8);
@@ -47,7 +47,7 @@ namespace {
 		dest[offset + 1] = value >> 0;
 	}
 
-	void writeUInt16Le(uint16_t value, const std::span<char>& dest, size_t offset) {
+	void writeUInt16L(uint16_t value, const std::span<char>& dest, size_t offset) {
 		assert((offset + 2) <= dest.size_bytes());
 		dest[offset] = value >> 0;
 		dest[offset + 1] = value >> 8;
@@ -59,13 +59,13 @@ namespace {
 	}
 
 	void writeHeader(Net::Packet::Category category, const std::span<char>& packetData) {
-		writeUInt16Le(Net::Packet::protocolSignature, packetData, Net::Packet::signatureOffset);
+		writeUInt16B(Net::Packet::protocolSignature, packetData, Net::Packet::signatureOffset);
 		writeUInt8(static_cast<Net::Packet::CategoryType>(category), packetData, Net::Packet::categoryOffset);
-		writeUInt16Le(static_cast<Net::Packet::SizeType>(packetData.size_bytes()), packetData, Net::Packet::sizeOffset);
+		writeUInt16B(static_cast<Net::Packet::SizeType>(packetData.size_bytes()), packetData, Net::Packet::sizeOffset);
 	}
 
 	void writeAck(Net::Packet::RequestIdType requestId, const std::span<char>& packetData) {
-		writeUInt16Le(requestId, packetData, Net::Packet::dataOffset);
+		writeUInt16B(requestId, packetData, Net::Packet::dataOffset);
 	}
 };
 
@@ -161,7 +161,7 @@ Net::Packet::Category Net::getPacketCategory(const std::span<char>& packet) {
 	if (packet.size_bytes() < Packet::headerSize) {
 		return Net::Packet::Category::Error;
 	}
-	const Packet::SignatureType signature = readUInt16Le(packet, 0);
+	const Packet::SignatureType signature = readUInt16B(packet, 0);
 	if (signature != Packet::protocolSignature) {
 		return Net::Packet::Category::Error;
 	}
@@ -187,7 +187,7 @@ std::optional<Net::Packet::ConnectData> Net::getConnectData(const std::span<char
 	Net::Packet::ConnectData data{};
 	data.protocol = readUInt8(packet, offset);
 	offset += sizeof(Net::Packet::ProtocolVersionType);
-	data.requestId = readUInt16Le(packet, offset);
+	data.requestId = readUInt16B(packet, offset);
 	offset += sizeof(Net::Packet::RequestIdType);
 	data.compression = readUInt8(packet, offset);
 	return data;
@@ -199,7 +199,7 @@ std::optional<Net::Packet::SetFormatData> Net::getSetFormatData(const std::span<
 	}
 	int offset = Packet::dataOffset;
 	Net::Packet::SetFormatData data{};
-	data.requestId = readUInt16Le(packet, offset);
+	data.requestId = readUInt16B(packet, offset);
 	offset += sizeof(Net::Packet::RequestIdType);
 	data.compression = readUInt8(packet, offset);
 	return data;
