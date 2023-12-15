@@ -114,4 +114,15 @@ namespace {
 
 		EXPECT_EQ(actual, expectedBE);
 	}
+
+	// getPacketCategory
+	TEST(Net, getPacketCategory) {
+		Net::Packet::Category expected = Net::Packet::Category::Disconnect;
+		std::array<char, 5> packet{ 0xA5, 0x71, 0x02, 0, 0 };
+
+		const auto actual = Net::getPacketCategory({ packet.data(), packet.size()});
+
+		EXPECT_EQ(actual, expected);
+	}
+
 }
