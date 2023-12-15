@@ -8,12 +8,26 @@
 #pragma comment(lib, "iphlpapi.lib")
 
 namespace {
+	uint32_t readUInt32B(const std::span<char>& data, size_t offset) {
+		assert((offset + 4) <= data.size_bytes());
+		return static_cast<unsigned char>(data[offset] << 24)
+			| (static_cast<unsigned char>(data[offset + 1]) << 16)
+			| (static_cast<unsigned char>(data[offset + 2]) << 8)
+			| (static_cast<unsigned char>(data[offset + 3]));
+	}
+
 	uint32_t readUInt32Le(const std::span<char>& data, size_t offset) {
 		assert((offset + 4) <= data.size_bytes());
 		return static_cast<unsigned char>(data[offset])
 			| (static_cast<unsigned char>(data[offset + 1]) << 8)
 			| (static_cast<unsigned char>(data[offset + 2]) << 16)
 			| (static_cast<unsigned char>(data[offset + 3]) << 24);
+	}
+
+	uint16_t readUInt16B(const std::span<char>& data, size_t offset) {
+		assert((offset + 2) <= data.size_bytes());
+		return static_cast<unsigned char>(data[offset] << 8)
+			| (static_cast<unsigned char>(data[offset + 1]));
 	}
 
 	uint16_t readUInt16Le(const std::span<char>& data, size_t offset) {
@@ -25,6 +39,12 @@ namespace {
 	uint8_t readUInt8(const std::span<char>& data, size_t offset) {
 		assert((offset + 1) <= data.size_bytes());
 		return data[offset];
+	}
+
+	void writeUInt16B(uint16_t value, const std::span<char>& dest, size_t offset) {
+		assert((offset + 2) <= dest.size_bytes());
+		dest[offset] = value >> 8;
+		dest[offset + 1] = value >> 0;
 	}
 
 	void writeUInt16Le(uint16_t value, const std::span<char>& dest, size_t offset) {
