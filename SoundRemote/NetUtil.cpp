@@ -10,10 +10,10 @@
 namespace {
 	uint32_t readUInt32B(const std::span<char>& data, size_t offset) {
 		assert((offset + 4) <= data.size_bytes());
-		return static_cast<unsigned char>(data[offset] << 24)
+		return (static_cast<unsigned char>(data[offset]) << 24)
 			| (static_cast<unsigned char>(data[offset + 1]) << 16)
 			| (static_cast<unsigned char>(data[offset + 2]) << 8)
-			| (static_cast<unsigned char>(data[offset + 3]));
+			| static_cast<unsigned char>(data[offset + 3]);
 	}
 
 	uint32_t readUInt32L(const std::span<char>& data, size_t offset) {
@@ -26,7 +26,7 @@ namespace {
 
 	uint16_t readUInt16B(const std::span<char>& data, size_t offset) {
 		assert((offset + 2) <= data.size_bytes());
-		return static_cast<unsigned char>(data[offset] << 8)
+		return static_cast<unsigned char>(data[offset]) << 8
 			| (static_cast<unsigned char>(data[offset + 1]));
 	}
 
