@@ -44,13 +44,17 @@ void Server::onClientsUpdate(std::forward_list<ClientInfo> clients) {
     clientsCache_ = std::move(newClients);
 }
 
-void Server::sendAudio(Audio::Compression compression, std::vector<char> data) {
+void Server::sendAudio(
+    Audio::Compression compression,
+    Net::Packet::SequenceNumberType sequenceNumber,
+    std::vector<char> data
+) {
     auto category = Net::Packet::Category::AudioDataOpus;
     if (compression == Audio::Compression::none) {
         category = Net::Packet::Category::AudioDataUncompressed;
     }
     auto packet = std::make_shared<std::vector<char>>(
-        Net::createAudioPacket(category, { data.data(), data.size() })
+        Net::createAudioPacket(category, sequenceNumber, { data.data(), data.size() })
     );
     for (auto&& address : clientsCache_[compression]) {
         send(address, packet);
