@@ -41,6 +41,14 @@ namespace {
 		return data[offset];
 	}
 
+	void writeUInt32B(uint32_t value, const std::span<char>& dest, size_t offset) {
+		assert((offset + 4) <= dest.size_bytes());
+		dest[offset] = value >> 24;
+		dest[offset + 1] = value >> 16;
+		dest[offset + 2] = value >> 8;
+		dest[offset + 3] = value >> 0;
+	}
+
 	void writeUInt16B(uint16_t value, const std::span<char>& dest, size_t offset) {
 		assert((offset + 2) <= dest.size_bytes());
 		dest[offset] = value >> 8;
@@ -120,11 +128,16 @@ std::optional<Audio::Compression> Net::compressionFromNetworkValue(Net::Packet::
 	}
 }
 
-std::vector<char> Net::createAudioPacket(Net::Packet::Category category, const std::span<const char>& audioData) {
-	std::vector<char> packet(Net::Packet::headerSize + audioData.size_bytes());
+std::vector<char> Net::createAudioPacket(
+	Net::Packet::Category category,
+	Net::Packet::SequenceNumberType sequenceNumber,
+	const std::span<const char>& audioData
+) {
+	std::vector<char> packet(Net::Packet::headerSize + Net::Packet::sequenceNumberSize + audioData.size_bytes());
 	std::span<char> packetData{ packet.data(), packet.size() };
 	writeHeader(category, packetData);
-	std::copy_n(audioData.data(), audioData.size_bytes(), packet.data() + Net::Packet::dataOffset);
+	writeUInt32B(sequenceNumber, packetData, Net::Packet::dataOffset);
+	std::copy_n(audioData.data(), audioData.size_bytes(), packet.data() + Net::Packet::audioDataOffset);
 	return packet;
 }
 

@@ -133,7 +133,7 @@ void CapturePipe::process(std::span<char> pcmAudio, std::shared_ptr<Server> serv
                     opusInputSize_,
                     uncompressed.data()
                 );
-                server->sendAudio(compression, uncompressed);
+                server->sendAudio(compression, audioSequenceNumber_,  uncompressed);
             } else {
                 std::vector<char> encodedPacket(Audio::Opus::maxPacketSize);
                 const auto packetSize = encoder->encode(
@@ -142,10 +142,11 @@ void CapturePipe::process(std::span<char> pcmAudio, std::shared_ptr<Server> serv
                 );
                 encodedPacket.resize(packetSize);
                 if (packetSize > 0) {
-                    server->sendAudio(compression, encodedPacket);
+                    server->sendAudio(compression, audioSequenceNumber_, encodedPacket);
                 }
             }
         }
+        ++audioSequenceNumber_;
         pcmAudioBuffer_.consume(opusInputSize_);
     }
 }

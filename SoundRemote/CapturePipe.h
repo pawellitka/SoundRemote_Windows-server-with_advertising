@@ -11,6 +11,7 @@
 #include <boost/asio/streambuf.hpp>
 
 #include "AudioUtil.h"
+#include "NetDefines.h"
 
 class AudioCapture;
 class AudioResampler;
@@ -46,4 +47,5 @@ private:
 	std::atomic_bool muted_ = false;
 	std::unordered_map<Audio::Compression, std::unique_ptr<EncoderOpus>> encoders_;
 	int opusInputSize_;
+	Net::Packet::SequenceNumberType audioSequenceNumber_ = 1u;
 };

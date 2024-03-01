@@ -15,6 +15,7 @@ namespace Net {
 		using CompressionType = uint8_t;
 		using KeyType = uint8_t;
 		using ModsType = uint8_t;
+		using SequenceNumberType = uint32_t;
 		constexpr int ackCustomDataSize = 4;
 		// Header data
 		constexpr int headerSize = sizeof SignatureType + sizeof CategoryType + sizeof SizeType;
@@ -26,6 +27,8 @@ namespace Net {
 		constexpr int keystrokeSize = sizeof KeyType + sizeof ModsType;
 		constexpr int ackSize = sizeof RequestIdType + ackCustomDataSize;
 		constexpr int ackCustomDataOffset = dataOffset + sizeof RequestIdType;
+		constexpr int sequenceNumberSize = sizeof SequenceNumberType;
+		constexpr int audioDataOffset = dataOffset + sequenceNumberSize;
 		struct ConnectData {
 			ProtocolVersionType protocol;
 			RequestIdType requestId;

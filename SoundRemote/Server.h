@@ -24,7 +24,11 @@ public:
 	Server(int clientPort, int serverPort, boost::asio::io_context& ioContext, std::shared_ptr<Clients> clients);
 	~Server();
 	void onClientsUpdate(std::forward_list<ClientInfo> clients);
-	void sendAudio(Audio::Compression compression, std::vector<char> data);
+	void sendAudio(
+		Audio::Compression compression,
+		Net::Packet::SequenceNumberType sequenceNumber,
+		std::vector<char> data
+	);
 	/*
 	* Sends disconnect packet to all the clients blocking the current thread.
 	*
