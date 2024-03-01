@@ -49,10 +49,9 @@ void Server::sendAudio(
     Net::Packet::SequenceNumberType sequenceNumber,
     std::vector<char> data
 ) {
-    auto category = Net::Packet::Category::AudioDataOpus;
-    if (compression == Audio::Compression::none) {
-        category = Net::Packet::Category::AudioDataUncompressed;
-    }
+    auto category = compression == Audio::Compression::none ?
+        Net::Packet::Category::AudioDataUncompressed :
+        Net::Packet::Category::AudioDataOpus;
     auto packet = std::make_shared<std::vector<char>>(
         Net::createAudioPacket(category, sequenceNumber, { data.data(), data.size() })
     );
