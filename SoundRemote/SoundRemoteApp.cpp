@@ -219,9 +219,14 @@ void SoundRemoteApp::changeCaptureDevice(const std::wstring& deviceId) {
 
 void SoundRemoteApp::stopCapture() {
     if (capturePipe_) {
-        clients_->removeClientsListener(
+        auto removed = clients_->removeClientsListener(
             std::bind(&CapturePipe::onClientsUpdate, capturePipe_.get(), _1)
         );
+        if (removed != 1) {
+            throw std::runtime_error(
+                Util::makeFatalErrorText(ErrorCode::REMOVE_CAPTURE_PIPE_CLIENTS_LISTENER)
+            );
+        }
         capturePipe_.reset();
     }
 }
