@@ -219,6 +219,9 @@ void SoundRemoteApp::changeCaptureDevice(const std::wstring& deviceId) {
 
 void SoundRemoteApp::stopCapture() {
     if (capturePipe_) {
+        clients_->removeClientsListener(
+            std::bind(&CapturePipe::onClientsUpdate, capturePipe_.get(), _1)
+        );
         capturePipe_.reset();
     }
 }

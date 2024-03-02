@@ -45,6 +45,12 @@ void Clients::addClientsListener(ClientsUpdateCallback listener) {
 	clientsListeners_.push_front(listener);
 }
 
+size_t Clients::removeClientsListener(ClientsUpdateCallback listener) {
+	return clientsListeners_.remove_if([&](ClientsUpdateCallback f) {
+		return f.target_type().name() == listener.target_type().name();
+	});
+}
+
 void Clients::maintain() {
 	const std::unique_lock lock(clientsMutex_);
 	bool clientRemoved = false;
