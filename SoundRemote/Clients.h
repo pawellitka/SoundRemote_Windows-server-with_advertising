@@ -38,10 +38,13 @@ private:
 		TimePoint lastContact_{};
 	};
 	
-	void onClientsUpdate();
+	void updateInfos();
+	void notifyListeners() const;
+	void updateAndNotify();
 
 	const int timeoutSeconds_;
 	std::unordered_map<Net::Address, std::unique_ptr<Client>> clients_;
+	std::forward_list<ClientInfo> clientInfos_;
 	std::shared_mutex clientsMutex_;
 	// listeners are not synchronized, the list is modified on program start and on device change
 	std::forward_list<ClientsUpdateCallback> clientsListeners_;

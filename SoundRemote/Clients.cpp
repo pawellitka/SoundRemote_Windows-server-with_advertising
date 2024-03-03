@@ -10,10 +10,10 @@ void Clients::add(const Net::Address& address, Audio::Compression compression) {
 			return;
 		}
 		clients_[address]->setCompression(compression);
-		onClientsUpdate();
+		updateAndNotify();
 	} else {
 		clients_[address] = std::make_unique<Client>(compression);		
-		onClientsUpdate();
+		updateAndNotify();
 	}
 }
 
@@ -23,7 +23,7 @@ void Clients::setCompression(const Net::Address& address, Audio::Compression com
 		return;
 	}
 	clients_[address]->setCompression(compression);
-	onClientsUpdate();
+	updateAndNotify();
 }
 
 void Clients::keep(const Net::Address& address) {
@@ -37,7 +37,7 @@ void Clients::keep(const Net::Address& address) {
 void Clients::remove(const Net::Address& address) {
 	const std::unique_lock lock(clientsMutex_);
 	if (clients_.erase(address)) {
-		onClientsUpdate();
+		updateAndNotify();
 	}
 }
 
@@ -65,19 +65,26 @@ void Clients::maintain() {
 		}
 	}
 	if (clientRemoved) {
-		onClientsUpdate();
+		updateAndNotify();
 	}
 }
 
-void Clients::onClientsUpdate() {
-	if (clientsListeners_.empty()) { return; }
-	std::forward_list<ClientInfo> clientInfos;
+void Clients::updateInfos() {
+	clientInfos_.clear();
 	for (auto&& client : clients_) {
-		clientInfos.push_front({ client.first, client.second->compression() });
+		clientInfos_.push_front({ client.first, client.second->compression() });
 	}
-	for (auto&& listener: clientsListeners_) {
-		listener(clientInfos);
+}
+
+void Clients::notifyListeners() const {
+	for (auto&& listener : clientsListeners_) {
+		listener(clientInfos_);
 	}
+}
+
+void Clients::updateAndNotify() {
+	updateInfos();
+	notifyListeners();
 }
 
 // Client
