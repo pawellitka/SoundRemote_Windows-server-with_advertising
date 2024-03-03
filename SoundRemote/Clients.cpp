@@ -43,6 +43,7 @@ void Clients::remove(const Net::Address& address) {
 
 void Clients::addClientsListener(ClientsUpdateCallback listener) {
 	clientsListeners_.push_front(listener);
+	listener(clientInfos_);
 }
 
 size_t Clients::removeClientsListener(ClientsUpdateCallback listener) {
