@@ -82,11 +82,11 @@ void SoundRemoteApp::run() {
     try {
         const auto clientPort = settings_->get<int>(Settings::ClientPort);
         if (!clientPort) {
-            throw std::runtime_error(Util::contructAppExceptionText("Settings", "Can't get client port"));
+            throw std::runtime_error(Util::makeAppErrorText("Settings", "Can't get client port"));
         }
         const auto serverPort = settings_->get<int>(Settings::ServerPort);
         if (!serverPort) {
-            throw std::runtime_error(Util::contructAppExceptionText("Settings", "Can't get server port"));
+            throw std::runtime_error(Util::makeAppErrorText("Settings", "Can't get server port"));
         }
 
         clients_ = std::make_shared<Clients>();

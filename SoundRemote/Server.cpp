@@ -109,12 +109,12 @@ awaitable<void> Server::receive(udp::socket& socket) {
     }
     catch (const boost::system::system_error& se) {
         if (se.code() != boost::asio::error::operation_aborted) {
-            Util::showError(Util::contructAppExceptionText("Receive", se.what()));
+            Util::showError(Util::makeAppErrorText("Receive", se.what()));
             std::exit(EXIT_FAILURE);
         }
     }
     catch (const std::exception& e) {
-        Util::showError(Util::contructAppExceptionText("Receive", e.what()));
+        Util::showError(Util::makeAppErrorText("Receive", e.what()));
         std::exit(EXIT_FAILURE);
     }
     catch (...) {
@@ -174,7 +174,7 @@ void Server::send(const Net::Address& address, const std::shared_ptr<std::vector
 // std::shared_ptr with the packet is passed to keep data alive until the handler call
 void Server::handleSend(const std::shared_ptr<std::vector<char>> packet, const boost::system::error_code& ec, std::size_t bytes) {
     if (ec) {
-        throw std::runtime_error(Util::contructAppExceptionText("Server send", ec.what()));
+        throw std::runtime_error(Util::makeAppErrorText("Server send", ec.what()));
     }
 }
 
@@ -188,7 +188,7 @@ void Server::maintain(boost::system::error_code ec) {
         if (ec == boost::asio::error::operation_aborted) {
             return;
         } else {
-            throw std::runtime_error(Util::contructAppExceptionText("Timer maintain", ec.what()));
+            throw std::runtime_error(Util::makeAppErrorText("Timer maintain", ec.what()));
         }
     }
     keepalive();
