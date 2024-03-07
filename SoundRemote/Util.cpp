@@ -1,3 +1,4 @@
+#include <sstream>
 #include <stdexcept>
 
 #include <Windows.h>
@@ -20,4 +21,10 @@ void Util::showInfo(const std::wstring& text, const std::wstring& caption) {
 
 std::string Util::contructAppExceptionText(const std::string& where, const std::string& error) {
     return where + ": " + error;
+}
+
+std::string Util::makeFatalErrorText(ErrorCode ec) {
+    std::ostringstream ss;
+    ss << "Fatal error: " << static_cast<int>(ec);
+    return ss.str();
 }

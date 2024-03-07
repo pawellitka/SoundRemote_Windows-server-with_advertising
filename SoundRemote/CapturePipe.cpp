@@ -34,6 +34,8 @@ struct [[nodiscard]] PipeCoroutine {
     //PipeCoroutine(const PipeCoroutine&) = delete;
 };
 
+Net::Packet::SequenceNumberType CapturePipe::audioSequenceNumber_ = 1u;
+
 CapturePipe::CapturePipe(const std::wstring& deviceId, std::shared_ptr<Server> server, boost::asio::io_context& ioContext, bool muted):
     device_(deviceId), server_(server), io_context_(ioContext), muted_(muted) {
     //throw std::runtime_error("CapturePipe::ctr");
