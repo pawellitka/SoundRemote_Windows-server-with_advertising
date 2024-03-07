@@ -8,7 +8,6 @@
 
 EncoderOpus::EncoderOpus(Audio::Compression compression, Audio::Opus::SampleRate sampleRate, Audio::Opus::Channels channels) {
     frameSize_ = getFrameSize(sampleRate);
-    inputPacketSize_ = getInputSize(frameSize_, channels);
 
     int error{};
     encoder_ = Encoder(
@@ -35,10 +34,6 @@ int EncoderOpus::encode(const char* pcmAudio, char* encodedPacket) {
         Audio::processError(encodeResult, Audio::Location::ENCODER_ENCODE);
     }
     return encodeResult;
-}
-
-int EncoderOpus::inputLength() const {
-    return inputPacketSize_;
 }
 
 int EncoderOpus::getFrameSize(Audio::Opus::SampleRate sampleRate) {
