@@ -35,7 +35,8 @@ namespace {
 	TEST_F(ClientsTest, AddClientsListener) {
 		std::vector<MockClientsListener> listeners(10);
 		for (auto&& listener : listeners) {
-			EXPECT_CALL(listener, onClientsUpdate);
+			// Expect 2 calls - the initial update and on a new client
+			EXPECT_CALL(listener, onClientsUpdate).Times(2);
 		}
 
 		for (auto&& listener : listeners) {
@@ -46,21 +47,23 @@ namespace {
 
 	TEST_F(ClientsTest, Add) {
 		const auto threadCount = 5;
-		const auto threadAdds = 50;
+		const auto operationsPerThread = 50;
+		const auto operationCount = threadCount * operationsPerThread;
 		MockClientsListener listener;
-		EXPECT_CALL(listener, onClientsUpdate).Times(threadCount * threadAdds);
+		// Add 1 expected call for the initial update
+		EXPECT_CALL(listener, onClientsUpdate).Times(operationCount + 1);
 
 		clients_->addClientsListener(std::bind(&MockClientsListener::onClientsUpdate, &listener, _1));
 		std::barrier barrier(threadCount);
 		auto addClients = [&](int start) {
 			barrier.arrive_and_wait();
-			for (int i = start; i < start + threadAdds; i++) {
+			for (int i = start; i < start + operationsPerThread; i++) {
 				auto address = "192.168.0." + std::to_string(i);
 				clients_->add(make_address_v4(address), Audio::Compression::none);
 			}
-			};
+		};
 		std::vector<std::jthread> threads(threadCount);
-		for (auto i = 0; i < threadCount * threadAdds; i+= threadAdds) {
+		for (auto i = 0; i < operationCount; i+= operationsPerThread) {
 			threads.emplace_back(addClients, i);
 		}
 	}
@@ -74,9 +77,12 @@ namespace {
 			Compression::kbps_256,
 			Compression::kbps_320
 		};
-		const auto threadCount = 5;
-		MockClientsListener listener;
 		const auto address = make_address_v4("127.0.0.1");
+		const auto threadCount = 5;
+
+		MockClientsListener listener;
+		// Expect the initial update
+		EXPECT_CALL(listener, onClientsUpdate);
 		std::forward_list<ClientInfo> clients;
 		clients.push_front(ClientInfo(address, Compression::none));
 		EXPECT_CALL(listener, onClientsUpdate(clients));
@@ -91,7 +97,7 @@ namespace {
 		auto compressionsSetter = [&](Audio::Compression compression) {
 			barrier.arrive_and_wait();
 			clients_->setCompression(address, compression);
-			};
+		};
 		std::vector<std::jthread> threads(threadCount);
 		for (auto&& c : compressions) {
 			threads.emplace_back(compressionsSetter, c);
@@ -100,11 +106,12 @@ namespace {
 
 	TEST_F(ClientsTest, Remove) {
 		const auto threadCount = 5;
-		const auto threadRemoves = 50;
-		const auto removesCount = threadCount * threadRemoves;
+		const auto operationsPerThread = 50;
+		const auto operationCount = threadCount * operationsPerThread;
 		MockClientsListener listener;
-		EXPECT_CALL(listener, onClientsUpdate).Times(removesCount);
-		for (int i = 0; i < removesCount; i++) {
+		// Add 1 expected call for the initial update
+		EXPECT_CALL(listener, onClientsUpdate).Times(operationCount + 1);
+		for (int i = 0; i < operationCount; i++) {
 			auto address = "192.168.0." + std::to_string(i);
 			clients_->add(make_address_v4(address), Audio::Compression::none);
 		}
@@ -113,13 +120,13 @@ namespace {
 		std::barrier barrier(threadCount);
 		auto removeClients = [&](int start) {
 			barrier.arrive_and_wait();
-			for (int i = start; i < start + threadRemoves; i++) {
+			for (int i = start; i < start + operationsPerThread; i++) {
 				auto address = "192.168.0." + std::to_string(i);
 				clients_->remove(make_address_v4(address));
 			}
-			};
+		};
 		std::vector<std::jthread> threads(threadCount);
-		for (auto i = 0; i < removesCount; i += threadRemoves) {
+		for (auto i = 0; i < operationCount; i += operationsPerThread) {
 			threads.emplace_back(removeClients, i);
 		}
 	}
