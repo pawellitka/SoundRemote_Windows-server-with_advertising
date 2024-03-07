@@ -23,7 +23,7 @@ struct AwaitableTimer {
         timer_.async_wait([h, destroyed](boost::system::error_code ec) mutable {
             if (ec) {
                 if (ec != boost::asio::error::operation_aborted) {
-                    throw std::runtime_error(Util::contructAppExceptionText("Timer1", ec.what()));
+                    throw std::runtime_error(Util::makeAppErrorText("Timer1", ec.what()));
                 }
             } else {
                 if (!*destroyed) {

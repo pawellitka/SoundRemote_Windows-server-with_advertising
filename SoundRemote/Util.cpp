@@ -19,8 +19,8 @@ void Util::showInfo(const std::wstring& text, const std::wstring& caption) {
     MessageBoxW(reinterpret_cast<HWND>(mainWindow_), text.c_str(), caption.c_str(), MB_ICONINFORMATION | MB_OK);
 }
 
-std::string Util::contructAppExceptionText(const std::string& where, const std::string& error) {
-    return where + ": " + error;
+std::string Util::makeAppErrorText(const std::string& where, const std::string& what) {
+    return where + ": " + what;
 }
 
 std::string Util::makeFatalErrorText(ErrorCode ec) {
