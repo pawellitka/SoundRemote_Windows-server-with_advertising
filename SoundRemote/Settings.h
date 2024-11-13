@@ -1,8 +1,8 @@
 #pragma once
 
+#include <optional>
 #include <string>
 #include <variant>
-#include <optional>
 
 class Settings {
 public:

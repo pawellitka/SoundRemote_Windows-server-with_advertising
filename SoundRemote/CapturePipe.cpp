@@ -1,3 +1,5 @@
+#include "CapturePipe.h"
+
 #include <coroutine>
 #include <unordered_set>
 
@@ -8,7 +10,6 @@
 #include "EncoderOpus.h"
 #include "Server.h"
 #include "Util.h"
-#include "CapturePipe.h"
 
 struct [[nodiscard]] PipeCoroutine {
     struct promise_type;

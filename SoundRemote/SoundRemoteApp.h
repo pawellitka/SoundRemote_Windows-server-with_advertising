@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mmdeviceapi.h>	// EDataFlow
+#include <mmdeviceapi.h>
 
 #include <atomic>
 #include <memory>

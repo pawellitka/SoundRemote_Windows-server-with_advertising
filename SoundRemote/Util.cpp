@@ -1,9 +1,9 @@
-#include <sstream>
-#include <stdexcept>
+#include "Util.h"
 
 #include <Windows.h>
 
-#include "Util.h"
+#include <sstream>
+#include <stdexcept>
 
 void* Util::mainWindow_ = nullptr;
 const std::regex Util::versionRegex_{ "(\\d+)\\.(\\d+)\\.(\\d+)\\.?(\\d+)?" };

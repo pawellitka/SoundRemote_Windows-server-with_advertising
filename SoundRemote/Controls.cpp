@@ -1,5 +1,8 @@
-#include "resource.h"
 #include "Controls.h"
+
+#include <CommCtrl.h>
+
+#include "resource.h"
 
 MuteButton::MuteButton(HWND hParent, const Rect& rect, const std::wstring& name) {
 	HINSTANCE hInst = GetModuleHandle(nullptr);

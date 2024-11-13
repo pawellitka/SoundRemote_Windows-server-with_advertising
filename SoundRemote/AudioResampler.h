@@ -1,12 +1,12 @@
 #pragma once
 
+#include <atlbase.h>
+#include <mmreg.h>
+#include <sal.h>
+
 #include <span>
 
 #include <boost/asio/streambuf.hpp>
-
-#include <sal.h>
-#include <atlcomcli.h>	//CComPtr
-#include <mmreg.h>      //WAVEFORMATEXTENSIBLE
 
 struct IMFTransform;
 

@@ -1,13 +1,13 @@
+#include "AudioCapture.h"
+
+#include <Audioclient.h>
+#include <endpointvolume.h>
+#include <mmdeviceapi.h>
+
 #include <boost/asio/error.hpp>
 #include <boost/asio/steady_timer.hpp>
 
-#include <mmdeviceapi.h>
-#include <functiondiscoverykeys_devpkey.h>
-#include <Audioclient.h>
-#include <endpointvolume.h> //IAudioMeterInformation
-
 #include "Util.h"
-#include "AudioCapture.h"
 
 using namespace boost::asio;
 using namespace std::chrono_literals;

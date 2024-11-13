@@ -1,7 +1,7 @@
 #pragma once
 
-#include <string>
 #include <regex>
+#include <string>
 
 enum class ErrorCode {
     REMOVE_CAPTURE_PIPE_CLIENTS_LISTENER = 1,

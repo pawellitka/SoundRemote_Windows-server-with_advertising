@@ -1,9 +1,10 @@
+#include "SettingsImpl.h"
+
 #include <array>
 #include <fstream>
 #include <sstream>
 
 #include "Util.h"
-#include "SettingsImpl.h"
 
 std::string toLower(std::string s) {
     std::transform(s.begin(), s.end(), s.begin(),

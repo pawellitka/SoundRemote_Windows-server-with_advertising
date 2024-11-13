@@ -1,9 +1,9 @@
-#include <cassert>
-
-#include <WS2tcpip.h>
-#include <iphlpapi.h>
-
 #include "NetUtil.h"
+
+#include <iphlpapi.h>
+#include <WS2tcpip.h>
+
+#include <cassert>
 
 #pragma comment(lib, "iphlpapi.lib")
 
