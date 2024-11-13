@@ -155,6 +155,7 @@
     <ClCompile Include="header_tests\SettingsHTest.cpp" />
     <ClCompile Include="header_tests\SettingsImplHTest.cpp" />
     <ClCompile Include="header_tests\SoundRemoteAppHTest.cpp" />
+    <ClCompile Include="header_tests\UpdateCheckerHTest.cpp" />
     <ClCompile Include="header_tests\UtilHTest.cpp" />
     <ClCompile Include="KeystrokeTest.cpp" />
     <ClCompile Include="NetUtilTest.cpp" />
@@ -164,6 +165,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="UtilTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SoundRemote\SoundRemote.vcxproj">

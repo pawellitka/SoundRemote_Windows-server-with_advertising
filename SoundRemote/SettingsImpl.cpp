@@ -102,7 +102,7 @@ void SettingsImpl::writeToFile(const std::string& fileName, const SettingsMap& d
         return;
     }
     for (auto&& p : defaults) {
-        const auto name = p.first;
+        const auto& name = p.first;
         Value value;
         if (settings.contains(name)) {
             value = settings.at(name);
