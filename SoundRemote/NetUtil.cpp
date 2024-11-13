@@ -5,8 +5,6 @@
 
 #include <cassert>
 
-#pragma comment(lib, "iphlpapi.lib")
-
 namespace {
 	uint32_t readUInt32B(const std::span<char>& data, size_t offset) {
 		assert((offset + 4) <= data.size_bytes());
