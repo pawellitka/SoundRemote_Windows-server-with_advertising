@@ -1,5 +1,6 @@
 #pragma once
 
+#include <regex>
 #include <string>
 
 enum class ErrorCode {
@@ -42,8 +43,22 @@ struct Util {
     /// <returns>error message</returns>
     static std::string makeFatalErrorText(ErrorCode ec);
 
+    /// <summary>
+    /// Compares two versions. Versions must have at least 3 numeric parts divided by a "."
+    /// and an optional 4th numeric part.
+    /// If one of the versions has a text suffix, it is considered smaller: "1.0.0-beta" &lt; "1.0.0".
+    /// No distinction is made between text suffixes: "1.0.0-alpha03" = "1.0.0-rc01".
+    /// </summary>
+    /// <param name="current">current version</param>
+    /// <param name="latest">latest release version</param>
+    /// <returns>
+    /// 1 if latest is newer, 0 if not, negative number if there was error parsing versions.
+    /// </returns>
+    static int isNewerVersion(const std::string& current, const std::string& latest);
+
 private:
     static void* mainWindow_;
+    static const std::regex versionRegex_;
 };
 
 //template <typename T, auto fn>

@@ -1,11 +1,9 @@
-#include <cassert>
-
-#include <WS2tcpip.h>
-#include <iphlpapi.h>
-
 #include "NetUtil.h"
 
-#pragma comment(lib, "iphlpapi.lib")
+#include <iphlpapi.h>
+#include <WS2tcpip.h>
+
+#include <cassert>
 
 namespace {
 	uint32_t readUInt32B(const std::span<char>& data, size_t offset) {

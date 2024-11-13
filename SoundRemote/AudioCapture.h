@@ -1,5 +1,8 @@
 #pragma once
 
+#include <atlbase.h>
+#include <mmreg.h>
+
 #include <chrono>
 #include <coroutine>
 #include <memory>
@@ -7,9 +10,6 @@
 #include <span>
 
 #include <boost/asio/io_context.hpp>
-
-#include <atlcomcli.h>	//CComPtr
-#include <mmreg.h>      //WAVEFORMATEXTENSIBLE
 
 #include "AudioUtil.h"
 

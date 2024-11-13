@@ -1,8 +1,8 @@
-#include <vector>
-
-#include <windows.h>
-
 #include "Keystroke.h"
+
+#include <Windows.h>
+
+#include <vector>
 
 Keystroke::Keystroke(int key, int mods): key_(key) {
 	if (mods == 0)

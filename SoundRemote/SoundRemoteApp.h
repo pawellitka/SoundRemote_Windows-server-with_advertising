@@ -1,12 +1,12 @@
 #pragma once
 
+#include <mmdeviceapi.h>
+
 #include <atomic>
 #include <memory>
 #include <string>
 
 #include <boost/asio/io_context.hpp>
-
-#include <mmdeviceapi.h>	// EDataFlow
 
 #include "resource.h"
 
@@ -17,6 +17,7 @@ struct ClientInfo;
 class Keystroke;
 class Server;
 class Settings;
+class UpdateChecker;
 
 class SoundRemoteApp {
 public:
@@ -34,6 +35,10 @@ private:
 	std::wstring clientListLabel_;
 	std::wstring keystrokeListLabel_;
 	std::wstring muteButtonText_;
+	std::wstring updateCheckTitle_;
+	std::wstring updateCheckFound_;
+	std::wstring updateCheckNotFound_;
+	std::wstring updateCheckError_;
 	// Controls
 	HWND mainWindow_ = nullptr;
 	HWND deviceComboBox_ = nullptr;
@@ -52,6 +57,7 @@ private:
 	std::unique_ptr<CapturePipe> capturePipe_;
 	std::shared_ptr<Settings> settings_;
 	std::shared_ptr<Clients> clients_;
+	std::unique_ptr<UpdateChecker> updateChecker_;
 
 	bool initInstance(int nCmdShow);
 	// UI related
@@ -94,6 +100,8 @@ private:
 	void onAddressButtonClick() const;
 	void updatePeakMeter();
 	void onReceiveKeystroke(const Keystroke& keystroke);
+	void checkUpdates();
+	void onUpdateCheckFinish(WPARAM wParam, LPARAM lParam);
 
 	/// <summary>
 	/// Starts server and audio processing.

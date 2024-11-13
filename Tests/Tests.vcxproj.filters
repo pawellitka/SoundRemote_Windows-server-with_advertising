@@ -60,6 +60,10 @@
       <Filter>Header Tests</Filter>
     </ClCompile>
     <ClCompile Include="ClientsTest.cpp" />
+    <ClCompile Include="header_tests\UpdateCheckerHTest.cpp">
+      <Filter>Header Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="UtilTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />

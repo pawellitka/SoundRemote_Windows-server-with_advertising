@@ -1,11 +1,12 @@
-#include <mftransform.h>
-#include <wmcodecdsp.h>
+#include "AudioResampler.h"
+
 #include <initguid.h>   // MUST INCLUDE BEFORE <mfapi.h>
 #include <mfapi.h>
 #include <Mferror.h>
+#include <mftransform.h>
+#include <wmcodecdsp.h>
 
 #include "AudioUtil.h"
-#include "AudioResampler.h"
 
 AudioResampler::AudioResampler(_In_ const WAVEFORMATEXTENSIBLE* inputFormat, _In_ const WAVEFORMATEXTENSIBLE* outputFormat,
     _In_ boost::asio::streambuf& outBuffer): outBuffer_(outBuffer) {

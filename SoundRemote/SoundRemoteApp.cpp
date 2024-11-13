@@ -1,16 +1,15 @@
-// sound_remote_app.cpp : Defines the entry point for the application.
-//
-
 #pragma comment(linker,"\"/manifestdependency:type='win32' \
 name='Microsoft.Windows.Common-Controls' version='6.0.0.0' \
 processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
-//#include "framework.h"
-#include <boost/asio/post.hpp>
+#include "SoundRemoteApp.h"
 
 #include <CommCtrl.h>
 #include <Windows.h>
 #include <Windowsx.h>
+#include <shellapi.h>
+
+#include <boost/asio/post.hpp>
 
 #include "AudioUtil.h"
 #include "CapturePipe.h"
@@ -20,7 +19,7 @@ processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #include "Server.h"
 #include "SettingsImpl.h"
 #include "Util.h"
-#include "SoundRemoteApp.h"
+#include "UpdateChecker.h"
 
 using namespace std::placeholders;
 
@@ -278,6 +277,41 @@ void SoundRemoteApp::onReceiveKeystroke(const Keystroke& keystroke) {
     Edit_ReplaceSel(keystrokes_, keystrokeDesc.c_str());
 }
 
+void SoundRemoteApp::checkUpdates() {
+    if (!updateChecker_) {
+        updateChecker_ = std::make_unique<UpdateChecker>(mainWindow_);
+    }
+    updateChecker_->checkUpdates();
+}
+
+void SoundRemoteApp::onUpdateCheckFinish(WPARAM wParam, LPARAM lParam) {
+    switch (wParam) {
+    case UPDATE_FOUND:
+        if (IDYES == MessageBox(
+            mainWindow_,
+            updateCheckFound_.c_str(),
+            updateCheckTitle_.c_str(),
+            MB_ICONINFORMATION | MB_YESNO
+        )) {
+            ShellExecute(
+                nullptr,
+                TEXT("open"),
+                TEXT("https://github.com/SoundRemote/server-windows/releases"),
+                nullptr,
+                nullptr,
+                SW_NORMAL
+            );
+        }
+        return;
+    case UPDATE_NOT_FOUND:
+        Util::showInfo(updateCheckNotFound_, updateCheckTitle_);
+        return;
+    case UPDATE_CHECK_ERROR:
+        Util::showInfo(updateCheckError_, updateCheckTitle_);
+        return;
+    }
+}
+
 void SoundRemoteApp::asioEventLoop(boost::asio::io_context& ctx) {
     for (;;) {
         try {
@@ -412,6 +446,10 @@ void SoundRemoteApp::initStrings() {
     clientListLabel_ = loadStringResource(IDS_CLIENTS);
     keystrokeListLabel_ = loadStringResource(IDS_KEYSTROKES);
     muteButtonText_ = loadStringResource(IDS_MUTE);
+    updateCheckTitle_ = loadStringResource(IDS_UPDATE_CHECK);
+    updateCheckFound_ = loadStringResource(IDS_UPDATE_FOUND);
+    updateCheckNotFound_ = loadStringResource(IDS_UPDATE_NOT_FOUND);
+    updateCheckError_ = loadStringResource(IDS_UPDATE_CHECK_ERROR);
 }
 
 bool SoundRemoteApp::initInstance(int nCmdShow) {
@@ -499,6 +537,10 @@ LRESULT SoundRemoteApp::wndProc(UINT message, WPARAM wParam, LPARAM lParam) {
                 DestroyWindow(mainWindow_);
                 return 0;
 
+            case IDM_CHECK_UPDATES:
+                checkUpdates();
+                return 0;
+
             default:
                 break;
             }
@@ -567,6 +609,10 @@ LRESULT SoundRemoteApp::wndProc(UINT message, WPARAM wParam, LPARAM lParam) {
         PostQuitMessage(0);
         return 0;
 
+    case WM_UPDATE_CHECK:
+        onUpdateCheckFinish(wParam, lParam);
+        return 0;
+ 
     default:
         break;
     }

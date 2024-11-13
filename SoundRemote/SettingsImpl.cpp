@@ -1,9 +1,10 @@
+#include "SettingsImpl.h"
+
 #include <array>
 #include <fstream>
 #include <sstream>
 
 #include "Util.h"
-#include "SettingsImpl.h"
 
 std::string toLower(std::string s) {
     std::transform(s.begin(), s.end(), s.begin(),
@@ -102,7 +103,7 @@ void SettingsImpl::writeToFile(const std::string& fileName, const SettingsMap& d
         return;
     }
     for (auto&& p : defaults) {
-        const auto name = p.first;
+        const auto& name = p.first;
         Value value;
         if (settings.contains(name)) {
             value = settings.at(name);

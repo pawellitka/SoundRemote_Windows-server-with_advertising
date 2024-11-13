@@ -1,10 +1,9 @@
 #pragma once
 
-#include <string>
-#include <functional>
-
 #include <Windows.h>
-#include <CommCtrl.h>
+
+#include <functional>
+#include <string>
 
 struct Rect;
 

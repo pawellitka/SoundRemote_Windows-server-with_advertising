@@ -1,10 +1,11 @@
+#include "EncoderOpus.h"
+
 #include <set>
 #include <stdexcept>
 
 #include <opus/opus.h>
 
 #include "Util.h"
-#include "EncoderOpus.h"
 
 EncoderOpus::EncoderOpus(Audio::Compression compression, Audio::Opus::SampleRate sampleRate, Audio::Opus::Channels channels) {
     frameSize_ = getFrameSize(sampleRate);
