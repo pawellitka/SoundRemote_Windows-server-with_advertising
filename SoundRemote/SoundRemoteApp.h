@@ -102,6 +102,7 @@ private:
 	void onReceiveKeystroke(const Keystroke& keystroke);
 	void checkUpdates();
 	void onUpdateCheckFinish(WPARAM wParam, LPARAM lParam);
+	void visitHomepage() const;
 
 	/// <summary>
 	/// Starts server and audio processing.
