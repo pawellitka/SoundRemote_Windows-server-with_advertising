@@ -312,6 +312,17 @@ void SoundRemoteApp::onUpdateCheckFinish(WPARAM wParam, LPARAM lParam) {
     }
 }
 
+void SoundRemoteApp::visitHomepage() const {
+    ShellExecute(
+        nullptr,
+        TEXT("open"),
+        TEXT("https://soundremote.github.io"),
+        nullptr,
+        nullptr,
+        SW_NORMAL
+    );
+}
+
 void SoundRemoteApp::asioEventLoop(boost::asio::io_context& ctx) {
     for (;;) {
         try {
@@ -539,6 +550,10 @@ LRESULT SoundRemoteApp::wndProc(UINT message, WPARAM wParam, LPARAM lParam) {
 
             case IDM_CHECK_UPDATES:
                 checkUpdates();
+                return 0;
+
+            case IDM_HOMEPAGE:
+                visitHomepage();
                 return 0;
 
             default:
