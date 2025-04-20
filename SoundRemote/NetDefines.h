@@ -17,6 +17,7 @@ namespace Net {
 		using KeyType = uint8_t;
 		using ModsType = uint8_t;
 		using SequenceNumberType = uint32_t;
+		using Advertising = uint32_t;
 		constexpr int ackCustomDataSize = 4;
 		// Header data
 		constexpr int headerSize = sizeof SignatureType + sizeof CategoryType + sizeof SizeType;
@@ -24,6 +25,7 @@ namespace Net {
 		constexpr int categoryOffset = sizeof SignatureType;
 		constexpr int sizeOffset = sizeof SignatureType + sizeof CategoryType;
 		constexpr int dataOffset = headerSize;
+		constexpr int advertisingOffset = sizeof Advertising;
 		// Packet data
 		constexpr int keystrokeSize = sizeof KeyType + sizeof ModsType;
 		constexpr int ackSize = sizeof RequestIdType + ackCustomDataSize;
@@ -54,9 +56,12 @@ namespace Net {
 			AudioDataOpus = 0x21u,
 			ClientKeepAlive = 0x30u,
 			ServerKeepAlive = 0x31u,
+			ServerAdvertise = 0x40u,
 			Ack = 0xF0u
 		};
 	}
+	constexpr DWORD integer_ip_address_loopback = 16777343;
+
 	constexpr Packet::ProtocolVersionType protocolVersion = 1u;
 
 	using Address = boost::asio::ip::address;

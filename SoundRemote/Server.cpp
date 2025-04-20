@@ -20,8 +20,11 @@ Server::Server(int clientPort, int serverPort, boost::asio::io_context& ioContex
     clients_(clients),
     socketSend_(ioContext, udp::v4()),
     socketReceive_(ioContext, udp::endpoint(udp::v4(), serverPort)),
+    socketBroadcast_(ioContext, udp::v4()),
     maintainenanceTimer_(ioContext) {
 
+    socketBroadcast_.set_option(udp::socket::reuse_address(true));
+    socketBroadcast_.set_option(boost::asio::socket_base::broadcast(true));
     //co_spawn(ioContext, receive(std::move(socket)), detached);
     co_spawn(ioContext, receive(socketReceive_), detached);
     startMaintenanceTimer();
@@ -32,6 +35,8 @@ Server::~Server() {
     socketReceive_.close();
     socketSend_.shutdown(udp::socket::shutdown_send);
     socketSend_.close();
+    socketBroadcast_.shutdown(udp::socket::shutdown_send);
+    socketBroadcast_.close();
 }
 
 void Server::onClientsUpdate(std::forward_list<ClientInfo> clients) {
@@ -193,6 +198,7 @@ void Server::maintain(boost::system::error_code ec) {
         }
     }
     keepalive();
+    advertise();
     clients_->maintain();
 
     startMaintenanceTimer();
@@ -206,4 +212,10 @@ void Server::keepalive() {
             send(address, packet);
         }
     }
+}
+
+void Server::advertise() {
+    auto packet = std::make_shared<std::vector<char>>(Net::createAdvertisePacket());
+    boost::asio::ip::udp::endpoint broadcastEndpoint(boost::asio::ip::address_v4::broadcast(), Net::defaultClientPort);
+    socketBroadcast_.send_to(boost::asio::buffer(packet->data(), packet->size()), broadcastEndpoint);
 }

@@ -75,15 +75,22 @@ namespace {
 	}
 };
 
-std::forward_list<std::wstring> Net::getLocalAddresses() {
+std::vector<char> Net::getRawLocalAddressesTable(DWORD* addrTableSize) {
 	// Allocate MIB_IPADDRTABLE
 	std::vector<char> buffer{ sizeof(MIB_IPADDRTABLE) };
 	MIB_IPADDRTABLE* addrTable = reinterpret_cast<MIB_IPADDRTABLE*>(buffer.data());
-	DWORD addrTableSize = 0;
-	if (ERROR_INSUFFICIENT_BUFFER == GetIpAddrTable(addrTable, &addrTableSize, 0)) {
-		buffer.resize(addrTableSize);
+	*addrTableSize = 0;
+	if (ERROR_INSUFFICIENT_BUFFER == GetIpAddrTable(addrTable, addrTableSize, 0)) {
+		buffer.resize(*addrTableSize);
 		addrTable = reinterpret_cast<MIB_IPADDRTABLE*>(buffer.data());
-	}
+	} 
+	return buffer;
+}
+
+std::forward_list<std::wstring> Net::getLocalAddresses() {
+	DWORD addrTableSize = 0;
+	std::vector<char> buffer = getRawLocalAddressesTable(&addrTableSize);
+	MIB_IPADDRTABLE* addrTable = reinterpret_cast<MIB_IPADDRTABLE*>(buffer.data());
 
 	// Fill MIB_IPADDRTABLE
 	if (NO_ERROR != GetIpAddrTable(addrTable, &addrTableSize, 0)) {
@@ -142,6 +149,29 @@ std::vector<char> Net::createAudioPacket(
 std::vector<char> Net::createKeepAlivePacket() {
 	std::vector<char> packet(Net::Packet::headerSize);
 	writeHeader(Net::Packet::Category::ServerKeepAlive, { packet.data(), packet.size() });
+	return packet;
+}
+
+std::vector<char> Net::createAdvertisePacket() {
+	DWORD addrTableSize = 0;
+	std::vector<char> buffer = getRawLocalAddressesTable(&addrTableSize);
+	MIB_IPADDRTABLE* addrTable = reinterpret_cast<MIB_IPADDRTABLE*>(buffer.data());
+	DWORD error_val = GetIpAddrTable(addrTable, &addrTableSize, 0);
+
+	int loopback_address_index = -1;
+	if (error_val == NO_ERROR)
+		for (int i_ip = 0; i_ip < addrTable->dwNumEntries; i_ip++)
+			if (addrTable->table[i_ip].dwAddr == integer_ip_address_loopback)
+				loopback_address_index = i_ip;
+
+	size_t valid_ips_count = (error_val != NO_ERROR ? 0 : addrTable->dwNumEntries - (loopback_address_index >= 0 ? 1 : 0));
+	std::vector<char> packet(Net::Packet::headerSize + valid_ips_count * Net::Packet::advertisingOffset);
+	writeHeader(Net::Packet::Category::ServerAdvertise, { packet.data(), packet.size() });
+	std::span<char> packetData{ packet.data(), packet.size() };
+	if (error_val == NO_ERROR)
+		for (int i_ip = 0; i_ip < addrTable->dwNumEntries; i_ip++)
+			if (i_ip != loopback_address_index)
+				writeUInt32B(addrTable->table[i_ip].dwAddr, packetData, Net::Packet::dataOffset + i_ip * Net::Packet::advertisingOffset);
 	return packet;
 }
 

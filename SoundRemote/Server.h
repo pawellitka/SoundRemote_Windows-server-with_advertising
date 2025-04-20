@@ -46,12 +46,14 @@ private:
 	void send(const Net::Address& address, const std::shared_ptr<std::vector<char>> packet);
 	void handleSend(const std::shared_ptr<std::vector<char>> packet, const boost::system::error_code& ec, std::size_t bytes);
 	void keepalive();
+	void advertise();
 
 	void startMaintenanceTimer();
 	void maintain(boost::system::error_code ec);
 
 	boost::asio::ip::udp::socket socketSend_;
 	boost::asio::ip::udp::socket socketReceive_;
+	boost::asio::ip::udp::socket socketBroadcast_;
 	boost::asio::steady_timer maintainenanceTimer_;
 	int clientPort_;
 	KeystrokeCallback keystrokeCallback_;

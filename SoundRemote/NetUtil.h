@@ -14,6 +14,12 @@ namespace Net {
 	/// </summary>
 	/// <returns>List of addresses or an empty list if an error occurs.</returns>
 	std::forward_list<std::wstring> getLocalAddresses();
+	/// <summary>
+	/// Gets raw IPv4 IP addresses.
+	/// </summary>
+	/// <param name="addrTableSize">address of the list of the addresses</param>
+	/// <returns>List of addresses.</returns>
+	std::vector<char> getRawLocalAddressesTable(DWORD* addrTableSize);
 
 	/// <summary>
 	/// Converts a compression value used in the network protocol to a value of the <c>Audio::Compression</c> enum.
@@ -29,6 +35,7 @@ namespace Net {
 		const std::span<const char>& audioData
 		);
 	std::vector<char> createKeepAlivePacket();
+	std::vector<char> createAdvertisePacket();
 	std::vector<char> createDisconnectPacket();
 	std::vector<char> createAckConnectPacket(Net::Packet::RequestIdType requestId);
 	std::vector<char> createAckSetFormatPacket(Net::Packet::RequestIdType requestId);
